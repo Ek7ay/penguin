@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>菜单修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 400px;
+				height: 510px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 308px;
+				left: 114px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="menu_name" class="class-lable">菜单名称：</lable>
+				<input type="text" id="menu_name" placeholder="请输入">
+				<lable for="is_show" class="class-lable">状态：</lable>
+				<select id="is_show" name="is_show">
+					<option value="">全部</option>
+					<option value="Y">开启</option>
+					<option value="N">关闭</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>菜单名称</th>
+					<th>菜单级别</th>
+					<th>页面地址</th>
+					<th>是否显示</th>
+					<th>是否有子菜单</th>
+					<th>备注</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>菜单名称：</td>
+						<td><input type="text" id="menu_name2" name="menu_name"></td>
+					</tr>
+					<tr>
+						<td>菜单编码：</td>
+						<td><input readonly="readonly" type="text" id="menu_id" name="menu_id"></td>
+					</tr>
+					<tr>
+						<td>菜单级别：</td>
+						<td><input type="text" id="menu_level" readonly="readonly" name="menu_level"></td>
+					</tr>
+					<tr>
+						<td>菜单地址：</td>
+						<td><input type="text" id="menu_url" name="menu_url"></td>
+					</tr>
+					<tr>
+						<td>图标地址：</td>
+						<td><input type="text" id="menu_icon" name="menu_icon"></td>
+					</tr>
+					<tr>
+						<td>是否显示：</td>
+						<td>
+							<select  id="is_show2" name="is_show">
+								<option value="Y">是</option>
+								<option value="N">否</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>是否有子菜单：</td>
+						<td>
+							<select  id="has_more" name="has_more">
+								<option value="Y">是</option>
+								<option value="N">否</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td id="beizhu">备&nbsp&nbsp&nbsp&nbsp注：</td>
+						<td><textarea id="remark" name="remark" rows="-8" cols="15"></textarea></td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button class="class_instruction shut" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var menus;
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/menu/queryMenu",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        menus = dataJson.menus;
+                        for (var i = 0; i < menus.length; i++) {
+                            var is_show = menus[i].is_show;
+                            var show;
+                            if(is_show == "Y"){
+                                show = "是";
+                            }else if (is_show == "N"){
+                                show = "否";
+                            }
+                            var has_more = menus[i].has_more;
+                            var more;
+                            if(has_more == "Y"){
+                                more = "是";
+                            }else if (has_more == "N"){
+                                more = "否";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+								   <td>${i+1}</td>
+								   <td>${menus[i].menu_name}</td>
+								   <td>${menus[i].menu_level}</td>
+								   <td>${menus[i].menu_url}</td>
+								   <td>${show}</td>
+								   <td>${more}</td>
+								   <td>${menus[i].remark}</td>
+								   <td>
+										<button type="button" onclick="editMsg( ${i} )">修改</button>
+										<!--<button type="button" onclick="delMsg( ${i} ,this)">删除</button>-->
+								   </td>
+								</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 分类查询
+		$("#search").click(()=>{
+            var menu_name = $("#menu_name").val();
+            var is_show = $("#is_show option:selected").val();
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/menu/queryMenu",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"menu_name":menu_name,"is_show":is_show},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        menus = dataJson.menus;
+                        for (var i = 0; i < menus.length; i++) {
+                            var is_show = menus[i].is_show;
+                            var show;
+                            if(is_show == "Y"){
+                                show = "是";
+                            }else if (is_show == "N"){
+                                show = "否";
+                            }
+                            var has_more = menus[i].has_more;
+                            var more;
+                            if(has_more == "Y"){
+                                more = "是";
+                            }else if (has_more == "N"){
+                                more = "否";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+								   <td>${i+1}</td>
+								   <td>${menus[i].menu_name}</td>
+								   <td>${menus[i].menu_level}</td>
+								   <td>${menus[i].menu_url}</td>
+								   <td>${show}</td>
+								   <td>${more}</td>
+								   <td>${menus[i].remark}</td>
+								   <td>
+										<button type="button" onclick="editMsg( ${i} )">修改</button>
+										<!--<button type="button" onclick="delMsg( ${i} ,this)">删除</button>-->
+								   </td>
+								</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+        // 获取修改内容
+        function editMsg(i){
+            // $("#shujub").empty();
+            $("#menu_name2").val(menus[i].menu_name);
+            $("#menu_id").val(menus[i].menu_id);
+            $("#menu_url").val(menus[i].menu_url);
+            $("#menu_icon").val(menus[i].menu_icon);
+            $("#menu_level").val(menus[i].menu_level);
+            $("#is_show2").val(menus[i].is_show);
+            $("#has_more").val(menus[i].has_more);
+            // $('#defaultImg').attr('src', 'data:image/jpg;base64,' + menus[i].logo_id);
+            $("#remark").val(menus[i]. remark);
+            $('.class-table').show();
+        };
+        // 修改界面的显示和隐藏
+		$(()=>{
+            $(".class-table").hide();
+		    $(".open").click(()=>{
+		        $(".class-table").show();
+			});
+		    $(".shut").click(()=>{
+		        $(".class-table").hide();
+			});
+		});
+        // 编辑结果提交
+        function submitEdit() {
+            var formData = new FormData($( "#upload" )[0]);
+            $.ajax({
+                url:"/operplat/menu/modifyMenu",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    }else{
+                        alert('修改成功');
+                    }
+                },
+                error: function(req,errorMsg,exception){
+                    alert("出错啦");
+                }
+            });
+        };
+	</script>
+</html>

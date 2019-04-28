@@ -1,0 +1,274 @@
+<!DOCTYPE HTML>
+<html style="height: 100%">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico">
+    <title>兑换券累计激活统计</title>
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/pintuer.css">
+    <link rel="stylesheet" href="../../css/mine.css" />
+    <style>
+     h2{text-align: left; margin: 5px 0 10px;}
+    </style>
+</head>
+
+<body class="info demo" style="height: 100%; margin: 0">
+    <div id="box" style="height: 100%">
+        <div class="header">
+            <h2>兑换券累计激活统计</h2>
+            <div class="month">
+                <label id="sy_label">
+                    开始日期
+                    <input type="text" id="sy_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+                </label>
+                <label id="ey_label" class="ml15">
+                    结束日期
+                    <input type="text" id="ey_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+                </label>
+
+                <label id="sm_label">
+                    开始日期
+                    <input type=" text " id="sm_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; "
+                    />
+                </label>
+                <label id="em_label" class="ml15 ">
+                    结束日期
+                    <input type="text " id="em_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; "
+                    />
+                </label>
+
+                <label id="sd_label">
+                    开始日期
+                    <input type="text " id="sd_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; "
+                    />
+                </label>
+                <label id="ed_label" class="ml15 ">
+                    结束日期
+                    <input type="text " id="ed_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; "
+                    />
+                </label>
+
+                <label class="ml15 ">
+                    统计周期
+                    <select onchange="changeTime()" name=" " id="stat_type" style="margin-left: 10px; ">
+                        <option value="Y"> 年</option>
+                        <option value="M"> 月</option>
+                        <option value="D"> 日</option>
+                    </select>
+                </label>
+                <button class="btn ml15 " id="search" type="submit">查询</button>
+            </div>
+        </div>
+        <div id="container" style="height: 100%"></div>
+    </div>
+    <script src="../../js/highcharts/echarts.min.js"></script>
+    <script src="../../js/highcharts/echarts-gl.min.js"></script>
+    <script src="../../js/highcharts/ecStat.min.js"></script>
+    <script src="../../js/highcharts/dataTool.min.js"></script>
+    <script src="../../js/highcharts/china.js"></script>
+    <script src="../../js/highcharts/world.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=ZUONbpqGBsYGXNIYHicvbAbM"></script>
+    <script src="../../js/highcharts/bmap.min.js"></script>
+    <script src="../../js/highcharts/simplex.js"></script>
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <script src="../../js/laydate.js "></script>
+    <script>
+        var stat_type = "D";
+        $("#stat_type").val("D");
+        //执行一个laydate实例
+        laydate.render({
+            type: "year",
+            elem: '#sy_date' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            type: "year",
+            elem: '#ey_date' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            type: "month",
+            elem: '#sm_date' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            type: "month",
+            elem: '#em_date' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            type: "date",
+            elem: '#sd_date' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            type: "date",
+            elem: '#ed_date' //指定元素
+        });
+
+        $('#sm_label').css('display', 'none');
+        $('#em_label').css('display', 'none');
+
+        $('#sy_label').css('display', 'none');
+        $('#ey_label').css('display', 'none');
+
+        function changeTime() {
+
+            stat_type = $('#stat_type').val();
+            console.log(" stat_type ... " + stat_type);
+            if (stat_type == 'Y') {
+
+                $('#sy_label').css('display', 'inline');
+                $('#ey_label').css('display', 'inline');
+
+                $('#sm_label').css('display', 'none');
+                $('#em_label').css('display', 'none');
+
+                $('#sd_label').css('display', 'none');
+                $('#ed_label').css('display', 'none');
+            } else if (stat_type == 'M') {
+
+                $('#sy_label').css('display', 'none');
+                $('#ey_label').css('display', 'none');
+
+                $('#sm_label').css('display', 'inline');
+                $('#em_label').css('display', 'inline');
+
+                $('#sd_label').css('display', 'none');
+                $('#ed_label').css('display', 'none');
+
+            } else if (stat_type == 'D') {
+
+                $('#sy_label').css('display', 'none');
+                $('#ey_label').css('display', 'none');
+
+                $('#sm_label').css('display', 'none');
+                $('#em_label').css('display', 'none');
+
+                $('#sd_label').css('display', 'inline');
+                $('#ed_label').css('display', 'inline');
+            }
+
+        }
+        var report_list;
+        var total_count;
+        // 声明数组变量
+        var cate = [];
+        var da = [];
+        $("#search").on("click", () => {
+            cate = [];
+            da = [];
+            // location.reload([true]);
+            // $("#container").remove();
+            // $("#box").append(`<div id="container" style="height: 100%"></div>`);
+            var s_date;
+            var e_date;
+            if (stat_type == "Y") {
+                s_date = $('#sy_date').val();
+                e_date = $('#ey_date').val();
+            } else if (stat_type == "M") {
+                s_date = $('#sm_date').val();
+                e_date = $('#em_date').val();
+                let start = new Date(s_date.replace(/-/g, '/')).getTime();
+                let end = new Date(e_date.replace(/-/g, '/')).getTime();
+                let sub = window.Math.ceil(end) - window.Math.ceil(start);
+                console.log(sub);
+                if (sub > 366 * 24 * 60 * 60 * 1000) {
+                    alert('查询结果最大显示12个月');
+                    return;
+                }
+            } else if (stat_type == "D") {
+                s_date = $('#sd_date').val();
+                e_date = $('#ed_date').val();
+                let start = new Date(s_date.replace(/-/g, '/')).getTime();
+                let end = new Date(e_date.replace(/-/g, '/')).getTime();
+                let sub = window.Math.ceil(end) - window.Math.ceil(start);
+                console.log(sub);
+                if (sub > 30 * 24 * 60 * 60 * 1000) {
+                    alert('查询结果最大显示30天');
+                    return;
+                }
+            } else {
+                alert('请选择统计周期');
+                return;
+            }
+
+            if (s_date == '') {
+                alert('请输入起始日期');
+                return;
+            }
+            if (e_date == '') {
+                alert('请输入截止日期');
+                return;
+            }
+            $.ajax({
+                url: "/operplat/stat/vou_stock",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data: {
+                    "s_date": s_date,
+                    "e_date": e_date,
+                    "stat_type": stat_type
+                },
+                success: function (dataJson, dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        report_list = dataJson.report_list;
+                        console.log(report_list);
+                        for (var i = 0; i < report_list.length; i++) {
+                            cate.push(report_list[i].stat_date);
+                            da.push(report_list[i].amt);
+                        }
+                        console.log(cate);
+                        console.log(da);
+                        // 执行报表实例
+                        // $("#box").append(`<div id="container" style="height: 100%"></div>`);
+                        var dom = document.getElementById("container");
+                        var myChart = echarts.init(dom);
+                        var app = {};
+                        option = null;
+                        option = {
+                            xAxis: {
+                                type: 'category',
+                                // data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                                data: cate
+                            },
+                            yAxis: {
+                                type: 'value'
+                            },
+                            series: [{
+                                // data: [820, 932, 901, 934, 1290, 1330, 1320],
+                                data: da,
+                                type: 'line',
+                                itemStyle: {
+                                    normal: {
+                                        label: {
+                                            show: true
+                                        }
+                                    }
+                                }
+                            }]
+                        };
+                        if (option && typeof option === "object") {
+                            myChart.setOption(option, false);
+                        }
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

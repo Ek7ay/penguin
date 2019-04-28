@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<title>客户代驾服务查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="phoneno" class="class-lable">激活手机号：</lable>
+				<input type="text" name="phoneno" placeholder="请输入">
+				<lable for="cusphoneno" class="class-lable">客户手机号：</lable>
+				<input type="text" name="cusphoneno" placeholder="请输入">
+				<lable for="status" class="class-lable">状态：</lable>
+				<select name="status">
+					<option value="">全部</option>
+					<option value="wait_act">待激活</option>
+					<option value="wait_use">待使用</option>
+					<option value="used">已使用</option>
+					<option value="exp">过期</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>流水号</th>
+					<th>激活手机号</th>
+					<th>代驾券</th>
+					<th>单价</th>
+					<th>创建时间</th>
+					<th>失效日期</th>
+					<th>状态</th>
+					<th>使用时间</th>
+					<th>三方返回信息</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		// 声明查询函数
+        function query() {
+            var phoneno = $("input[name='phoneno']").val();
+            var cusphoneno = $("input[name='cusphoneno']").val();
+            if (phoneno.length == 0 && cusphoneno.length == 0){
+                alert('客户手机号和激活手机号至少输入一个');
+				return;
+			}
+            var status = $("select[name='status'] option:selected").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/instend_driver/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"phoneno":phoneno,"cusphoneno":cusphoneno,"status":status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var svs = dataJson.svs;
+                        for (var i = 0; i < svs.length; i++){
+                            var status = svs[i].status;
+                            var sta;
+                            if (status == "wait_act"){sta = "待激活"}
+                            if (status == "wait_use"){sta = "待使用"}
+                            if (status == "used"){sta = "已使用"}
+                            if (status == "exp"){sta = "过期"}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${svs[i].payno}</td>
+										   <td>${svs[i].phoneno}</td>
+										   <td>${svs[i].driver_code}</td>
+										   <td>${svs[i].price}</td>
+										   <td>${svs[i].ctime}</td>
+										   <td>${svs[i].out_date}</td>
+										   <td>${sta}</td>
+										   <td>${svs[i].use_time}</td>
+										   <td>${svs[i].rsp_msg}</td>
+										</tr>`);
+						}
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// 分类查询
+		$("#search").click(()=>{query();});
+	</script>
+</html>

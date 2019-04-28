@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="renderer" content="webkit">
+	<title>兑换券统计</title>
+	<link rel="stylesheet" href="../../css/reset.css" />
+	<link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+	<style>
+		.total {
+			height: 30px;
+			line-height: 30px;
+			margin-right: 40px;
+			display: flex;
+			align-items: center;
+			font-size: 15px;
+			font-weight: bold;
+		}
+
+		.total span {
+			color: #000;
+			font-size: 15px;
+			padding: 10px;
+			display: block;
+			text-align: center;
+			font-weight: normal;
+			line-height: 25px;
+		}
+		.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+		.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+		.paging label{ margin: 0 15px; }
+		.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+		.btm_biaodan {
+			height: 100%; 
+		}
+	</style>
+</head>
+
+<body class="info demo">
+	<div class="header">
+		<div class="month">
+		
+			<label>
+				开始日期
+				<input type="text" id="s_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+			</label>
+			<label class="ml15">
+				结束日期
+				<input type="text" id="e_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+			</label>
+			<button class="btn ml15" id="search">搜索</button>
+			<label class="fr total">总金额：
+				<span id="totalAmt"></span>
+			</label>
+		</div>
+	</div>
+	<div class="content btm_biaodan">
+		<table border="1" cellspacing="" cellpadding="">
+			<tr>
+				<th>序号</th>
+				<th>兑换券码</th>
+				<th>交易时间</th>
+				<th>交易金额</th>
+				<th>手机号</th>
+				<th>状态</th>
+			</tr>
+		</table>
+
+	</div>
+	<!-- 分页查询 -->
+	<div class="paging">
+		<button type="button" id="prev">上一页</button>
+		<label>
+			<input type="number" oninput="if(value<0)value =''" id="pageNum">
+			<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+		</label>
+		<button type="button" id="next">下一页</button>
+		<label id="nowPage">
+			当前第&nbsp;<span></span>&nbsp;页
+		</label>
+		<label style="margin-left: 0;" id="pageNo">
+			共&nbsp;<span></span>&nbsp;页
+		</label>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script>
+// 执行日期插件实例
+	lay('#version').html('-v' + laydate.v);
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#s_date' //指定元素
+	});
+	lay('#version').html('-v' + laydate.v);
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#e_date' //指定元素
+	});
+// 变量声明
+	var trans;
+	var s_date;
+	var e_date;
+	var index = 1;
+	var pageNo;
+	var sum;
+//查询函数声明	
+	function querytrans(s_date, e_date,index) {
+		$('.test').empty();
+		$.ajax({
+			url: "/operplat/newvouacct/querybydate",
+			context: document.body,
+			dataType: 'JSON',
+			data: {
+				// 'vouid': $("#vouId").val(),
+				's_date': s_date,
+				'e_date': e_date,
+				"page":index,
+				"count":"20"
+			},
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					alert(retMsg);
+					return;
+				} else {
+					trans = dataJson.someDatail;
+					sum = dataJson.sum;
+					pageNo = dataJson.pageNo;
+					$('#totalAmt').html(dataJson.totalAmt);
+					for (var i = 0; i < trans.length; i++) {
+						var status;
+						if(trans[i].voustatus == "01"){
+							status = "未激活";
+						}else if(trans[i].voustatus == "02"){
+							status = "已激活";
+						}else{
+							status = "";
+						}
+						$(".btm_biaodan table").append(
+							"<tr class='test'><td>" + (i + 1) +
+							"</td><td>" + trans[i].vouid +
+							"</td><td>" + trans[i].birthdt +
+							"</td><td>" + trans[i].vouden +
+							"</td><td>" + trans[i].phoneno +
+							"</td><td>" + status +
+							"</td><tr>");
+					}
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	}
+	// 上一页
+	$("#prev").on("click",()=>{
+		if(index<=1){
+			alert("已经是第一页了！");
+			return;
+		};
+		index--;
+		$("#nowPage span").html(index);
+		$(".test").empty();
+		s_date = $('#s_date').val();
+		e_date = $('#e_date').val();
+		querytrans(s_date, e_date,index);
+	});
+	// 下一页
+	$("#next").on("click",()=>{
+		if(index>=pageNo){
+			alert("已经是最后一页了！");
+			return;
+		};
+		index++;
+		$("#nowPage span").html(index);
+		$(".test").empty();
+		s_date = $('#s_date').val();
+		e_date = $('#e_date').val();
+		querytrans(s_date, e_date,index);
+	});
+	// 输入页查询
+	$("#go").on("click",()=>{
+		var ind = $("#pageNum").val();
+		index = ind;
+		if(ind<=0){
+			alert("不能小于第一页！");
+			return;
+		};
+		if(ind>pageNo){
+			alert("不能大于最后一页！");
+			return;
+		};
+		$("#nowPage span").html(ind);
+		$(".test").empty();
+		s_date = $('#s_date').val();
+		e_date = $('#e_date').val();
+		querytrans(s_date, e_date,index);
+	});
+	// 分类查询
+	$('#search').click(function () {
+		s_date = $('#s_date').val();
+		e_date = $('#e_date').val();
+		if (s_date == '') {
+			alert('请输入起始日期');
+			return;
+		}
+		if (e_date == '') {
+			alert('请输入截止日期');
+			return;
+		}
+		$(".test").empty();
+		index = 1;
+		querytrans(s_date, e_date,index);
+		console.log(pageNo);
+		$('#pageNo span').html(pageNo);  
+		$('#nowPage span').html(index);	
+	});
+
+</script>
+
+</html>

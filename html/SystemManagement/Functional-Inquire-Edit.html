@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>功能配置修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 375px;
+				height: 440px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 230px;
+				left: 83px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="pid">编码：</lable>
+				<input type="text" id="pid" placeholder="请输入">
+				<lable for="req_name" class="class-lable">名称：</lable>
+				<input type="text" id="req_name" placeholder="请输入">
+				<lable for="fuc_switch" class="class-lable">开关：</lable>
+				<select id="fuc_switch">
+					<option value="">全部</option>
+					<option value="on">开</option>
+					<option value="off">关</option>
+				</select>
+				<lable for="status" class="class-lable">状态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="useable">可用</option>
+					<option value="unuseable">不可用</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>编码</th>
+					<th>请求地址</th>
+					<th>名称</th>
+					<th>开关</th>
+					<th>状态</th>
+					<th>备注</th>
+					<th>操作</th>
+				</tr>
+				<!--<tr>-->
+					<!--<th>sadfsaf</th>-->
+					<!--<th>dsafasf</th>-->
+					<!--<th>sdfafdsadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>-->
+						<!--<button type="button" class="class_button open" >修改</button>-->
+					<!--</th>-->
+				<!--</tr>-->
+			</table>
+		</div>
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>编&nbsp&nbsp&nbsp&nbsp码：</td>
+						<td>
+							<input readonly="readonly" type="text" id="pid2" name="pid">
+						</td>
+					</tr>
+					<tr>
+						<td>请求地址：</td>
+						<td>
+							<input type="text" id="req_path" name="req_path">
+						</td>
+					</tr>
+					<tr>
+						<td>名&nbsp&nbsp&nbsp&nbsp称：</td>
+						<td>
+							<input type="text" id="req_name2" name="req_name">
+						</td>
+					</tr>
+					<tr>
+						<td>开&nbsp&nbsp&nbsp&nbsp关：</td>
+						<td>
+							<select  id="fuc_switch2" name="fuc_switch">
+								<!--<option value="on">开</option>-->
+								<!--<option value="off">关</option>-->
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>状&nbsp&nbsp&nbsp&nbsp态：</td>
+						<td>
+							<select  id="status2" name="status">
+								<!--<option value="">全部</option>-->
+								<!--<option value="useable">可用</option>-->
+								<!--<option value="unuseable">不可用</option>-->
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td id="beizhu">备&nbsp&nbsp&nbsp&nbsp注：</td>
+						<td>
+							<textarea id="remark" name="remark" rows="-8" cols="16"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var configs;
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/fuc_config/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        configs = dataJson.configs;
+                        for (var i = 0; i < configs.length; i++) {
+                            var status = configs[i].status;
+                            var sta;
+                            if(status == "useable"){
+                                sta = "可用";
+                            }else if (status == "unuseable"){
+                                sta = "不可用";
+                            }
+                            var fuc_switch = configs[i].fuc_switch;
+                            var fuc;
+                            if(fuc_switch == "on"){
+								fuc = "开";
+							}else if (fuc_switch == "off"){
+                                fuc = "关";
+							}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${configs[i].pid}</td>
+										   <td>${configs[i].req_path}</td>
+										   <td>${configs[i].req_name}</td>
+										   <td>${fuc}</td>
+										   <td>${sta}</td>
+										   <td>${configs[i].remark}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 分类查询
+		$("#search").click(()=>{
+            var pid = $("#pid").val();
+            var req_name = $("#req_name").val();
+            var fuc_switch = $("#fuc_switch option:selected").val();
+            var status = $("#status option:selected").val();
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/fuc_config/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"pid":pid,"req_name":req_name,"fuc_switch":fuc_switch,"status":status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        configs = dataJson.configs;
+                        for (var i = 0; i < configs.length; i++) {
+                            var status = configs[i].status;
+                            var sta;
+                            if(status == "useable"){
+                                sta = "可用";
+                            }else if (status == "unuseable"){
+                                sta = "不可用";
+                            }
+                            var fuc_switch = configs[i].fuc_switch;
+                            var fuc;
+                            if(fuc_switch == "on"){
+                                fuc = "开";
+                            }else if (fuc_switch == "off"){
+                                fuc = "关";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${configs[i].pid}</td>
+										   <td>${configs[i].req_path}</td>
+										   <td>${configs[i].req_name}</td>
+										   <td>${fuc}</td>
+										   <td>${sta}</td>
+										   <td>${configs[i].remark}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+        // 获取修改内容
+        function editMsg(i){
+            // $("#shujub").empty();
+            $("#pid2").val(configs[i].pid);
+            $("#req_path").val(configs[i].req_path);
+            $("#req_name2").val(configs[i].req_name);
+            var fuc_switch = configs[i].fuc_switch;
+            if (fuc_switch == "on"){
+                $("#fuc_switch2").empty();
+                $("#fuc_switch2").append(`
+                <option value="on">开</option>
+				<option value="off">关</option>
+                `);
+            }else if (fuc_switch == "off"){
+                $("#fuc_switch2").empty();
+                $("#fuc_switch2").append(`
+				 <option value="off">关</option>
+                 <option value="on">开</option>
+                `);
+            }
+            var status = configs[i].status;
+            if (status == "useable"){
+                $("#status2").empty();
+                $("#status2").append(`
+                <option value="useable">可用</option>
+				<option value="unuseable">不可用</option>
+                `);
+			}else if (status == "unuseable"){
+                $("#status2").empty();
+                $("#status2").append(`
+				 <option value="unuseable">不可用</option>
+                 <option value="useable">可用</option>
+                `);
+			}
+            $("#remark").val(configs[i]. remark);
+            $('.class-table').show();
+        };
+        // 修改界面的显示和隐藏
+		$(()=>{
+            $(".class-table").hide();
+		    $(".open").click(()=>{
+		        $(".class-table").show();
+			});
+		    $(".shut").click(()=>{
+                $(".class-table").hide();
+            });
+		});
+        // 编辑结果提交
+        function submitEdit() {
+            var formData = new FormData($( "#upload" )[0]);
+            $.ajax({
+                url:"/operplat/fuc_config/modify",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    }else{
+                        alert('修改成功');
+                    }
+                    $(".class-table").hide();
+                    window.location.reload();
+                },
+                error: function(req,errorMsg,exception){
+                    alert("出错啦");
+                }
+            });
+        };
+	</script>
+</html>

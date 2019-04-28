@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>商户额度变动记录查询</title>
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <link rel="stylesheet" href="../../css/TRconner/mine.css">
+    <style>
+        .paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+        .paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+        .paging label{ margin: 0 15px; }
+        .paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+        .btm_biaodan {height: 100%;}
+        #go{position: relative;top: -1px;}
+    </style>
+</head>
+<body class="info demo">
+<div class="header">
+        <button class="btn class-lable" id="turn">回到商户信息修改页面</button>
+    </div>
+</div>
+<div class="content btm_biaodan">
+    <table border="1" cellspacing="" cellpadding="">
+        <tr>
+            <th>序号</th>
+            <th>编码</th>
+            <th>名称</th>
+            <th>价格</th>
+            <th>时间</th>
+            <th>创建人</th>
+            <th>状态</th>
+            <th>备注</th>
+        </tr>
+    </table>
+</div>
+
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/common.js"></script>
+<script>
+    // 声明全局变量
+    var group_code = getUrlParam('group_code');
+//    console.log(group_code);
+    // 回到商户信息修改页面
+    $(()=>{
+        $("#turn").on("click",()=>{
+            window.location.replace('./set_meal_Query.html');
+        });
+    });
+
+
+    // 获取传入的cusid值
+    $(()=>{
+        $.ajax({
+            url: "/operplat/sv_group/query",
+            context: document.body,
+            dataType: "JSON",
+            data: group_code,
+            async: false,
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                   var groups = dataJson.groups;
+                var svs = groups[0].svs;
+                var type;
+                   console.log(svs)
+                    for (var i = 0; i < svs.length; i++) {
+                        if(svs[i].group_desc == null) {
+                            svs[i].sv_count = "";
+                        }
+                        if(svs[i].remark == null) {
+                            svs[i].remark = "";
+                        }
+                        if(svs[i].status == "normal") {
+                            type = "正常"
+                        } else {
+                            type = "删除"
+                        }
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										   <td>${i + 1}</td>
+										   <td>${svs[i].sv_code}</td>
+										   <td>${svs[i].sv_name}</td>
+										   <td>${svs[i].price}</td>
+										   <td>${svs[i].ctime}</td>
+										   <td>${svs[i].oper_id}</td>
+										   <td>${type}</td>
+										    <td>${svs[i].remark}</td>
+										</tr>`);
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+
+    });
+    // 声明查询函数
+    function query(index,cusid) {
+        cusid = $("#cusid").val();
+        order_type = $("#order_type option:selected").val();
+        s_date = $("#s_date").val();
+        e_date = $("#e_date").val();
+        $('.test').empty();
+        $.ajax({
+            url:"/operplat/trading_new/merchant_quota_changes",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            data:{"cusid":cusid,
+                "order_type":order_type,
+                "s_date":s_date,
+                "e_date":e_date,
+                "page_num":index,
+                "page_count":"20"},
+            success:function (dataJson,dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    changes = dataJson.changes;
+                    sum = dataJson.sum;
+                    pageNo = dataJson.pageNo;
+                    for (var i = 0; i < changes.length; i++) {
+                        var action_type = changes[i].action_type;
+                        var type;
+                        if(action_type == "recharge_add"){
+                            type = "充值增加额度";
+                        }else if (action_type == "tran_fail_add"){
+                            type = "交易失败退还额度";
+                        }else if (action_type == "tran_succ_add"){
+                            type = "交易成功减少额度";
+                        }
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${changes[i].cusid}</td>
+										   <td>${type}</td>
+										   <td>${changes[i].action_name}</td>
+										   <td>${changes[i].payno}</td>
+										   <td>${changes[i].amt}</td>
+										   <td>${changes[i].bf_quota}</td>
+										   <td>${changes[i].af_quota}</td>
+										   <td>${changes[i].ctime}</td>
+										</tr>`);
+                    }
+                }
+            },
+            error:function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+        $('#pageNo span').html(pageNo);
+        $('#nowPage span').html(index);
+        $('#pageNum').val(index);
+    }
+
+</script>
+</html>

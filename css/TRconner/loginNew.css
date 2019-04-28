@@ -1,0 +1,105 @@
+ul,body{
+    margin:0;
+    padding:0;
+}
+.bg{
+    width:100%;
+    height:100%;
+    position:absolute;
+    background:url(../../images/login/Background.png) no-repeat;
+    background-size: 100%;
+}
+.login{
+    display: flex;
+    justify-content: center;
+}
+.log-box{
+    width: 542px;
+    height: 566px;
+    z-index: 10;
+    background-color: #f8fafa;
+    position: absolute;
+    top: 158px;
+}
+.log-box ul li{
+    list-style: none;
+}
+.log-box ul li div{
+    width: 375px;
+    height: 50px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+.log-box ul li input{
+    width: 341px;
+    height: 40px;
+    font-size: 18px;
+    color: #2f2f2f;
+    border: 0;
+    background-color: #F8FAFA;
+    margin-top:5px;
+    margin-left: 30px;
+    outline:none;
+}
+.log-box ul li input:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px #F8FAFA inset !important;
+}
+.log-box ul li{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+.log-box ul li:first-child{
+    margin-top: 80px;
+}
+.log-box ul li:nth-child(2){
+    margin-top: 61px;
+    position: relative;
+}
+.log-box ul li:nth-child(2) img{
+    position: absolute;
+    left: 89px;
+    top:17px;
+}
+.log-box ul li:nth-child(3){
+    margin-top: 42px;
+    position: relative;
+}
+.log-box ul li:nth-child(3) img{
+    position: absolute;
+    left: 89px;
+    top:15px;
+}
+.log-box ul li:nth-child(4){
+    margin-top: 21px;
+    position: relative;
+}
+.log-box ul li:nth-child(4) div{
+    border-bottom: none;
+}
+.log-box ul li:nth-child(4) img{
+    position: absolute;
+    left: 89px;
+    top:15px;
+    cursor:pointer;
+}
+.log-box ul li:nth-child(4) p{
+    display: inline-block;
+    color: #9a9898;
+    font-size: 18px;
+    margin-left: 32px;
+    margin-top: 14px;
+}
+.log-box ul li:last-child{
+    margin-top: 40px;
+}
+.log-box ul li:last-child button{
+    width: 362px;
+    height: 54px;
+    border-radius: 50px;
+    background-color: #2391f2;
+    font-size: 20px;
+    color: #ffffff;
+    border: none;
+    outline:none;
+}

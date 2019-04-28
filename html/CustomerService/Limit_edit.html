@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>客户限制信息修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+			#alebox{
+				border: 1px solid #00b7ee;
+				width: 300px;
+				height: 392px;
+				background-color: #ffffff;
+				position: fixed;
+				top: 50%;
+				left: 50%;
+				-webkit-transform: translate(-50%, -50%);
+				-moz-transform: translate(-50%, -50%);
+				-ms-transform: translate(-50%, -50%);
+				-o-transform: translate(-50%, -50%);
+				transform: translate(-50%, -50%);
+			}
+			#alebox .x{
+				overflow: auto;
+				cursor: pointer;
+			}
+			#alebox .x span{
+				color: red;
+				float: right;
+				font-size: 20px;
+			}
+			#alebox .area{
+				width: 180px;
+				height: 80px;
+			}
+			#alebox .inp{
+				width: 180px;
+				height: 30px;
+				border-radius: 3px;
+				border: 1px solid #66666691;
+			}
+			#alebox table tr td{
+				padding: 10px 10px;
+			}
+			#alebox table tr .sis{
+				position: relative;
+				bottom: 35px;
+			}
+			#alebox button{
+				width: 80px;
+				height: 25px;
+				margin-top: 10px;
+				margin-left: 50px;
+				background-color: #2cbeff;
+				color: #fff;
+				outline: none;
+				border: none;
+				cursor: pointer;
+			}
+			.header{
+				min-width: 900px;
+			}
+			table{
+				white-space:nowrap;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="limit_phone">限制手机号：</lable>
+				<input type="text" id="limit_phone" placeholder="请输入"
+					   onkeyup="this.value=this.value.replace(/\D/g,'')"
+					   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+					   oninput="if(value.length>11)value=value.slice(0,11)"
+				>
+				<lable for="limit_type" class="class-lable">审核状态：</lable>
+				<select id="limit_type">
+					<option value="">全部</option>
+					<option value="STOP">终止交易</option>
+					<option value="WARN">提示</option>
+				</select>
+				<lable for="limit_status" class="class-lable">限制状态：</lable>
+				<select id="limit_status">
+					<option value="">全部</option>
+					<option value="ABLE">生效</option>
+					<option value="CANCEL">失效</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>限制编号</th>
+					<th>限制手机号</th>
+					<th>限制日期</th>
+					<th>开始日期</th>
+					<th>结束日期</th>
+					<th>限制类型</th>
+					<th>限制状态</th>
+					<th>上一修改日</th>
+					<th>上一操作员</th>
+					<th>限制原因</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<div id="alebox" style="display: none">
+			<div class="x"><span>×</span></div>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>限制编号：</td>
+						<td>
+							<input type="text" readonly="readonly" class="inp" id="limit_id" name="limit_id">
+						</td>
+					</tr>
+					<tr>
+						<td>限制状态：</td>
+						<td>
+							<select class="inp" name="limit_status" id="limit_status2">
+								<option value="ABLE">生效</option>
+								<option value="CANCEL">失效</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td class="sis">限制原因：</td>
+						<td>
+							<textarea
+									name="limit_reason"
+									id="limit_reason"
+									class="area"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td class="sis">备注：</td>
+						<td>
+							<textarea id="remark" name="remark" class="area"></textarea>
+						</td>
+					</tr>
+				</table>
+			</form>
+			<button class="x">取消</button><button id="subb">提交</button>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		// 声明查询函数
+		var limit_array;
+        function query() {
+            var limit_phone = $("#limit_phone").val();
+            var limit_type = $("#limit_type option:selected").val();
+            var limit_status = $("#limit_status option:selected").val();
+			if(!(/^1[3456789]\d{9}$/.test(limit_phone))){
+				alert("手机号码有误，请重填");
+				return false;
+			}
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/black/limitquery",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"limit_phone":limit_phone,"limit_type":limit_type,"limit_status":limit_status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        limit_array = dataJson.limit_array;
+                        for (var i = 0; i < limit_array.length; i++) {
+                            var limit_type = limit_array[i].limit_type;
+                            var lol;
+                            if(limit_type == "STOP"){
+                                lol = "终止交易";
+                            }else if (limit_type == "WARN"){
+                                lol = "提示";
+                            }
+                            var limit_status = limit_array[i].limit_status;
+                            var sta;
+                            if(limit_status == "ABLE"){
+                                sta = "生效";
+                            }else if (limit_status == "CANCEL"){
+                                sta = "失效";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${limit_array[i].limit_id}</td>
+										   <td>${limit_array[i].limit_phone}</td>
+										   <td>${limit_array[i].limit_date}</td>
+										   <td>${limit_array[i].std_date}</td>
+										   <td>${limit_array[i].end_date}</td>
+										   <td>${lol}</td>
+										   <td>${sta}</td>
+										   <td>${limit_array[i].last_change_date}</td>
+										   <td>${limit_array[i].last_change_user}</td>
+										   <td>${limit_array[i].limit_reason}</td>
+										   <td><button type="button" onclick="edit(${i})">维护</button></td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// 分类查询
+		$("#search").click(()=>{query();});
+		// 维护
+		function edit(data) {
+			$("#limit_id").empty().val(limit_array[data].limit_id);
+			$("#limit_status2").val(limit_array[data].limit_status);
+			$("#limit_reason").empty().val(limit_array[data].limit_reason);
+			$("#remark").empty().val(limit_array[data].remark);
+			$("#alebox").show();
+		}
+		// 弹出框关闭
+		$(() => { $(".x").click(() => {
+			$("#alebox").hide();
+		}) });
+		// 维护结果提交
+		$("#subb").on("click", () => {
+			var formData = new FormData($("#upload")[0]);
+			$.ajax({
+				url:"/operplat/black/limitupdate",
+				type: 'POST',
+				data: formData,
+				async: false,
+				cache: false,
+				contentType: false,
+				processData: false,
+				success:function (dataJson,dataStatus) {
+					if ("success" != dataJson.retCode){
+						alert(dataJson.retMsg);
+					}else {
+						$("#alebox").hide();
+						query();
+						alert(dataJson.retMsg);
+					}
+				},
+				error:function (req, errorMsg, exception) {
+					$("#alebox").hide();
+					alert(errorMsg);
+				}
+			});
+		})
+	</script>
+</html>

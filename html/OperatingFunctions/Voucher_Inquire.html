@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>兑换卷查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			#s-up{
+				background-color: #ee372e;
+				color: #FFFFFF;
+				margin-left: 80px;
+			}
+			#search{
+				background-color: #4d9985;
+				color: #FFFFFF;
+			}
+			#close{
+				width: 20px;
+				height: 20px;
+				color: red;
+				position: absolute;
+				top: 0px;
+				right: 0px;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			#check input,#checkd input{
+				margin-top: 4px;
+				width: 15px;
+				height: 15px;
+			}
+			#box{
+				background-color: #FFFFFF;
+				position: fixed;
+				top: 100px;
+				left: 300px;
+				border: 1px solid #00AAEE;
+				font-size: 14px;
+			}
+			#box table{
+				margin: 0 auto;
+				border-top: 1px solid black;
+				border-left: 1px solid black;
+			}
+			#box tr th,#box tr td{
+				width: 100px;
+				padding: 5px 0px;
+				border-bottom: 1px solid black;
+				border-right: 1px solid black;
+			}
+			#box tr th:last-child,#box tr th:last-child{
+				width: 300px;
+			}
+			.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+			.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+			.paging label{ margin: 0 15px; }
+			.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+			.btm_biaodan {height: 100%;}
+			#go{position: relative;top: -1px;}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="batchno">批次编码：</lable>
+				<input type="text" id="batchno" placeholder="请输入">
+				<lable for="voutype" class="class-lable">兑换券类型：</lable>
+				<select id="voutype">
+					<option value="">全部</option>
+				</select>
+				<lable for="voustatus" class="class-lable">状态：</lable>
+					<select id="voustatus">
+						<option value="">全部</option>
+						<option value="01">未激活</option>
+						<option value="02">已激活</option>
+					</select>
+				<lable class="class-lable" for="s_date">开始日期：</lable>
+				<input type="text" id="s_date" placeholder="请输入">
+				<lable class="class-lable" for="e_date">结束日期：</lable>
+				<input type="text" id="e_date" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button>
+				<button class="btn class-lable" id="s-up"><span class="qier"></span>卡制卡</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<form id="upload" enctype="multipart/form-data">
+				<table border="1" cellspacing="" cellpadding="">
+					<tr>
+						<th>序号</th>
+						<th>兑换卷编码</th>
+						<th>批次编码</th>
+						<th>公司编码</th>
+						<th>手机号</th>
+						<th>兑换券类型名称</th>
+						<th>面值</th>
+						<th>状态</th>
+						<th>激活日期</th>
+						<th>失效日期</th>
+						<th id="checkd"><input type="checkbox"></th>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div id="box" style="display: none">
+			<div id="close">×</div>
+			<table>
+				<tr>
+					<th>序号</th>
+					<th>激活码</th>
+					<th>原因</th>
+				</tr>
+			</table>
+		</div>
+		<!-- 分页查询 -->
+		<div class="paging">
+			<button type="button" id="prev">上一页</button>
+			<label>
+				<input type="number" oninput="if(value<0)value =''" id="pageNum">
+				<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+			</label>
+			<button type="button" id="next">下一页</button>
+			<label id="nowPage">
+				当前第&nbsp;<span></span>&nbsp;页
+			</label>
+			<label style="margin-left: 0;" id="pageNo">
+				共&nbsp;<span></span>&nbsp;页
+			</label>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script src="../../js/platformName.js"></script>
+	<script>
+        // 执行日期插件实例
+		$(()=>{
+            lay('#version').html('-v' + laydate.v);
+            laydate.render({
+                elem: '#s_date'
+                // ,type: 'datetime'
+            });
+            laydate.render({
+                elem: '#e_date'
+            });
+		});
+		// 兑换券类型查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/vou_type/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var types = dataJson.types;
+                        for(var i = 0; i<types.length; i++){
+                            $("#voutype").append(`<option value=${types[i].voutype}>${types[i].type_name}</option>`);
+						}
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 错误列表的隐藏
+		$(()=>{
+		    $("#close").on("click",()=>{
+		        $("#box").hide();
+			})
+		});
+        // 全选框的处理
+        $("#checkd input").on("change",()=>{
+            if ($("#checkd input").attr("checked") == "checked"){
+                $("#check input").attr("checked",true);
+                console.log("true");
+            }
+            if ($("#checkd input").attr("checked") != "checked"){
+                $("#check input").attr("checked",false);
+                console.log("false");
+            }
+        });
+		// 声明全局变量
+        var vouids;
+        var index = 1;
+        var pageNo;
+        var sum;
+		// 声明查询函数
+        function query(index) {
+            var batchno = $("#batchno").val();
+            var voutype = $("#voutype option:selected").val();
+            var voustatus = $("#voustatus option:selected").val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/newvouacct/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"batchno":batchno,
+					  "voutype":voutype,
+                      "voustatus":voustatus,
+					  "s_date":s_date,
+					  "e_date":e_date,
+					  "page_num":index,
+					  "page_count":"20"},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        vouids = dataJson.vouids;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        for (var i = 0; i < vouids.length; i++) {
+                            var voustatus = vouids[i].voustatus;
+                            var type;
+                            if(voustatus == "01"){
+                                type = "未激活";
+                                $(".btm_biaodan table").append(
+                                    `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${vouids[i].vouid}</td>
+										   <td>${vouids[i].batchno}</td>
+										   <td>${vouids[i].cpid}</td>
+										   <td>${vouids[i].phoneno}</td>
+										   <td>${vouids[i].vou_type_name}</td>
+										   <td>${vouids[i].vouden}</td>
+										   <td>${type}</td>
+										   <td>${vouids[i].effdate}</td>
+										   <td>${vouids[i].expdate}</td>
+										   <td id="check">
+										   		<input type="checkbox" name="vouids" value=${vouids[i].vouid}>
+								   		   </td>
+										</tr>`);
+                            }else if (voustatus == "02"){
+                                type = "已激活";
+                                $(".btm_biaodan table").append(
+                                    `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${vouids[i].vouid}</td>
+										   <td>${vouids[i].batchno}</td>
+										   <td>${vouids[i].cpid}</td>
+										   <td>${vouids[i].phoneno}</td>
+										   <td>${vouids[i].vou_type_name}</td>
+										   <td>${vouids[i].vouden}</td>
+										   <td>${type}</td>
+										   <td>${vouids[i].effdate}</td>
+										   <td>${vouids[i].expdate}</td>
+										   <td></td>
+										</tr>`);
+                            }
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+            $('#pageNo span').html(pageNo);
+            $('#nowPage span').html(index);
+            $('#pageNum').val(index);
+        }
+        // load查询
+        query(index);
+        // 上一页
+        $("#prev").on("click",()=>{
+            if(index<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index--;
+            query(index);
+        });
+        // 下一页
+        $("#next").on("click",()=>{
+            if(index>=pageNo){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index++;
+            query(index);
+        });
+        // 输入页查询
+        $("#go").on("click",()=>{
+            index  = $("#pageNum").val();
+            if(index<=0){
+                alert("不能小于第一页！");
+                return;
+            };
+            if(index>Number(pageNo)){
+                alert("不能大于最后一页！");
+                $("#pageNum").val(1);
+                $('#nowPage span').html(1);
+                index = 1;
+                query(index);
+                return;
+            };
+            query(index);
+        });
+		// 分类查询
+		$("#search").click(()=>{
+		    $("#box").hide();
+		    index = 1;
+            query(index);
+		});
+        // 制卡
+        $("#s-up").on("click",()=>{
+            // 订单非空校验
+            var checkval = $("#check input");
+            console.log(checkval);
+            var checkvaloption = "";
+            for (i=0;i<checkval.length;i++){
+                if (checkval[i].checked == true){
+                    checkvaloption += checkval[i].value;
+                    console.log(checkval[i].value);
+                }
+            }
+            console.log(checkvaloption);
+            if(checkvaloption == "")
+            {
+                alert('请选择需要处理的兑换券');
+                return;
+            }
+            var re = confirm('确认提交吗？');
+            if (re){
+                $.ajax({
+                    url:"/operplat/penguin_card/create",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: true,
+                    data:$('#upload').serialize(),
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            alert(dataJson.retMsg);
+                            $("#checkd input").attr("checked",false);
+                            index = 1;
+                            query(index);
+                            var error_list = dataJson.error_list;
+                            if(error_list.length != 0){
+								$("#box").show();
+								for (var i=0;i<error_list.length;i++){
+                                    $("#box table").append(
+                                        `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${error_list[i].vouid}</td>
+										   <td>${error_list[i].reason}</td>
+										</tr>`);
+								}
+							}
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                        index = 1;
+                        query(index);
+                    }
+                });
+            };
+        });
+	</script>
+</html>

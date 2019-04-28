@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>黄牛信息查询</title>
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/pintuer.css">
+    <link rel="stylesheet" href="../../css/mine.css" />
+    <style>
+        body,
+        html {
+            /*height: 100%*/
+        }
+
+        .father {
+            height: 90%;
+            margin-top: 45px;
+        }
+
+        .father .btm_biaodan {
+            min-height: 18%;
+        }
+
+        h2 {
+            text-align: left;
+            margin: 10px;
+        }
+
+        .divFlex {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            /*align-items: center;*/
+        }
+
+        .xf span {
+            position: relative;
+            top: 1px;
+        }
+        .paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+        .paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+        .paging label{ margin: 0 15px; }
+        .paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+        .btm_biaodan {height: 100%;}
+        #go,#go1,#go2{position: relative;top: -1px;}
+    </style>
+</head>
+
+<body class="info demo" style="padding: 0px;margin: 0px">
+<div style="overflow: auto;position: fixed;width: 100%;background: #fff;padding: 20px;margin: 0px;z-index: 999;">
+    <div class="header">
+        <div class="month">
+            <lable class="class-lable" for="phone">手机号：</lable>
+            <input type="text" id="phone" placeholder="请输入">
+            <lable for="s_date">开始日期：</lable>
+            <input type="text" id="s_date" placeholder="请输入">
+            <lable class="class-lable" for="e_date">结束日期：</lable>
+            <input type="text" id="e_date" placeholder="请输入">
+            <button class="btn class-lable" id="search">搜索</button>
+        </div>
+    </div>
+
+    <div class="content btm_biaodan">
+        <h2>黄牛信息查询</h2>
+        <div class="content duihuan">
+            <table border="1" cellspacing="" cellpadding="">
+                <tr>
+                    <th>黄牛编码</th>
+                    <th>客户号</th>
+                    <th>姓名</th>
+                    <th>手机号</th>
+                    <th>创建时间</th>
+                    <th>状态</th>
+                    <th>额度</th>
+                    <th>权益</th>
+                    <th>备注</th>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div class="father" style="margin-top: 180px;padding: 0px 7px 20px 20px">
+
+    <div class="divFlex">
+        <div style="width: 48% ; margin-top: 10px;">
+            <h2>额度变动查询</h2>
+            <div class="content biandong-title biandong">
+                <table border="1" cellspacing="" cellpadding="">
+                    <tr valign="middle">
+                        <th>相关流水号</th>
+                        <th>操作类型</th>
+                        <th>变动额度</th>
+                        <th>变动前</th>
+                        <th>变动后</th>
+                        <th>时间</th>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="content biandong" style="overflow: auto;margin-top: 0px">
+                <!--<table border="1" cellspacing="" cellpadding=""></table>-->
+                <!-- 分页查询 -->
+                <div class="paging">
+                    <button type="button" id="prev1">上一页</button>
+                    <label>
+                        <input type="number" oninput="if(value<0)value =''" id="pageNum1">
+                        <button type="button" style="margin-left: 10px; width: 50px;" id="go1">跳转</button>
+                    </label>
+                    <button type="button" id="next1">下一页</button>
+                    <label id="nowPage1">
+                        当前第&nbsp;<span></span>&nbsp;页
+                    </label>
+                    <label style="margin-left: 0;" id="pageNo1">
+                        共&nbsp;<span></span>&nbsp;页
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div style="width: 48%; margin-top: 10px;">
+            <h2>权益变动查询</h2>
+            <div class="content jihuo-title jihuo" style="width: 99%" >
+                <table border="1" cellspacing="" cellpadding="">
+                    <tr valign="middle">
+                        <!--<th style="width: 25%">操作类型</th>-->
+                        <!--<th style="width: 12%">变动额度</th>-->
+                        <!--<th style="width: 14%">变动前</th>-->
+                        <!--<th style="width: 14%">变动后</th>-->
+                        <!--<th style="width: 34%">时间</th>-->
+
+                        <th>相关流水号</th>
+                        <th>操作类型</th>
+                        <th>变动额度</th>
+                        <th>变动前</th>
+                        <th>变动后</th>
+                        <th>时间</th>
+                    </tr>
+                </table>
+
+            </div>
+
+            <div class="content jihuo" style="overflow: auto;margin-top: 0px">
+                <!--<table border="1" cellspacing="" cellpadding=""></table>-->
+                <!-- 分页查询 -->
+                <div class="paging">
+                    <button type="button" id="prev2">上一页</button>
+                    <label>
+                        <input type="number" oninput="if(value<0)value =''" id="pageNum2">
+                        <button type="button" style="margin-left: 10px; width: 50px;" id="go2">跳转</button>
+                    </label>
+                    <button type="button" id="next2">下一页</button>
+                    <label id="nowPage2">
+                        当前第&nbsp;<span></span>&nbsp;页
+                    </label>
+                    <label style="margin-left: 0;" id="pageNo2">
+                        共&nbsp;<span></span>&nbsp;页
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/pintuer.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/platformName.js"></script>
+<script src="../../js/laydate.js"></script>
+<script>
+    // 执行日期插件实例
+    $(() => {
+        laydate.render({
+            elem: '#s_date'
+        });
+        laydate.render({
+            elem: '#e_date'
+        });
+    });
+    // 获取平台名字
+    var index1 = 1;
+    var index = 1;
+    var pageNo1;
+    var pageNo2;
+    var status;
+    var remark;
+
+    $("#search").click(() => {
+        var mob = $('#phone').val();
+        var s_date = $("#s_date").val();
+        var e_date = $("#e_date").val();
+        if (mob === ""){
+            alert('手机号不能为空');
+            return;
+        }
+        queryPhone(mob);
+        queryAcctsChange(mob,index1,s_date,e_date);
+        queryCoupon(mob,index,s_date,e_date);
+    });
+
+    function queryPhone(phone) {
+        $('.test').empty();
+        $.ajax({
+            url: "/operplat/cattle/cattleQuery",
+            context: document.body,
+            dataType: 'JSON',
+            data: {
+                'phoneno': phone,
+            },
+            async: false,
+            success: function (dataJson, dataStatus) {
+                var retCode = dataJson.retCode;
+                var retMsg = dataJson.retMsg;
+                if (retCode != 'success') {
+                    // alert(retMsg);
+                    return;
+                } else {
+                    if (dataJson.status === "normal") {
+                        status = "正常";
+                    } else if (dataJson.status === "delete") {
+                        status = "删除";
+                    }
+                    if (dataJson.remark == null) {
+                        remark = "";
+                    } else {
+                        remark = dataJson.remark ;
+                    }
+                    $(".duihuan table").append(
+                        `<tr class="test">
+							<td>${dataJson.cattle_id}</td>
+							<td>${dataJson.cusid}</td>
+							<td>${dataJson.p_name}</td>
+							<td>${dataJson.phoneno}</td>
+							<td>${dataJson.ctime}</td>
+							<td>${status}</td>
+							<td>${dataJson.quota}</td>
+							<td>${dataJson.amt}</td>
+							<td>${remark}</td>
+							</tr>`
+                    );
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert('出错啦，请稍后再试。');
+            }
+        });
+    }
+
+    function queryAcctsChange(phone,index,s_date,e_date) {
+        var sum;
+        $('.test1').empty();
+        $.ajax({
+            url: "/operplat/cattle/qryQoutaHis",
+            context: document.body,
+            dataType: 'JSON',
+            data: {
+                'phoneno': phone,
+                'stime': s_date,
+                'etime': e_date,
+                "page_num":index,
+                "page_count":"20"
+            },
+            async: false,
+            success: function (dataJson, dataStatus) {
+                var retCode = dataJson.retCode;
+                var retMsg = dataJson.retMsg;
+                if (retCode != "success") {
+                    // alert(retMsg);
+                    pageNo1 = "0";
+                    return;
+                } else {
+                    sum = dataJson.sum;
+                    pageNo1 = dataJson.sum_page;
+                    var changList = dataJson.changList;
+
+                    for (var i = 0; i < changList.length; i++) {
+
+                        var action_type = changList[i].action_type;
+
+                        if (action_type == "quota_add") {
+                            action_type = "增加额度";
+                        } else if (action_type == "trans_succ_sub") {
+                            action_type = "交易成功减额度";
+                        } else if (action_type == "trans_fail_add") {
+                            action_type = "交易失败回退额度";
+                        }
+                        $(".biandong table").append(
+                            `<tr class="test1" valign="middle">
+                            <td>${changList[i].payno}</td>
+							<td>${action_type}</td>
+							<td>${changList[i].quota}</td>
+							<td>${changList[i].before_quota}</td>
+							<td>${changList[i].after_quota}</td>
+							<td>${changList[i].ctime}</td>
+							</tr>`
+                        );
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert('出错啦，请稍后再试。');
+            }
+        });
+        $('#pageNo1 span').html(pageNo1);
+        $('#nowPage1 span').html(index);
+        $('#pageNum1').val(index);
+    }
+    // 上一页
+    var pageNo1 = $('#pageNo1 span').val();
+    $("#prev1").on("click",()=>{
+        if (pageNo1 !== "") {
+            if(index1<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index1--;
+            var mob = $('#phone').val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            queryAcctsChange(mob,index1,s_date,e_date);
+        }
+    });
+    // 下一页
+    $("#next1").on("click",()=>{
+        if (pageNo1 !== "") {
+            if(index1>=pageNo1){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index1++;
+            var mob = $('#phone').val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            queryAcctsChange(mob,index1,s_date,e_date);
+        }
+    });
+    // 输入页查询
+    $("#go1").on("click",()=>{
+        if (pageNo1 !== "") {
+            index1 = $("#pageNum1").val();
+            if (index1 <= 0) {
+                alert("不能小于第一页！");
+                return;
+            }
+            ;
+            if (index1 > pageNo1) {
+                alert("不能大于最后一页！");
+                $("#pageNum1").val(1);
+                $('#nowPage1 span').html(1);
+                index1 = 1;
+                var mob = $('#phone').val();
+                var s_date = $("#s_date").val();
+                var e_date = $("#e_date").val();
+                queryAcctsChange(mob, index1, s_date, e_date);
+                return;
+            }
+            ;
+            var mob = $('#phone').val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            queryAcctsChange(mob, index1, s_date, e_date);
+        }
+    })
+    function queryCoupon(phone,index,s_date,e_date) {
+        $('.test2').empty();
+        $.ajax({
+            url: "/operplat/cattle/qryAmtHis",
+            context: document.body,
+            dataType: 'JSON',
+            data: {
+                'phoneno': phone,
+                'stime': s_date,
+                'etime': e_date,
+                "page_num":index,
+                "page_count":"20"
+            },
+            async: false,
+            success: function (dataJson, dataStatus) {
+                var retCode = dataJson.retCode;
+                var retMsg = dataJson.retMsg;
+                if (retCode != 'success') {
+                    // alert(retMsg);
+                    pageNo2 = "0";
+                    return;
+                } else {
+                    pageNo2 = dataJson.sum_page;
+                    var changList = dataJson.changList;
+                    for (var i = 0; i < changList.length; i++) {
+
+                        var action_type = changList[i].action_type;
+
+                        if (action_type == "buy_succ_add") {
+                            action_type = "增加额度";
+                        } else if (action_type == "buy_fail_sub") {
+                            action_type = "交易成功减额度";
+                        } else if (action_type == "transfer_succ_sub") {
+                            action_type = "转让成功减权益";
+                        } else if (action_type == "transfer_fail_add") {
+                            action_type = "转让失败加权益";
+                        }
+                        $(".jihuo table").append(
+                            `<tr class="test2" valign="middle">
+                            <td>${changList[i].payno}</td>
+							<td>${action_type}</td>
+							<td>${changList[i].amt}</td>
+							<td>${changList[i].before_amt}</td>
+							<td>${changList[i].after_amt}</td>
+							<td>${changList[i].ctime}</td>
+							</tr>`
+                        );
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert('出错啦，请稍后再试。');
+            }
+        });
+        $('#pageNo2 span').html(pageNo2);
+        $('#nowPage2 span').html(index);
+        $('#pageNum2').val(index);
+    }
+    // 上一页
+    var pageNo2 = $('#pageNo2 span').val();
+    $("#prev2").on("click",()=>{
+        if (pageNo2 !== "") {
+            if(index<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index--;
+            var mob = $('#phone').val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            queryCoupon(mob,index,s_date,e_date);
+        }
+    });
+    // 下一页
+    $("#next2").on("click",()=>{
+        if (pageNo2 !== "") {
+            if(index>=pageNo2){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index++;
+            var mob = $('#phone').val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            queryCoupon(mob,index,s_date,e_date);
+        }
+    });
+    // 输入页查询
+    $("#go2").on("click",()=>{
+        if (pageNo2 !== "") {
+            index = $("#pageNum2").val();
+            if (index <= 0) {
+                alert("不能小于第一页！");
+                return;
+            }
+            ;
+            if (index > pageNo2) {
+                alert("不能大于最后一页！");
+                $("#pageNum2").val(1);
+                $('#nowPage2 span').html(1);
+                index = 1;
+                var mob = $('#phone').val();
+                var s_date = $("#s_date").val();
+                var e_date = $("#e_date").val();
+                queryCoupon(mob, index, s_date, e_date);
+                return;
+            }
+            ;
+            var mob = $('#phone').val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            queryCoupon(mob, index, s_date, e_date);
+        }
+    })
+</script>
+
+</html>

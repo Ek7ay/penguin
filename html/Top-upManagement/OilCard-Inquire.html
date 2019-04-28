@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>油卡信息查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 375px;
+				height: 518px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 310px;
+				left: 83px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table tr td textarea{
+				border-radius: 3px;
+			}
+			.class-table form table tr:last-child td{
+				padding:10px 0px;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+			.class-table form table tr td.author .author_list{
+				display: flex;
+				flex-direction: column;
+				width: 151px;
+				height: 300px;
+				overflow-y: scroll;
+				border: 1px solid #958888;
+				border-radius: 5px;
+			}
+			.class-table form table tr td.author .author_list label{
+				margin-top: 5px;
+				text-align: right;
+			}
+			.class-table form table tr td.author .author_list label input{
+				position: relative;
+				margin-right: 5px;
+				top: 3px;
+				width: 15px;
+				height: 15px;
+			}
+			.second{
+				margin-top: 10px;
+			}
+			.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+			.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+			.paging label{ margin: 0 15px; }
+			.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+			.btm_biaodan {height: 100%;}
+			#go{position: relative;top: -1px;}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="cardid">卡&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;号：</lable>
+				<input type="text" id="cardid" placeholder="请输入">
+				<lable for="cardtype" class="class-lable">卡&nbsp;类&nbsp;&nbsp;型：</lable>
+					<select id="cardtype">
+						<option value="">全部</option>
+						<option value="zsh">中石化充值卡</option>
+						<option value="zsy">中石油充值卡</option>
+						<option value="other">其他</option>
+					</select>
+				<lable for="status" class="class-lable">状&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="used">已使用</option>
+					<option value="unused">未使用</option>
+					<option value="delete">删除</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button><br>
+				<div class="second">
+					<lable for="input_time">录入时间：</lable>
+					<input type="text" id="input_time" placeholder="请输入">
+					<lable for="tran_amt" class="class-lable">油卡面额：</lable>
+					<input type="text" id="tran_amt" placeholder="请输入">
+					<lable for="use_type"  class="class-lable">使用方式：</lable>
+					<select id="use_type">
+						<option value="">全部</option>
+						<option value="card_pwd">卡密返显</option>
+						<option value="of_proxy">欧飞代理充值</option>
+					</select>
+				</div>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>卡号</th>
+					<th>编码</th>
+					<th>面额</th>
+					<th>充值卡类型</th>
+					<th>使用时间</th>
+					<th>失效日期</th>
+					<th>使用类型</th>
+					<th>客户号</th>
+					<th>状态</th>
+					<th>备注</th>
+				</tr>
+				<!--<tr>-->
+					<!--<th>1</th>-->
+					<!--<th>asfas</th>-->
+					<!--<th>sadf</th>-->
+					<!--<th>1</th>-->
+					<!--<th>safds</th>-->
+					<!--<th>asfas</th>-->
+					<!--<th>sadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>dsafsadf</th>-->
+				<!--</tr>-->
+			</table>
+		</div>
+		<!-- 分页查询 -->
+		<div class="paging">
+			<button type="button" id="prev">上一页</button>
+			<label>
+				<input type="number" oninput="if(value<0)value =''" id="pageNum">
+				<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+			</label>
+			<button type="button" id="next">下一页</button>
+			<label id="nowPage">
+				当前第&nbsp;<span></span>&nbsp;页
+			</label>
+			<label style="margin-left: 0;" id="pageNo">
+				共&nbsp;<span></span>&nbsp;页
+			</label>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 执行日期插件实例
+		$(()=>{
+            lay('#version').html('-v' + laydate.v);
+            laydate.render({
+                elem: '#input_time'
+                // ,type: 'datetime'
+            });
+            laydate.render({
+                elem: '#effdate'
+            });
+            laydate.render({
+                elem: '#expdate'
+            });
+		});
+		// 声明全局变量
+        var cards;
+        var cardid;
+        var cardtype;
+        var status;
+        var input_time;
+		var tran_amt;
+        var use_type;
+        var index = 1;
+        var pageNo;
+        var sum;
+		// 声明查询函数
+        function query(index) {
+			cardid = $("#cardid").val();
+            cardtype = $("#cardtype option:selected").val();
+            status = $("#status option:selected").val();
+            input_time = $("#input_time").val();
+			tran_amt = $("#tran_amt").val();
+            use_type = $("#use_type option:selected").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/oil_card/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"cardid":cardid,
+					  "cardtype":cardtype,
+					  "status":status,
+					  "input_time":input_time,
+					  "tran_amt":tran_amt,
+					  "use_type":use_type,
+					  "page_num":index,
+					  "page_count":"20"},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        cards = dataJson.cards;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        for (var i = 0; i < cards.length; i++) {
+                            var cardtype = cards[i].cardtype;
+                            var type;
+                            if(cardtype == "zsh"){
+                                type = "中石化充值卡";
+                            }else if (cardtype == "zsy"){
+                                type = "中石油充值卡";
+                            }else if (cardtype == "other"){
+                                type = "其他";
+                            }
+                            var use_type = cards[i].use_type;
+                            var utype;
+                            if(use_type == "card_pwd"){
+                                utype = "卡密反显";
+                            }else if (use_type == "of_proxy"){
+                                utype = "欧飞代理充值";
+                            }else {
+                                utype = "";
+							}
+                            var status = cards[i].status;
+                            var sta;
+                            if(status == "used"){
+                                sta = "已经使用";
+                            }else if (status == "unused"){
+                                sta = "未使用";
+                            }else if (status == "delete"){
+                                sta = "删除";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${cards[i].cardid}</td>
+										   <td>${cards[i].pid}</td>
+										   <td>${cards[i].tran_amt}</td>
+										   <td>${type}</td>
+										   <td>${cards[i].use_time}</td>
+										   <td>${cards[i].expdate}</td>
+										   <td>${utype}</td>
+										   <td>${cards[i].cusid}</td>
+										   <td>${sta}</td>
+										   <td>${cards[i].remark}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+            $('#pageNo span').html(pageNo);
+            $('#nowPage span').html(index);
+            $('#pageNum').val(index);
+        }
+		// load查询
+		query(index);
+        // 上一页
+        $("#prev").on("click",()=>{
+            if(index<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index--;
+            query(index);
+        });
+        // 下一页
+        $("#next").on("click",()=>{
+            if(index>=pageNo){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index++;
+            query(index);
+        });
+        // 输入页查询
+        $("#go").on("click",()=>{
+            index  = $("#pageNum").val();
+            if(index<=0){
+                alert("不能小于第一页！");
+                return;
+            };
+            if(index>Number(pageNo)){
+                alert("不能大于最后一页！");
+                $("#pageNum").val(1);
+                $('#nowPage span').html(1);
+                index = 1;
+                query(index);
+                return;
+            };
+            query(index);
+        });
+		// 分类查询
+		$("#search").click(()=>{
+		    index = 1;
+            query(index);
+		});
+	</script>
+</html>

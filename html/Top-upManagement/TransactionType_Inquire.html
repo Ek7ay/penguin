@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>交易类型查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 375px;
+				height: 450px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 225px;
+				left: 101px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table tr td textarea{
+				border-radius: 3px;
+			}
+			.class-table form table tr:last-child td{
+				padding:10px 0px;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+			.class-table form table tr td.author .author_list{
+				display: flex;
+				flex-direction: column;
+				width: 151px;
+				height: 300px;
+				overflow-y: scroll;
+				border: 1px solid #958888;
+				border-radius: 5px;
+			}
+			.class-table form table tr td.author .author_list label{
+				margin-top: 5px;
+				text-align: right;
+			}
+			.class-table form table tr td.author .author_list label input{
+				position: relative;
+				margin-right: 5px;
+				top: 3px;
+				width: 15px;
+				height: 15px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>显示序号</th>
+					<th>序号</th>
+					<th>编码</th>
+					<th>名称</th>
+					<th>请求路径</th>
+					<th>状态</th>
+				</tr>
+				<!--<tr>-->
+					<!--<th>1</th>-->
+					<!--<th>asfas</th>-->
+					<!--<th>sadf</th>-->
+					<!--<th>1</th>-->
+					<!--<th>safds</th>-->
+					<!--<th>asfas</th>-->
+					<!--<th>-->
+						<!--<button type="button" class="class_button open" >修改</button>-->
+					<!--</th>-->
+				<!--</tr>-->
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        var tranTypes;
+		// 声明查询函数
+        function query() {
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/tranType/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        tranTypes = dataJson.tranTypes;
+                        for (var i = 0; i < tranTypes.length; i++) {
+                            var status = tranTypes[i].status;
+                            var sta;
+                            if(status == "useable"){
+                                sta = "可用";
+                            }else if (status == "unuseable"){
+                                sta = "不可用";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${tranTypes[i].pid}</td>
+										   <td>${tranTypes[i].tran_type}</td>
+										   <td>${tranTypes[i].tran_name}</td>
+										   <td>${tranTypes[i].req_path}</td>
+										   <td>${sta}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+		$(()=>{query();});
+	</script>
+</html>

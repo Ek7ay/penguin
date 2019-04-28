@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>油卡信息新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>卡号:</td>
+						<td>
+							<input placeholder="必输项" id="cardid" name="cardid" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+						</td>
+					</tr>
+					<tr>
+						<td>面额:</td>
+						<td>
+							<select name="tran_amt">
+								<option value="100">100</option>
+								<option value="200">200</option>
+								<option value="500">500</option>
+								<option value="1000">1000</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>密码:</td>
+						<td>
+							<input placeholder="必输项" id="cardpwd" name="cardpwd" onKeyUp="value=value.replace(/[\W]/g,'')"/>
+						</td>
+					</tr>
+					<tr>
+						<td>加密因子:</td>
+						<td>
+							<input placeholder="必输项" id="factor" name="factor" onKeyUp="value=value.replace(/[\W]/g,'')"/>
+						</td>
+					</tr>
+					<tr>
+						<td>卡类型:</td>
+						<td>
+							<select name="cardtype">
+								<option value="zsh">中石化充值卡</option>
+								<option value="zsy">中石油充值卡</option>
+								<option value="other">其他</option>
+							</select>
+						</td>
+					</tr>
+					<!-- <tr>
+						<td>生效日期:</td>
+						<td>
+							<input id="effdate" name="effdate"/>
+						</td>
+					</tr> -->
+					<tr>
+						<td>失效日期:</td>
+						<td>
+							<input placeholder="必输项" id="expdate" name="expdate"/>
+						</td>
+					</tr>
+					<tr>
+						<td>备注:</td>
+						<td>
+							<textarea name="remark"></textarea>
+						</td>
+					</tr>
+				</table>
+				<button type="button" class="btn-submit" id="submit">提交</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/laydate.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+            // 执行日期插件实例
+            lay('#version').html('-v' + laydate.v);
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#effdate' //指定元素
+                // ,type: 'datetime'
+            });
+            lay('#version').html('-v' + laydate.v);
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#expdate' //指定元素
+                // ,type: 'datetime'
+            });
+            $("#submit").on("click",()=>{
+                var cardid = $("#cardid").val();
+                if(cardid == ''){
+                    alert('卡号不能为空');
+                    return;
+                }
+                var cardpwd = $("#cardpwd").val();
+                if(cardpwd == ''){
+                    alert('密码不能为空');
+                    return;
+                }
+                var factor = $("#factor").val();
+                if(factor == ''){
+                    alert('加密因子不能为空');
+                    return;
+                }
+                var expdate = $("#expdate").val();
+                if(expdate == ''){
+                    alert('失效日期不能为空');
+                    return;
+                }
+                var formData = new FormData($("#upload")[0]);
+                $.ajax({
+                    url:"/operplat/oil_card/add",
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            console.log(dataJson);
+                            alert(dataJson.retMsg);
+                            console.log(dataJson.retMsg);
+                            window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            });
+		</script>
+	</body>
+</html>

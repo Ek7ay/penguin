@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>套餐购买使用情况</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="s_date">开始日期：</lable>
+				<input type="text" id="s_date" placeholder="请输入">
+				<lable for="e_date" class="class-lable">截至日期：</lable>
+				<input type="text" id="e_date" placeholder="请输入">
+				<lable for="group_type" class="class-lable">套餐类型：</lable>
+				<input type="text" id="group_type" placeholder="请输入">
+				<!--<lable for="group_type" class="class-lable">套餐类型：</lable>-->
+				<!--<select id="group_type">-->
+					<!--<option value="">全部</option>-->
+				<!--</select>-->
+				<lable for="cusid" class="class-lable">客户号：</lable>
+				<input type="text" id="cusid" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button><br>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>套餐类型</th>
+					<th>套餐编码</th>
+					<th>套餐名称</th>
+					<th>购买数量</th>
+					<th>服务数量</th>
+					<th>使用的数量</th>
+					<th>未使用的数量</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script>
+        // 执行日期插件实例
+        $(()=>{
+            lay('#version').html('-v' + laydate.v);
+            laydate.render({
+                elem: '#s_date'
+                // ,type: 'datetime'
+            });
+            laydate.render({
+                elem: '#e_date'
+            });
+        });
+        // 查出套餐类型
+        // $(() => {
+        //     $.ajax({
+        //         url: "/operplat/sv_group/query",
+        //         context: document.body,
+        //         dataType: "JSON",
+        //         async: false,
+        //         data:{"status":"normal"},
+        //         success: function (dataJson, dataStatus) {
+        //             if ("success" != dataJson.retCode) {
+        //                 alert(dataJson.retMsg);
+        //             } else {
+        //                 groups = dataJson.groups;
+        //                 var type;
+        //                 for (var i = 0; i < groups.length; i++) {
+        //                     $("#group_type").append(
+        //                         `<option value=${groups[i].group_type}>${groups[i].group_type}</option>
+		// 								  `);
+        //                 }
+        //             }
+        //         },
+        //         error: function (req, errorMsg, exception) {
+        //             alert(errorMsg);
+        //         }
+        //     });
+        // });
+		// 声明查询函数
+        function query() {
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            var group_type = $("#group_type").val();
+            var cusid = $("#cusid").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/cus/sv_group/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"s_date":s_date, "e_date":e_date, "group_type":group_type,"cusid":cusid},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var groups = dataJson.groups;
+                        for (var i = 0; i < groups.length; i++) {
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${groups[i].group_type}</td>
+										   <td>${groups[i].group_code}</td>
+										   <td>${groups[i].group_name}</td>
+										   <td>${groups[i].buy_count}</td>
+										   <td>${groups[i].sv_count}</td>
+										   <td>${groups[i].sv_used_count}</td>
+										   <td>${groups[i].sv_unused_count}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+        $(()=>{query();});
+		// 分类查询
+		$("#search").click(()=>{query();});
+	</script>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>黄牛交易汇总查询</title>
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <link rel="stylesheet" href="../../css/TRconner/mine.css">
+    <style>
+
+        #mo{
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            padding: 5px;
+            background: rgba(0,0,0,0.5);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+        #check input,#checkd input{
+            margin-top: 4px;
+            width: 15px;
+            height: 15px;
+        }
+
+        #total-box div span{
+            color: #00aaee;
+        }
+        select{
+            width: 180px;
+            height: 30px;
+            border-radius: 5px;
+            background: #FFFFFF;
+            border: 1px solid #E2E2E2;
+        }
+        .paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+        .paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+        .paging label{ margin: 0 15px; }
+        .paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+        .btm_biaodan {height: 100%;}
+        #go{position: relative;top: -1px;}
+    </style>
+</head>
+<body class="info demo">
+<div id="mo"></div>
+<div class="header">
+    <div class="month" id="lable">
+        <lable for="phone_no">注册手机号：</lable>
+        <input type="text" id="phone_no" placeholder="请输入">
+        <button class="btn class-lable" id="search">搜索</button>
+    </div>
+</div>
+<div class="content btm_biaodan">
+    <form id="upload" enctype="multipart/form-data">
+        <table border="1" cellspacing="" cellpadding="">
+            <tr>
+                <th>序号</th>
+                <th>手机号</th>
+                <th>客户号</th>
+                <th>客户姓名</th>
+                <th>可用服务权益额度</th>
+                <th>待处理权益数量</th>
+                <th>待转账金额</th>
+                <th>处理中订单数</th>
+                <th>成功订单数</th>
+                <th>失败订单数</th>
+            </tr>
+        </table>
+    </form>
+</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/platformName.js"></script>
+<script>
+
+    // 声明全局变量
+    var phone_no;
+    var index = 1;
+    // 声明查询函数
+    function query(index) {
+        phone_no = $("#phone_no").val();
+        $(".test").empty();
+        $.ajax({
+            url:"/operplat/cattle/cattleStatQuery",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            data:{
+                "phone_no":phone_no,
+            },
+            success:function (dataJson,dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    list = dataJson.list;
+                    total_discount_amt = dataJson.total_discount_amt;
+                    for (var i = 0; i < list.length; i++) {
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										  <td>${i+1}</td>
+										   <td>${list[i].phoneno}</td>
+										   <td>${list[i].cusid}</td>
+										   <td>${list[i].p_name}</td>
+										   <td>${list[i].quota}</td>
+										   <td>${list[i].amt}</td>
+										   <td>${list[i].wait_send_amt}</td>
+										   <td>${list[i].wait_result_count}</td>
+										   <td>${list[i].succ_count}</td>
+										   <td>${list[i].fail_count}</td>
+										</tr>`);
+                    }
+                }
+            },
+            error:function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+    }
+    // 分类查询
+    $("#search").click(()=>{
+        index = 1;
+        query(index);
+    });
+</script>
+</html>

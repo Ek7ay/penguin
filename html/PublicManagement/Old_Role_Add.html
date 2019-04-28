@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>角色新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>角色名称:</td>
+						<td>
+							<input type="text" name="role_name">
+							<input type="hidden" id="oper_id" name="oper_id"/>
+						</td>
+					</tr>
+					<tr>
+						<td>角色描述:</td>
+						<td>
+							<textarea name="role_desc"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>系统角色:</td>
+						<td>
+							<select name="is_sys">
+								<option value="Y">是</option>
+								<option value="N">不是</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>功能菜单:</td>
+						<td class="author">
+							<div class="author_list" id="author_list">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注:</td>
+						<td>
+							<textarea name="remark"></textarea>
+						</td>
+					</tr>
+				</table>
+				<button type="button" class="btn-submit" id="submit">提交</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+			// 获取创建人
+            var oper_id = getCookie("oper_id");
+            $('#oper_id').val(oper_id); // 赋值
+			// 获取功能菜单列表
+			$(()=>{
+                $.ajax({
+                    url:"/operplat/menu/queryMenu",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            var menus = dataJson.menus;
+                            console.log(menus);
+                            for(var i=0;i<menus.length;i++){
+                                $("#author_list").append(`
+                                <label>${menus[i].menu_name}<input type="checkbox" name="menus" value=${menus[i].menu_id}></label>
+                                `);
+                            }
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+
+                    }
+                });
+			});
+			// 表单提交
+			$("#submit").on("click",()=>{
+                $.ajax({
+                    url:"/operplat/role/addRole",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:$('#upload').serialize(),
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            console.log(dataJson);
+                            alert(dataJson.retMsg);
+                            console.log(dataJson.retMsg);
+                            window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+
+                    }
+                });
+			});
+		</script>
+	</body>
+</html>

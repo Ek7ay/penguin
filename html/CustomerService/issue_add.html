@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>疑难问题新增</title>
+    <link rel="stylesheet" href="../../css/TRconner/style.css">
+
+</head>
+
+<body class="add">
+    <form id="upload" enctype="multipart/form-data">
+        <label>
+            <span>标题：</span>
+            <input type="text" placeholder="必输项" name="title" id="ititle" />
+        </label>
+        <label>
+            <span class="textarea">内容：</span>
+            <textarea name="answer" id="icontent" placeholder="添加多个问题以‘/’结尾，单个问题不用添加"></textarea>
+        </label>
+        <label>
+            <span class="textarea">备注：</span>
+            <textarea name="remark" id="iremark"></textarea>
+        </label>
+        <button type="button" class="btn-submit" id="submit">提交</button>
+    </form>
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <script src="../../js/cookie.js"></script>
+    <script>
+        $("#submit").on("click", () => {
+            var title = $("#ititle").val();
+            if (title == '') {
+                alert('标题不能为空');
+                return;
+            }
+            var content = $("#icontent").val();
+            if (content == '') {
+                alert('内容不能为空');
+                return;
+            }
+
+            $.ajax({
+                url: "/operplat/faq/addFaqMsg",
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    'title': title,
+                    'answer': content,
+                    'remark': $("#iremark").val()
+                },
+                async: false,
+
+                success: function (dataJson, dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        window.location.reload();
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

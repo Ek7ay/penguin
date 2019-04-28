@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>限额新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <style>
+		  .add form label span{width: 115px !important;}
+		  #up_menu,#is_show,#has_more{ width: 210px; height: 33px; background: #F2F2F2;border-radius: 5px}
+  	  </style>
+	</head>
+	<body class="add">
+		<form id="upload" enctype="multipart/form-data">
+			<label><span>限额类型：</span><select name="limit_type" id="limit_type">
+				<option value="total_day_limit">日累计总限额</option>
+				<option value="total_cus_day_limit">个人日累计限额</option>
+				<option value="trans_day_limit">单交易日累计总限额</option>
+				<option value="trans_cus_day_limit">单交易个人日累计限额</option>
+				<option value="trans_single_limit">交易单次限额</option>
+				<option value="all_cus_limit">客户累计限额</option>
+			</select><p style="color: #787878;font-size: 12px;">注:已存在日累计总限额和个人日累计限额时,将无法新增,如要修改请前往-->限额修改页面</p></label>
+			<label><span>限制额度：</span><input type="Number" onkeyup="value=value.replace(/[^\d]/g,'')" placeholder="必输项" name="limit_value" id="limit_value"/>
+			</label>
+			<label><span>交易类型：</span><select name="tran_type" id="tran_type">
+				<option value=""></option>
+			</select>
+			<p style="color: #787878;font-size: 12px;">注:日累计总限额和个人日累计限额时,交易类型不可选</p>
+			</label>
+			<label><span>请求地址：</span><input type="text" readonly="readonly" placeholder="交易类型不为空时为必输项" name="req_path" id="req_path"/>
+			</label>
+			<label><span>请求名称：</span><input type="text" readonly="readonly" placeholder="交易类型不为空时为必输项" name="req_name" id="req_name"/>
+			</label>
+			<label><span class="textarea">备注：</span><textarea name="remark" placeholder="请认真填写备注信息"></textarea></label>
+			<button type="button" class="btn-submit" id="submit">提交</button>
+		</form>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+			// 加载交易类型
+			var types;
+			$(()=>{
+                $.ajax({
+                    url:"/operplat/tran_type/query",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"status":"useable"},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                        } else {
+                            types = dataJson.types;
+                            for (var i = 0; i < types.length; i++) {
+                                $("#tran_type").append(`<option data-value=${i} value=${types[i].tran_type}>${types[i].tran_name}</option>`);
+                            }
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+			});
+			$("#tran_type").attr('disabled',true);
+			$('#limit_type').on('change',()=>{
+            		var selectType = $('#limit_type option:selected').val();
+            		if (selectType=='total_day_limit'||selectType=='total_cus_day_limit'||selectType=='all_cus_limit') {
+            			$('#tran_type').val('');
+            			$("#tran_type").attr('disabled',true);
+            			$('#req_path').val('');
+            			$('#req_name').val('');
+            		}else{
+            			$("#tran_type").attr('disabled',false);
+            		}
+            });
+            $('#tran_type').on('change',()=>{
+					$('#req_path').val('');
+					$('#req_name').val('');
+                	var index = $('#tran_type option:selected').attr("data-value");
+					$('#req_path').val(types[index].req_path);
+					$('#req_name').val(types[index].tran_name);
+            });
+
+			$("#submit").on("click",()=>{
+
+				if ($('#limit_value').val()=='') {
+					alert('请输入限制额度');
+					return;
+				}
+				if ($('#tran_type option:selected').attr('value')!='') {
+					if ($('#req_path').val()=='') {
+						alert('请输入请求地址');
+						return;
+					}
+					if ($('#req_name').val()=='') {
+						alert('请输入请求名称');
+						return;
+					}
+				}
+				
+			    var formData = new FormData($("#upload")[0]);
+			   	// if ($('#tran_type option:selected').val()=='') {
+			    // 	formData.append("tran_type", '');
+			    // }
+			    
+                $.ajax({
+                    url:"/operplat/limit/add",
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            alert(dataJson.retMsg);
+                         window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+			});
+		</script>
+	</body>
+</html>

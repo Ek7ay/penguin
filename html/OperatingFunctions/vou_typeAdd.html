@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>兑换券类型新增</title>
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body class="add">
+	<form action="" method="post" id="upload">
+		<label><span>类型名称：</span><input type="text" class="must" name="type_name" /></label>
+		<label><span class="textarea">备注：</span><textarea name="remark"></textarea></label>
+		<button type="button" class="btn-submit">提交</button>
+	</form>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		$('.btn-submit').click(function(){
+            var submit=$(".must").val();
+            if(submit==""){
+                alert("请填写必输项");
+                return false;
+            }else{
+				$.ajax({
+					url:"/operplat/vou_type/add",
+					context: document.body,
+					dataType: "JSON",
+					data:$("#upload").serialize(),
+					async: false,
+					success:function (dataJson,dataStatus) {
+						if ("success" != dataJson.retCode){
+							alert(dataJson.retMsg);
+						}else {
+							alert(dataJson.retMsg);
+							window.location.reload();
+						}
+					},
+					error:function (req, errorMsg, exception) {
+						alert(errorMsg);
+					}
+				});
+			}
+		});
+			
+	</script>
+</body>
+</html>

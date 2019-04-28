@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>套餐新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	  <style>
+			.check{
+				width: 15px!important;
+				height: 15px!important;
+				position: relative;
+				top: 2px;
+			}
+		    #fwbm{
+				color: #00a0e9;
+				font-size: 16px;
+			}
+	  </style>
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>套餐类型:</td>
+						<td>
+							<select name="group_type" id="group_type">
+								<option value="car_wash">洗车套餐</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>套餐编码:</td>
+						<td>
+							<input placeholder="必输项,例如：s_car_wash_time_10" id="group_code" name="group_code" onKeyUp="value=value.replace(/[\W]/g,'')"/>
+						</td>
+					</tr>
+					<tr>
+						<td>套餐名称:</td>
+						<td>
+							<input placeholder="必输项" id="group_name" name="group_name"/>
+						</td>
+					</tr>
+					<tr>
+						<td>套餐描述:</td>
+						<td>
+							<textarea name="group_desc" id="group_desc"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>备注:</td>
+						<td>
+							<textarea name="remark" id="remark"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>操作选项:</td>
+						<td>
+							<textarea placeholder='必输项,例如{"code":"small","price":0,"desc":"五座及以下小型轿车"}' id="options" name="options"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td id="fwbm">服务编码</td>
+						<td></td>
+					</tr>
+				</table>
+			</form>
+			<form id="price" action="" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>套餐原价:</td>
+						<td>
+							<input placeholder="必输项，选择服务编码后自动填充" id="out_price" name="out_price" disabled="disabled" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+						</td>
+					</tr>
+					<tr>
+						<td>套餐现价:</td>
+						<td>
+							<input placeholder="必输项" id="sell_price" name="sell_price" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+						</td>
+					</tr>
+				</table>
+			</form>
+			<form id="upload2" enctype="multipart/form-data">
+				<table></table>
+				<button type="button" class="btn-submit" id="submit">提交</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/laydate.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+			var arr = [];
+			// 获取服务编码
+			$(()=>{
+                $.ajax({
+                    url:"/operplat/base_sv/query",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"status":"normal"},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                        } else {
+                            var svs = dataJson.svs;
+                            for (var i = 0; i < svs.length; i++) {
+                                $("#upload table").append(
+                                    `<tr class="sel">
+										   <td>
+										   		<input class="check" data-index=${i} id=${i} type="checkbox" name="sv_code" value=${svs[i].sv_code}><span>${svs[i].sv_name}</span>
+										   </td>
+										   <td>
+										   		<input type="text" data-text=${svs[i].price} placeholder="请输入项目数量" class="count"  name="count" disabled="disabled" onkeyup="this.value=this.value.replace(/\\D/g,'')" onafterpaste="this.value=this.value.replace(/\\D/g,'')">
+										   </td>
+									</tr>`);
+                            }
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+			});
+			// 销售价格求和
+			var sum;
+			$(()=> {
+                $(".sel").live("change", () => {
+                    sum = 0;
+                    $(".sel").each(function (index, sel) {
+                        if ($(sel).find('.check')[0].checked) {
+                            var x = $(sel).find('.count').val();
+                            var y= $(sel).find('.count').attr("data-text");
+                            sum += x*y;
+                        }
+                    });
+                    $("#out_price").val(sum);
+                });
+            });
+			// 复选框的控制
+			// $(()=>{
+			//     $(".check").live("change",function () {
+            //         var index = $(this).attr("data-index");
+            //         console.log(index);
+            //         console.log($(this))
+            //         if ($("#"+index).attr("checked") != "checked"){
+            //             $("#"+index).parent().next().children().attr("disabled",true);
+            //             console.log("1")
+            //         }
+            //         if ($("#"+index).attr("checked") == "checked"){
+            //             $("#"+index).parent().next().children().attr("disabled",false);
+            //             console.log("2");
+            //             console.log($("#"+index));
+            //             console.log($("#"+index).parent().next().children())
+			// 		}
+            //     });
+			// });
+            $(()=>{
+                $(".check").live("change",function () {
+                    if ($(this).attr("checked") != "checked"){
+                        $(this).parent().next().children().attr("disabled",true);
+                        $(this).parent().next().children().val("");
+                    }
+                    if ($(this).attr("checked") == "checked"){
+                        $(this).parent().next().children().attr("disabled",false);
+                    }
+                });
+            });
+			// 提交结果
+            $("#submit").on("click",()=>{
+                // 拼接数组
+				arr = [];
+               $(".sel").each(function (index,sel) {
+				   if ($(sel).find('.check')[0].checked){
+				       var newArr = {
+                           sv_code:$(sel).find('.check').val(),
+                           count:$(sel).find('.count').val()
+					   }
+					   arr.push(newArr);
+				   }
+               })
+                arr = JSON.stringify( arr );
+                var group_code = $("#group_code").val();
+                if(group_code == ''){
+                    alert('套餐编码不能为空');
+                    return;
+                }
+                var group_name = $("#group_name").val();
+                if(group_name == ''){
+                    alert('套餐名称不能为空');
+                    return;
+                }
+                var out_price = $("#out_price").val();
+                if(out_price == ''){
+                    alert('套餐原价不能为空');
+                    return;
+                }
+                var sell_price = $("#sell_price").val();
+                if(sell_price == ''){
+                    alert('套餐现价不能为空');
+                    return;
+                }
+                var group_type = $("#group_type option:selected").val();
+                var group_code = $("#group_code").val();
+                var group_name = $("#group_name").val();
+                var group_desc = $("#group_desc").val();
+                var sell_price = $("#sell_price").val();
+                var out_price = $("#out_price").val();
+                var remark = $("#remark").val();
+				var options = $("#options").val();
+                $.ajax({
+                    url:"/operplat/sv_group/add",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: true,
+                    data:{"group_type":group_type, "group_code":group_code,"group_name":group_name,"group_desc":group_desc,
+						"sell_price":sell_price,"out_price":out_price,"remark":remark,"svs":arr,"options":options},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            console.log(dataJson);
+                            alert(dataJson.retMsg);
+                            console.log(dataJson.retMsg);
+                            window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            });
+		</script>
+	</body>
+</html>

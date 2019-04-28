@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="renderer" content="webkit">
+	<title>按订单退款</title>
+	<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+	<link rel="stylesheet" href="../../css/TRconner/mine.css">
+	<style>
+		.class-table{
+			width: 375px;
+			height: 290px;
+			border: 1px solid grey;
+			position: fixed;
+			top: 15%;
+			left: 35%;
+			padding-top: 25px;
+			background-color: #FFFFFF;
+		}
+		.class-table form table tr{
+			font-size: 15px;
+			line-height: 40px;
+		}
+		.class-table form table tr td:first-child{
+			text-align: right;
+		}
+		.class-table form table tr td input{
+			width: 150px;
+			height: 30px;
+			border: 1px solid #757f75;
+			border-radius: 3px;
+			box-sizing: border-box;
+		}
+		.class-table form table{
+			margin-left: 71px;
+			margin-top: 13px;
+		}
+		#beizhu{
+			position: absolute;
+			top: 67px;
+			left: 57px;
+		}
+		.class-table form table tr td select{
+			width: 150px;
+			height: 30px;
+			border: 1px solid #757f75;
+			border-radius: 3px;
+			box-sizing: border-box;
+		}
+		.class-table form table tr td textarea{
+			border-radius: 3px;
+		}
+		.class-table form table tr:last-child td{
+			padding:10px 0px;
+		}
+		.class_instruction{
+			width: 70px;
+			height: 25px;
+			font-size: 14px;
+			border: none;
+			background-color: #818181;
+			color: white;
+			border-radius: 3px;
+		}
+		.pop-up-button{
+			margin-top: 20px;
+			margin-left: 89px;
+		}
+		.pop-up-button button:last-child{
+			margin-left: 54px;
+		}
+		a.shut{
+			position: absolute;
+			top: -3px;
+			right: 6px;
+			color: red;
+			font-size: 24px;
+		}
+		.class-table form table tr td.author .author_list{
+			display: flex;
+			flex-direction: column;
+			width: 151px;
+			height: 300px;
+			overflow-y: scroll;
+			border: 1px solid #958888;
+			border-radius: 5px;
+		}
+		.class-table form table tr td.author .author_list label{
+			margin-top: 5px;
+			text-align: right;
+		}
+		.class-table form table tr td.author .author_list label input{
+			position: relative;
+			margin-right: 5px;
+			top: 3px;
+			width: 15px;
+			height: 15px;
+		}
+		.second{
+			margin-top: 10px;
+		}
+		#payno{
+			font-size: 6px;
+		}
+		.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+		.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+		.paging label{ margin: 0 15px; }
+		.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+		.btm_biaodan {height: 100%;}
+		#go{position: relative;top: -1px;}
+	</style>
+</head>
+<body class="info demo">
+	<div class="header">
+		<div class="month" id="lable">
+			<lable for="phoneno">手机号：</lable>
+			<input type="text" id="phoneno" placeholder="请输入" oninput="if(value.length>11)value=value.slice(0,11)"
+				   onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+			<button class="btn class-lable" id="search">搜索</button><br>
+		</div>
+	</div>
+	<div class="content btm_biaodan" id="base">
+		<table border="1" cellspacing="" cellpadding="">
+			<tr>
+				<th>序号</th>
+				<th>手机号</th>
+				<th>余额</th>
+			</tr>
+		</table>
+	</div>
+	<div class="content btm_biaodan" id="details">
+		<table border="1" cellspacing="" cellpadding="">
+			<tr>
+				<th>序号</th>
+				<th>流水号</th>
+				<th>消费金额</th>
+				<th>订单时间</th>
+				<th>操作</th>
+			</tr>
+		</table>
+	</div>
+	<!-- 分页查询 -->
+	<div class="paging">
+		<button type="button" id="prev">上一页</button>
+		<label>
+			<input type="number" oninput="if(value<0)value =''" id="pageNum">
+			<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+		</label>
+		<button type="button" id="next">下一页</button>
+		<label id="nowPage">
+			当前第&nbsp;<span></span>&nbsp;页
+		</label>
+		<label style="margin-left: 0;" id="pageNo">
+			共&nbsp;<span></span>&nbsp;页
+		</label>
+	</div>
+	<!--修改表单-->
+	<div class="class-table">
+		<a class="shut" href="javascript:;">×</a>
+		<form id="upload" enctype="multipart/form-data">
+			<table>
+				<tr>
+					<td>流水号：</td>
+					<td>
+						<input style="display: none" readonly="readonly" type="text" name="operid" id="operid">
+						<input readonly="readonly" id="payno" name="payno">
+						<select style="display: none" name="opertype">
+							<option value="add">退款</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td id="beizhu">交易描述：</td>
+					<td>
+						<textarea id="actionname" name="actionname" rows="-8" cols="16"></textarea>
+					</td>
+				</tr>
+			</table>
+			<div class="pop-up-button">
+				<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>
+				<button type="button" class="class_instruction shut">取消</button>
+			</div>
+		</form>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/cookie.js"></script>
+<script>
+    // 修改界面的显示和隐藏
+    $(()=>{
+        $(".class-table").hide();
+        $(".open").click(()=>{
+            $(".class-table").show();
+        });
+        $(".shut").click(()=>{
+            $(".class-table").hide();
+            $("#payno").empty();
+            $("#actionname").empty();
+        });
+    });
+    // 声明全局变量
+    var trans;
+    var index = 1;
+    var pageNo;
+    var sum;
+    // 声明查询函数
+    function query(index) {
+        var phoneno = $("#phoneno").val();
+        if(!(/^1[3456789]\d{9}$/.test(phoneno))){
+            alert("手机号码有误，请重填");
+            return false;
+        }
+        $('.test').empty();
+        $.ajax({
+            url:"/operplat/cus/query_flows_msg",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            data:{"phoneno":phoneno,"page_num":index, "page_count":"20","transtatus":"00"},
+            success:function (dataJson,dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    var cusInfos = dataJson.cusInfos;
+                    sum = dataJson.sum;
+                    pageNo = dataJson.pageNo;
+                    for (var j = 0; j < cusInfos.length; j++){
+                        $("#base table").append(
+                            `<tr class="test">
+							   <td>${j + 1}</td>
+							   <td>${cusInfos[j].phoneno}</td>
+							   <td>${cusInfos[j].balance}</td>
+							</tr>`)
+					}
+                    trans = dataJson.trans;
+                    for (var i = 0; i < trans.length; i++) {
+                        $("#details table").append(
+                            `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${trans[i].payno}</td>
+										   <td>${trans[i].tran_amt}</td>
+										   <td>${trans[i].trandt}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">退款</button>
+										   </td>
+										</tr>`);
+                    }
+                }
+            },
+            error:function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+        $('#pageNo span').html(pageNo);
+        $('#nowPage span').html(index);
+        $('#pageNum').val(index);
+    }
+    // 上一页
+    $("#prev").on("click",()=>{
+        if(index<=1){
+            alert("已经是第一页了！");
+            return;
+        };
+        index--;
+        query(index);
+    });
+    // 下一页
+    $("#next").on("click",()=>{
+        if(index>=pageNo){
+            alert("已经是最后一页了！");
+            return;
+        };
+        index++;
+        query(index);
+    });
+    // 输入页查询
+    $("#go").on("click",()=>{
+        index  = $("#pageNum").val();
+        if(index<=0){
+            alert("不能小于第一页！");
+            return;
+        };
+        if(index>Number(pageNo)){
+            alert("不能大于最后一页！");
+            $("#pageNum").val(1);
+            $('#nowPage span').html(1);
+            index = 1;
+            query(index);
+            return;
+        };
+        query(index);
+    });
+    $("#search").click(()=>{
+        index = 1;
+        query(index);
+    });
+    // 获取修改内容
+    function editMsg(i){
+        $("#payno").empty();
+        $("#actionname").empty();
+        var oper_id = getCookie("oper_id");
+        console.log(oper_id);
+        $("#operid").val(oper_id);
+        var payno = trans[i].payno;
+        // payno = payno.substring(6);
+        $("#payno").val(payno);
+        $('.class-table').show();
+    };
+    // 编辑结果提交
+    function submitEdit() {
+        var actionname = $("#actionname").val();
+        if(actionname == ''||actionname.length == 0){
+            alert('交易描述不能为空');
+            return;
+        }
+        var formData = new FormData($( "#upload" )[0]);
+        $.ajax({
+            url:"/operplat/operRefund",
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success:function (dataJson,dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                }else{
+                    // alert('修改成功');
+                    alert(dataJson.retMsg);
+                    $(".class-table").hide();
+                    // window.location.reload();
+                    index = 1;
+                    query(index);
+                }
+            },
+            error: function(req,errorMsg,exception){
+                alert("出错啦");
+            }
+        });
+    };
+</script>
+</html>

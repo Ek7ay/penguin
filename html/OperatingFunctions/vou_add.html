@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>兑换券生成</title>
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/style.css">
+  <style>
+  		label select{ height: 35px; width: 212px;}
+  		button{ cursor: pointer;}
+  		button a{ width: 100%; height: 100%; display: block;}
+  		.disabled{background: #E0E0E0; color: #fff;}
+	  	.class-must{
+			border: 1px solid #EEEEEE;
+			border-radius: 5px;
+		}
+  </style>
+</head>
+<body class="add">
+	<form action="" id="upload">
+		<label><span>公司名称：</span><select name="cpid" class="must class-must" id="companyCode"></select></label>
+		<label><span>券类型：</span><select name="vouType" class="must class-must" id="vouType"></select></label>
+		<label><span>生效日期：</span><input type="text" autocomplete="off" class="must" name="effDate" id="s_date" /></label>
+		<label><span>失效日期：</span><input type="text" autocomplete="off" class="must" name="expDate" id="e_date" /></label>
+		<label><span>面值：</span><input type="number" class="must" name="vouDen" placeholder="不建议大于10000" /></label>
+		<label><span>数量：</span><input type="number" class="must" name="number" placeholder="不建议大于65000" /></label>
+		<label><span>加密因子：</span>
+			<input type="text" class="must" name="pinKey" maxlength="16" placeholder="16位随机字母或者符号中文除外" />
+			<input type="hidden" name="oper_id" id="oper_id"/>
+		</label>
+		<button type="button	" class="btn-submit make">生成批次号</button>
+	</form>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script>
+		//执行一个laydate实例
+		laydate.render({
+			elem: '#s_date' //指定元素
+		});
+		//执行一个laydate实例
+		laydate.render({
+			elem: '#e_date' //指定元素
+		});
+
+		let oper_id = getCookie('oper_id');
+		$('#oper_id').val(oper_id); // 往隐藏域中添值
+		// 请求公司列表
+        $.ajax({
+            url: "/operplat/company/query",
+            context: document.body,
+            dataType: "JSON",
+            data: {'status':'enabled'},
+            async: false,
+            success: function(dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                    return;
+                } else {
+                    let cpsGloable = dataJson.cps;
+                    for (let i = 0; i < dataJson.cps.length; i++) {
+                        $('#companyCode').append('<option value="' + dataJson.cps[i].cpid + '" >' + dataJson.cps[i].cpname + '</option>');
+                    }
+                }
+            },
+            error: function(req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+        // 兑换券类型查询
+        $.ajax({
+            url: "/operplat/vou_type/query",
+            context: document.body,
+            dataType: "JSON",
+            data: {'status':'enabled'},
+            async: false,
+            success: function(dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                    return;
+                } else {
+                    let types = dataJson.types;
+                    for (let i = 0; i < types.length; i++) {
+                        $('#vouType').append('<option value="' + types[i].voutype + '" >' + types[i].type_name + '</option>');
+                    }
+                }
+            },
+            error: function(req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+        let batchNo;  // 声明一个全局变量接受批次号
+        
+        $('.make').click(function(){
+        		$.ajax({
+	            url: "/operplat/vou/vouget",
+	            context: document.body,
+	            dataType: "JSON",
+	            data:$("#upload").serialize(),
+	            async: false,
+	            success: function(dataJson, dataStatus) {
+	                if ("success" != dataJson.retCode) {
+	                    alert(dataJson.retMsg);
+	                    return;
+	                } else {
+	                    batchNo = dataJson.batchNo;	
+	                    window.location.replace('./vou_add_download.html?batchNo='+batchNo);
+	                    window.event.returnValue=false; //解决页面不跳转的问题
+	                }
+	            },
+	            error: function(req, errorMsg, exception) {
+	                alert(errorMsg);
+	            }
+	        });
+        });
+        
+	</script>
+</body>
+</html>

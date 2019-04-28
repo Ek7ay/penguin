@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>基础服务删除</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="sv_code">服务编码：</lable>
+				<input type="text" id="sv_code" placeholder="请输入">
+				<lable for="price">价格：</lable>
+				<input type="text" id="price" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>次序号</th>
+					<th>编码</th>
+					<th>名称</th>
+					<th>价格</th>
+					<th>创建人</th>
+					<th>时间</th>
+					<th>状态</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var svs;
+		// 声明查询函数
+        function query() {
+            var sv_code = $("#sv_code").val();
+            var price = $("#price").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/base_sv/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"sv_code":sv_code, "status":"normal","price":price},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        svs = dataJson.svs;
+                        for (var i = 0; i < svs.length; i++) {
+                            var status = svs[i].status;
+                            var sta;
+                            if(status == "normal"){
+                                sta = "正常";
+                            }else if (status == "del"){
+                                sta = "删除";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${svs[i].sv_code}</td>
+										   <td>${svs[i].sv_name}</td>
+										   <td>${svs[i].price}</td>
+										   <td>${svs[i].oper_id}</td>
+										   <td>${svs[i].ctime}</td>
+										   <td>${sta}</td>
+										    <td>
+												<button type="button" class="del" onclick="delMsg( ${i} ,this)">删除</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+        $(()=>{query();});
+		// 分类查询
+		$("#search").click(()=>{query();});
+        // 删除
+        function delMsg(data,that){
+            var re = confirm('确认删除此条信息？');
+            var pid = svs[data].pid;
+            if(re) {
+                $.ajax({
+                    url:"/operplat/base_sv/del",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"pid":pid,"status":"delete"},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                            return;
+                        } else {
+                            alert(dataJson.retMsg);
+                            query();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            }
+        };
+	</script>
+</html>

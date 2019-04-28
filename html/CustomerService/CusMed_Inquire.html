@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>客户药联卡查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="phoneno">客户手机号：</lable>
+				<input type="text" id="phoneno" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>卡券编码</th>
+					<th>客户号</th>
+					<th>交易金额</th>
+					<th>总金额</th>
+					<th>状态</th>
+					<th>流水号</th>
+					<th>客户姓名</th>
+					<th>手机号</th>
+					<th>创建时间</th>
+					<th>失效日期</th>
+					<th>药联卡号</th>
+					<th>药联订单号</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		// 声明查询函数
+        function query() {
+            var phoneno = $("#phoneno").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/drug/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"phoneno":phoneno},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var drugs = dataJson.drugs;
+                        for (var i = 0; i < drugs.length; i++) {
+                            var status = drugs[i].status;
+                            var sta;
+                            if (status == "active") {
+                                sta = "已激活";
+							}else if (status == "not_active"){
+								sta = "未激活";
+							}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${drugs[i].card_vou_code}</td>
+										   <td>${drugs[i].cusid}</td>
+										   <td>${drugs[i].tran_amt}</td>
+										   <td>${drugs[i].total}</td>
+										   <td>${sta}</td>
+										   <td>${drugs[i].payno}</td>
+										   <td>${drugs[i].cus_name}</td>
+										   <td>${drugs[i].phoneno}</td>
+										   <td>${drugs[i].ctime}</td>
+										   <td>${drugs[i].exp_date}</td>
+										   <td>${drugs[i].drug_card_no}</td>
+										   <td>${drugs[i].drug_order_id}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// 分类查询
+		$("#search").click(()=>{query();});
+	</script>
+</html>

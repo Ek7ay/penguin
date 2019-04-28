@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>企鹅卡查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+			.sec{
+				margin-left: 7px;
+			}
+			.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+			.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+			.paging label{ margin: 0 15px; }
+			.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+			.btm_biaodan {height: 100%;}
+			#go{position: relative;top: -1px;}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="card_no">卡号：</lable>
+				<input type="text" id="card_no" placeholder="请输入">
+				<lable class="sec" for="vouid">兑换码：</lable>
+				<input type="text" id="vouid" placeholder="请输入">
+				<lable for="s_date">开始时间：</lable>
+				<input type="text" id="s_date" placeholder="请输入">
+				<lable class="sec" for="e_date">结束时间：</lable>
+				<input type="text" id="e_date" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<form id="upload" enctype="multipart/form-data">
+				<table border="1" cellspacing="" cellpadding="">
+					<tr>
+						<th>序号</th>
+						<th>卡号</th>
+						<th>兑换码</th>
+						<th>创建时间</th>
+						<th>创建人</th>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<!-- 分页查询 -->
+		<div class="paging">
+			<button type="button" id="prev">上一页</button>
+			<label>
+				<input type="number" oninput="if(value<0)value =''" id="pageNum">
+				<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+			</label>
+			<button type="button" id="next">下一页</button>
+			<label id="nowPage">
+				当前第&nbsp;<span></span>&nbsp;页
+			</label>
+			<label style="margin-left: 0;" id="pageNo">
+				共&nbsp;<span></span>&nbsp;页
+			</label>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 执行日期插件实例
+		$(()=>{
+            lay('#version').html('-v' + laydate.v);
+            laydate.render({
+                elem: '#s_date'
+                // ,type: 'datetime'
+            });
+            laydate.render({
+                elem: '#e_date'
+            });
+		});
+		// 声明全局变量
+        var cards;
+        var index = 1;
+        var pageNo;
+        var sum;
+		// 声明查询函数
+        function query(index) {
+            var card_no = $("#card_no").val();
+            var vouid = $("#vouid").val();
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/penguin_card/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"card_no":card_no,
+					  "vouid":vouid,
+					  "s_date":s_date,
+					  "e_date":e_date,
+					  "page_num":index,
+					  "page_count":"20"},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        cards = dataJson.cards;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        for (var i = 0; i < cards.length; i++) {
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${cards[i].card_no}</td>
+										   <td>${cards[i].vouid}</td>
+										   <td>${cards[i].ctime}</td>
+										   <td>${cards[i].oper_id}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+            $('#pageNo span').html(pageNo);
+            $('#nowPage span').html(index);
+            $('#pageNum').val(index);
+        }
+		// load查询
+		query(index);
+        // 上一页
+        $("#prev").on("click",()=>{
+            if(index<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index--;
+            query(index);
+        });
+        // 下一页
+        $("#next").on("click",()=>{
+            if(index>=pageNo){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index++;
+            query(index);
+        });
+        // 输入页查询
+        $("#go").on("click",()=>{
+            index  = $("#pageNum").val();
+            if(index<=0){
+                alert("不能小于第一页！");
+                return;
+            };
+            if(index>Number(pageNo)){
+                alert("不能大于最后一页！");
+                $("#pageNum").val(1);
+                $('#nowPage span').html(1);
+                index = 1;
+                query(index);
+                return;
+            };
+            query(index);
+        });
+		// 分类查询
+		$("#search").click(()=>{
+		    index = 1;
+            query(index);
+		});
+	</script>
+</html>

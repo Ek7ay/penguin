@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>黄牛权益转账</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	  <style>
+		  #search_amt{
+			  margin: 15px auto;
+		  }
+		  #submit{
+			  margin-left: 135px;
+		  }
+		  .btn-s{
+			  padding: 3px 20px;
+			  background-color: #2484b3;
+			  color: #FFFFFF;
+			  font-size: 14px;
+			  border-radius: 5px;
+			  outline: none;
+		  }
+	  </style>
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>手机号码:</td>
+						<td>
+							<input id="phone_no" placeholder="请输入正确的手机号"
+								   onkeyup="this.value=this.value.replace(/\D/g,'')"
+								   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+								   oninput="if(value.length>11)value=value.slice(0,11)"
+							/>
+						</td>
+					</tr>
+					<tr>
+						<td>权益余额:</td>
+						<td>
+							<input placeholder="根据手机号查询而来" readonly="readonly" id="amt"/>
+						</td>
+					</tr>
+					<tr>
+						<td></td>
+						<td><button class="btn-s" type="button" id="search_amt">权益余额查询</button></td>
+					</tr>
+					<tr>
+						<td>转让量：</td>
+						<td>
+							<input placeholder="请输入转让数量" id="amt_z" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+						</td>
+					</tr>
+				</table>
+				<button type="button" class="btn-s" id="submit">转让</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+			// 查询权益余额
+			var phone_no;
+			function phonenno() {
+                phone_no = $("#phone_no").val();
+                if(!(/^1[3456789]\d{9}$/.test(phone_no))){
+                    alert("手机号码有误，请重填");
+                    return false;
+                }
+                return true;
+            }
+			function queryamt() {
+                if (!phonenno()) { return; }
+                $.ajax({
+                    url:"/operplat/cattle/cattleQuery",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"phoneno":phone_no},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                        } else {
+                            var amt = dataJson.amt;
+							$("#amt").empty().val(amt);
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+			}
+			$("#search_amt").on("click",() => {queryamt()});
+			// 权益转让
+			$("#submit").on("click", () => {
+				if (!phonenno()) { return; }
+                var amt = $("#amt_z").val();
+                if(amt == ''){
+                    alert('转让数量不能为空');
+                    return;
+                }
+                if (amt % 50 !== 0) {
+                    alert('请输入50的倍数!!!');
+                    return;
+				}
+				if (amt > 300000) {
+                    alert('转让权益一次不能大于30万!!!');
+                    return;
+				}
+                var mymessage=confirm("确认要转让您的权益吗？");
+                if(mymessage === true) {
+                    $.ajax({
+                        url:"/operplat/cattle/cattleTransfer",
+                        context: document.body,
+                        dataType: "JSON",
+                        async: false,
+                        data:{"phone_no":phone_no,"amt":amt},
+                        success:function (dataJson,dataStatus) {
+                            if ("success" != dataJson.retCode) {
+                                alert(dataJson.retMsg);
+                            } else {
+                                queryamt();
+                                alert(dataJson.retMsg);
+                            }
+                        },
+                        error:function (req, errorMsg, exception) {
+                            alert(errorMsg);
+                        }
+                    });
+				}
+			});
+		</script>
+	</body>
+</html>

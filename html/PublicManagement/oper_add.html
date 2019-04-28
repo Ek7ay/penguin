@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>人员新增</title>
+    <link rel="stylesheet" href="../../css/TRconner/style.css">
+    <style>
+        #upload{
+            position: relative;
+            width: 350px;
+        }
+        #Pull_the_egg{
+            width: 300px;
+            border: 1px solid teal;
+            margin: 30px 0 0 25px;
+            font-size: 12px;
+        }
+        #Pull_the_egg span{
+            cursor: pointer;
+        }
+        ul{
+            width: 140px;
+        }
+        li{
+            list-style: none;
+            position: relative;
+            right: 15px;
+        }
+        li img{
+            position: relative;
+            top: 2.5px;
+        }
+    </style>
+</head>
+
+<body class="add">
+    <form id="upload" enctype="multipart/form-data">
+        <label>
+            <span>人员姓名：</span>
+            <input type="text" placeholder="必输项" id="name" />
+        </label>
+        <label>
+            <span>登录名称：</span>
+            <input type="text" placeholder="必输项" id="loginName" />
+        </label>
+        <label>
+            <span>角色：</span>
+            <select id="role" style="width: 207px;height: 35px;padding-left: 10px">
+            </select>
+        </label>
+        <label>
+            <span>人员类型：</span>
+            <select id="userType" style="width: 207px;height: 35px;padding-left: 10px">
+                <option value="view"> 查看 </option>
+                <option value="oper"> 运维 </option>
+                <option value="admin"> 系统管理 </option>
+                <option value="sys"> Boss </option>
+            </select>
+        </label>
+        <button type="button" class="btn-submit" id="submit">提交</button>
+    </form>
+    <div id="Pull_the_egg">
+
+    </div>
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <script src="../../js/cookie.js"></script>
+    <script>
+        // 加载角色列表
+        $.ajax({
+            url: "/operplat/role/queryRole",
+            context: document.body,
+            dataType: 'JSON',
+            data: {
+                'role_status': 'enabled'
+            },
+            async: false,
+            success: function (dataJson, dataStatus) {
+                var retCode = dataJson.retCode;
+                var retMsg = dataJson.retMsg;
+                if (retCode != 'success') {
+                    alert(retMsg);
+                    return;
+                } else {
+                    var roles = dataJson.roles;
+                    var htmlStr = "";
+                    for (var i = 0; i < roles.length; i++) {
+                        htmlStr += '<option value=' + roles[i].role_id + '>' + roles[i].role_name +
+                            '</option>';
+                    }
+                    $("#role").html(htmlStr);
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert('出错啦，请稍后再试。');
+            }
+        });
+
+        $("#submit").on("click", () => {
+            var name = $("#name").val();
+            if (name == '') {
+                alert('人员姓名不能为空');
+                return;
+            }
+            var loginName = $("#loginName").val();
+            if (loginName == '') {
+                alert('登录名称不能为空');
+                return;
+            }
+
+            var role = $('#role option:selected').val();
+            if (role == '') {
+                alert('角色不能为空');
+                return;
+            }
+
+            var userType = $('#userType option:selected').val();
+            if (userType == '') {
+                alert('用户类型不能为空');
+                return;
+            }
+
+            $.ajax({
+                url: "/operplat/user/addUser",
+                type: 'POST',
+                dataType: 'JSON',
+                data: {
+                    'oper_name': name,
+                    'login_name': loginName,
+                    'role_id': role,
+                    'user_type': userType,
+                    'user_img': ""
+                },
+                async: false,
+                success: function (dataJson, dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        window.location.reload();
+                        alert(dataJson.retMsg);
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+
+        // =======自动加载对应角色权限=======
+        // 获取全部菜单数组
+        var ygj ;
+        $.ajax({
+                url: "/operplat/menu/queryMenuLevel",
+                context: document.body,
+                dataType: 'JSON',
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        ygj = dataJson.menus;
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        // 加载菜单列表
+        $(()=>{
+            $('#Pull_the_egg').html(recursive(ygj));
+            var role_id = $("#role option:selected").val();
+            queryrole();
+            comparess();
+            Amerger();
+        });
+        // 获取列表结构
+        function recursive(arr) {
+            var len = arr.length;
+            var str = '<ul>';
+            for (let i = 0; i < len; i++) {
+                if (arr[i].has_more != 'Y') {
+                    str += `<li style="display: none"><span>${arr[i].menu_name}</span>`;
+                    str += '</li>';
+                    continue;
+                } else {
+                    str += `<li class="menu-fu" style="display: none">
+					   <span>${arr[i].menu_name}<img src="../../images/jiahao.png" height="14" width="14"/></span>
+					   <ul>`;
+                    if (arr[i].childMenus != null && arr[i].childMenus.length > 0) {
+                        str += recursive(arr[i].childMenus);
+                    }
+                    str += '</ul>';
+                    str += '</li>';
+                }
+            }
+            str += '</ul>';
+            return str;
+        };
+        // 控制菜单的展开与合并
+        function Amerger() {
+            $('.menu-fu span').toggle(function(){
+                $(this).next().slideUp();
+            },function(){
+                $(this).next().slideDown();
+            });
+        }
+        Amerger();
+        // 获取对应角色菜单权限
+        var role_menus;
+        function queryrole(role_id) {
+            $.ajax({
+                url: "/operplat/role/queryRole",
+                context: document.body,
+                dataType: 'JSON',
+                data: {"role_id":role_id},
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        role_menus = dataJson.roles[0].menus;
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+        // 与全部菜单进行比较，决定显示哪些菜单
+        $("#role").on("change", () => {
+            $('#Pull_the_egg').empty();
+            $('#Pull_the_egg').html(recursive(ygj));
+            var role_id = $("#role option:selected").val();
+            queryrole(role_id);
+            comparess();
+            Amerger();
+        });
+        // 菜单比较的辅助函数
+        function comparess() {
+            var yangarr = $("#Pull_the_egg").find('span');
+            for (var p = 0; p < role_menus.length; p++) {
+                for (var d = 0; d < yangarr.length; d++) {
+                    if (yangarr[d].innerText == role_menus[p].menu_name) {
+                        yangarr[d].parentElement.style.display = "block";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>

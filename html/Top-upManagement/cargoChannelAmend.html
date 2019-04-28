@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="renderer" content="webkit">
+    <title>供货渠道修改</title>
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <link rel="stylesheet" href="../../css/TRconner/mine.css">
+</head>
+<style>
+    .class-table {
+        width: 375px;
+        height: 470px;
+        border: 1px solid grey;
+        position: fixed;
+        top: 15%;
+        left: 35%;
+        padding-top: 25px;
+        background-color: #FFFFFF;
+    }
+
+    .class-table form table tr {
+        font-size: 15px;
+        line-height: 40px;
+    }
+
+    .class-table form table tr td:first-child {
+        text-align: right;
+    }
+
+    .class-table form table tr td input {
+        width: 150px;
+        height: 30px;
+        border: 1px solid #757f75;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+
+    .class-table form table {
+        margin-left: 71px;
+        margin-top: 13px;
+    }
+
+    #beizhu {
+        position: absolute;
+        top: 235px;
+        left: 83px;
+    }
+
+    .class-table form table tr td select {
+        width: 150px;
+        height: 30px;
+        border: 1px solid #757f75;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+
+    .class_instruction {
+        width: 70px;
+        height: 25px;
+        font-size: 14px;
+        border: none;
+        background-color: #818181;
+        color: white;
+        border-radius: 3px;
+    }
+
+    .pop-up-button {
+        margin-top: 20px;
+        margin-left: 89px;
+    }
+
+    .pop-up-button button:last-child {
+        margin-left: 54px;
+    }
+
+    a.shut {
+        position: absolute;
+        top: -3px;
+        right: 6px;
+        color: red;
+        font-size: 24px;
+    }
+</style>
+<body class="info demo">
+<div class="content btm_biaodan">
+    <table border="1" cellspacing="" cellpadding="">
+        <tr>
+            <th>序号</th>
+            <th>渠道编码</th>
+            <th>渠道名称</th>
+            <th>联系人</th>
+            <th>联系电话</th>
+            <th>加入时间</th>
+            <th>状态</th>
+            <th>操作</th>
+        </tr>
+    </table>
+</div>
+<div class="class-table">
+    <a class="shut" href="javascript:;">×</a>
+    <form id="upload" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td>渠道编码：</td>
+                <td>
+                    <input type="text" id="chan_code2" name="chan_code">
+                </td>
+            </tr>
+            <tr>
+                <td>渠道名称：</td>
+                <td>
+                    <input readonly="readonly" type="text" id="chan_name2" name="chan_name">
+                </td>
+            </tr>
+            <tr>
+                <td>联系人：</td>
+                <td>
+                    <input type="text" id="contacts2" name="contacts">
+                </td>
+            </tr>
+            <tr>
+                <td>联系电话：</td>
+                <td>
+                    <input type="text" id="phoneno2" name="phoneno">
+                </td>
+            </tr>
+            <tr>
+                <td>状态：</td>
+                <td>
+                    <select id="status2" name="status">
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td id="beizhu">备&nbsp&nbsp&nbsp&nbsp注：</td>
+                <td>
+                    <textarea id="remark2" name="remark" rows="-8" cols="15" style="margin-top: 6px"></textarea>
+                </td>
+            </tr>
+
+        </table>
+        <div class="pop-up-button">
+            <input type="text" style="display: none" id="pid2" name="pid">
+            <button class="class_instruction shut" onclick="submitEdit()">确定</button>
+            <button class="class_instruction shut">取消</button>
+        </div>
+    </form>
+</div>
+</body>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/cookie.js"></script>
+<script>
+    var chans;
+    // load查询
+    $(() => {
+        $.ajax({
+            url: "/operplat/supply/query",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    chans = dataJson.chans;
+                    for (var i = 0; i < chans.length; i++) {
+                        var status = chans[i].status;
+                        var sta;
+                        if (status == "enable") {
+                            sta = "启用";
+                        } else if (status == "not_enable") {
+                            sta = "未启用";
+                        }
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										   <td>${i + 1}</td>
+										   <td>${chans[i].chan_code}</td>
+										   <td>${chans[i].chan_name}</td>
+										   <td>${chans[i].contacts}</td>
+										   <td>${chans[i].phoneno}</td>
+										   <td>${chans[i].ctime}</td>
+										   <td>${sta}</td>
+										    <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+    });
+    // 获取修改内容
+    function editMsg(i) {
+        $("#chan_code2").val(chans[i].chan_code);
+        $("#chan_name2").val(chans[i].chan_name);
+        $("#contacts2").val(chans[i].contacts);
+        $("#phoneno2").val(chans[i].phoneno);
+        $("#remark2").val(chans[i].remark);
+        $("#pid2").val(chans[i].pid);
+        var status = chans[i].status;
+        if (status == "enable") {
+            $("#status2").empty();
+            $("#status2").append(
+                ` <option value="enable">启用</option>
+					 <option value="not_enable">未启用</option>`
+            );
+        } else if (status == "not_enable") {
+            $("#status2").empty();
+            $("#status2").append(
+                `<option value="not_enable">未启用</option>
+                 <option value="enable">启用</option> `
+            );
+        }
+        $("#remark").val(chans[i].remark);
+        $('.class-table').show();
+    };
+    // 修改界面的显示和隐藏
+    $(() => {
+        $(".class-table").hide();
+        $(".open").click(() => {
+            $(".class-table").show();
+        });
+        $(".shut").click(() => {
+            $(".class-table").hide();
+        });
+    });
+    // 编辑结果提交
+    function submitEdit() {
+        var formData = new FormData($("#upload")[0]);
+        $.ajax({
+            url: "/operplat/supply/modify",
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    alert('修改成功');
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert("出错啦");
+            }
+        });
+    };
+</script>
+</html>

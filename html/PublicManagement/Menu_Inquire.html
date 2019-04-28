@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>菜单查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.leftid{
+				text-align: left !important;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="menu_id">菜单编码：</lable>
+				<input type="text" id="menu_id" placeholder="请输入">
+				<lable for="menu_name" class="class-lable">菜单名称：</lable>
+				<input type="text" id="menu_name" placeholder="请输入">
+				<lable for="menu_level" class="class-lable">菜单级别：</lable>
+				<input type="text" id="menu_level" placeholder="请输入">
+				<lable for="up_menu" class="class-lable">上级菜单：</lable>
+				<input type="text" id="up_menu" placeholder="请输入">
+				<lable for="is_show" class="class-lable">是否显示：</lable>
+				<select id="is_show">
+					<option value="">全部</option>
+					<option value="Y">是</option>
+					<option value="N">否</option>
+				</select>
+				<lable for="has_more" class="class-lable">是否有子菜单：</lable>
+				<select id="has_more">
+					<option value="">全部</option>
+					<option value="Y">是</option>
+					<option value="N">否</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>菜单编码</th>
+					<th>菜单名称</th>
+					<th>菜单级别</th>
+					<th>上级菜单</th>
+					<th>菜单页面地址</th>
+					<th>显示顺序</th>
+					<th>是否显示</th>
+					<th>是否有子菜单</th>
+					<th>备注</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var menus;
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/menu/queryMenu",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        menus = dataJson.menus;
+                        for (var i = 0; i < menus.length; i++) {
+                            var is_show = menus[i].is_show;
+                            var show;
+                            if(is_show == "Y"){
+                                show = "是";
+                            }else if (is_show == "N"){
+                                show = "否";
+                            }
+                            var has_more = menus[i].has_more;
+                            var has;
+                            if(has_more == "Y"){
+                                has = "是";
+                            }else if (has_more == "N"){
+                                has = "否";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td class="leftid">${menus[i].menu_id}</td>
+										   <td>${menus[i].menu_name}</td>
+										   <td>${menus[i].menu_level}</td>
+										   <td>${menus[i].up_menu}</td>
+										   <td>${menus[i].menu_url}</td>
+										   <td>${menus[i].seq_index}</td>
+										   <td>${show}</td>
+										   <td>${has}</td>
+										   <td>${menus[i].remark}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 分类查询
+		$("#search").click(()=>{
+            var menu_id = $("#menu_id").val();
+            var menu_name = $("#menu_name").val();
+            var menu_level = $("#menu_level").val();
+            var up_menu = $("#up_menu").val();
+            var is_show = $("#is_show option:selected").val();
+            var has_more = $("#has_more option:selected").val();
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/menu/queryMenu",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"menu_id":menu_id,"menu_name":menu_name,"menu_level":menu_level,"up_menu":up_menu,"is_show":is_show,"has_more":has_more},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        menus = dataJson.menus;
+                        for (var i = 0; i < menus.length; i++) {
+                            var is_show = menus[i].is_show;
+                            var show;
+                            if(is_show == "Y"){
+                                show = "是";
+                            }else if (is_show == "N"){
+                                show = "否";
+                            }
+                            var has_more = menus[i].has_more;
+                            var has;
+                            if(has_more == "Y"){
+                                has = "是";
+                            }else if (has_more == "N"){
+                                has = "否";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${menus[i].menu_id}</td>
+										   <td>${menus[i].menu_name}</td>
+										   <td>${menus[i].menu_level}</td>
+										   <td>${menus[i].up_menu}</td>
+										   <td>${menus[i].menu_url}</td>
+										   <td>${menus[i].seq_index}</td>
+										   <td>${show}</td>
+										   <td>${has}</td>
+										   <td>${menus[i].remark}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+	</script>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>客户绑定油卡信息删除</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+		<div class="month" id="lable">
+			<lable for="phoneno">电话号码：</lable>
+			<input type="text" id="phoneno" placeholder="请输入">
+			<lable for="card_type" class="class-lable">卡类型：</lable>
+			<select id="card_type">
+				<option value="">全部</option>
+				<option value="zsy">中国石油</option>
+				<option value="zsh">中国石化</option>
+			</select>
+			<lable for="card_no" class="class-lable">卡号码：</lable>
+			<input type="text" id="card_no" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+			<button class="btn class-lable" id="search">搜索</button>
+		</div>
+	</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>顺序号</th>
+					<th>客户号</th>
+					<th>手机号</th>
+					<th>持卡人姓名</th>
+					<th>卡号</th>
+					<th>卡类型</th>
+					<th>状态</th>
+					<th>添加时间</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 声明全局变量
+        var cards;
+		// 声明查询函数
+        function query() {
+            var phoneno = $("#phoneno").val();
+            if(phoneno == ""){
+                alert("请输入手机号");
+                return;
+			}
+            var card_type = $("#card_type option:selected").val();
+            var card_no = $("#card_no").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/cus/queryCusOilCards",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data:{"phoneno":phoneno, "card_type":card_type,"card_no":card_no},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        cards = dataJson.cards;
+                        for (var i = 0; i < cards.length; i++) {
+                            var card_type = cards[i].card_type;
+                            var lol;
+                            if(card_type == "zsh"){
+                                lol = "中国石化";
+                            }else if (card_type == "zsy"){
+                                lol = "中国石油";
+                            }
+                            var status = cards[i].status;
+                            var sta;
+                            if(status == "useable"){
+                                sta = "可用";
+                            }else if (status == "unuseable"){
+                                sta = "不可用";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${cards[i].cusid||""}</td>
+										   <td>${cards[i].phoneno||""}</td>
+										   <td>${cards[i].cus_name||""}</td>
+										   <td>${cards[i].card_no}</td>
+										   <td>${lol}</td>
+										   <td>${sta}</td>
+										   <td>${cards[i].ctime}</td>
+										   <td>
+												<button type="button" class="del" onclick="delMsg( ${i} ,this)">删除</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+        // 分类查询
+        $("#search").click(()=>{query();});
+        // 删除
+        function delMsg(data,that){
+            var re = confirm('确认删除此条信息？');
+            var pid = cards[data].pid;
+            if(re) {
+                $.ajax({
+                    url:"/operplat/cus/delCusOilCards",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"pid":pid,"status":"delete"},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                            return;
+                        } else {
+                            alert(dataJson.retMsg);
+                            index = 1;
+                            query(index);
+                        }
+                        query();
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            }
+        };
+	</script>
+</html>

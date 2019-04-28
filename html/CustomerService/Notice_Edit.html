@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>公告修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+			.class-table{
+				width: 360px;
+				height: 500px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 152px;
+				left: 71px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table tr td textarea{
+				border-radius: 3px;
+			}
+			.class-table form table tr:last-child td{
+				padding:10px 0px;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+			.class-table form table tr td.author .author_list label{
+				margin-top: 5px;
+				text-align: right;
+			}
+			.class-table form table tr td.author .author_list label input{
+				position: relative;
+				margin-right: 5px;
+				top: 3px;
+				width: 15px;
+				height: 15px;
+			}
+			#content{
+				width: 201px;
+				height: 219px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+		<div class="month" id="lable">
+			<lable for="pid">序号：</lable>
+			<input type="text" id="pid" placeholder="请输入">
+			<lable for="location" class="class-lable">位置：</lable>
+			<select id="location">
+				<option value="">全部</option>
+				<option value="index_notice">首页公告</option>
+				<option value="oil_notice">油卡充值公告</option>
+				<option value="trading_notice">交易市场公告</option>
+			</select>
+			<lable for="status" class="class-lable">状态：</lable>
+			<select id="status">
+				<option value="">全部</option>
+				<option value="on">开启</option>
+				<option value="off">关闭</option>
+			</select>
+			<button class="btn class-lable" id="search">搜索</button><br>
+		</div>
+	</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>顺序号</th>
+					<th>序号</th>
+					<th>位置</th>
+					<th>状态</th>
+					<th>内容</th>
+					<th>备注</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<!--修改表单-->
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>序号：</td>
+						<td>
+							<input readonly="readonly" type="text" id="pid2" name="pid">
+						</td>
+					</tr>
+					<tr>
+						<td>位置：</td>
+						<td>
+							<input readonly="readonly" type="text" id="location2">
+						</td>
+					</tr>
+					<tr>
+						<td>状态：</td>
+						<td>
+							<select id="status2" name="status">
+								<option value="on">开启</option>
+								<option value="off">关闭</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td id="beizhu">内容：</td>
+						<td>
+							<textarea id="content" name="content"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 修改界面的显示和隐藏
+        $(()=>{
+            $(".class-table").hide();
+            $(".open").click(()=>{
+                $(".class-table").show();
+            });
+            $(".shut").click(()=>{
+                $(".class-table").hide();
+            });
+        });
+        // 声明全局变量
+        var notices;
+		// 声明查询函数
+        function query() {
+            var pid = $("#pid").val();
+            var location = $("#location option:selected").val();
+            var status = $("#status option:selected").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/notice/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data:{"pid":pid, "location":location,"status":status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        notices = dataJson.notices;
+                        for (var i = 0; i < notices.length; i++) {
+                            var location = notices[i].location;
+                            var lol;
+                            if(location == "index_notice"){
+                                lol = "首页公告";
+                            }else if (location == "oil_notice"){
+                                lol = "油卡充值公告";
+                            }else if (location == "trading_notice"){
+                                lol = "市场交易公告";
+                            }
+                            var status = notices[i].status;
+                            var sta;
+                            if(status == "on"){
+                                sta = "开启";
+                            }else if (status == "off"){
+                                sta = "关闭";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${notices[i].pid}</td>
+										   <td>${lol}</td>
+										   <td>${sta}</td>
+										   <td>${notices[i].content}</td>
+										   <td>${notices[i].remark}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+		$(()=>{query();});
+        // 分类查询
+        $("#search").click(()=>{query();});
+        // 获取修改内容
+        function editMsg(i){
+            $("#pid2").val(notices[i].pid);
+            var location = notices[i].location;
+            var lol;
+            if(location == "index_notice"){
+                lol = "首页公告";
+            }else if (location == "oil_notice"){
+                lol = "油卡充值公告";
+            }else if (location == "trading_notice"){
+                lol = "市场交易公告";
+            }
+            $("#location2").val(lol);
+            $("#status2").val(notices[i].status);
+            $("#content").val(notices[i].content);
+            $('.class-table').show();
+        };
+        // 编辑结果提交
+        function submitEdit() {
+            var formData = new FormData($( "#upload" )[0]);
+            $.ajax({
+                url:"/operplat/notice/modify",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    }else{
+                        alert(dataJson.retMsg);
+                        $(".class-table").hide();
+                        query();
+                    }
+                },
+                error: function(req,errorMsg,exception){
+                    alert("出错啦");
+                }
+            });
+        };
+	</script>
+</html>

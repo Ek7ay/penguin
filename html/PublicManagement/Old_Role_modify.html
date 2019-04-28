@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>角色修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 375px;
+				height: 620px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 407px;
+				left: 83px;
+			}
+			#caidan{
+				position: absolute;
+				top: 113px;
+				left: 71px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table tr td textarea{
+				border-radius: 3px;
+			}
+			.class-table form table tr:last-child td{
+				padding:10px 0px;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+			.class-table form table tr td.author .author_list{
+				display: flex;
+				flex-direction: column;
+				width: 151px;
+				height: 300px;
+				overflow-y: scroll;
+				border: 1px solid #958888;
+				border-radius: 5px;
+			}
+			.class-table form table tr td.author .author_list label{
+				margin-top: 5px;
+				text-align: right;
+			}
+			.class-table form table tr td.author .author_list label input{
+				position: relative;
+				margin-right: 5px;
+				top: 3px;
+				width: 15px;
+				height: 15px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="role_id">角色编码：</lable>
+				<input type="text" id="role_id" placeholder="请输入">
+				<lable for="role_name" class="class-lable">角色名称：</lable>
+				<input type="text" id="role_name" placeholder="请输入">
+				<lable for="role_status" class="class-lable">角色状态：</lable>
+					<select id="role_status">
+						<option value="">全部</option>
+						<option value="enabled">可用</option>
+						<option value="del">删除</option>
+					</select>
+				<lable for="is_sys" class="class-lable">是否系统权限：</lable>
+				<select id="is_sys">
+					<option value="">全部</option>
+					<option value="Y">是</option>
+					<option value="N">不是</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>角色编码</th>
+					<th>角色名称</th>
+					<th>创建时间</th>
+					<th>角色状态</th>
+					<th>系统角色</th>
+					<th>角色描述</th>
+					<th>备注</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>角色编码：</td>
+						<td>
+							<input readonly="readonly" type="text" id="role_id2" name="role_id">
+						</td>
+					</tr>
+					<tr>
+						<td>角色名称：</td>
+						<td>
+							<input type="text" id="role_name2" name="role_name">
+						</td>
+					</tr>
+					<tr>
+						<td id="caidan">功能菜单：</td>
+						<td class="author">
+							<div class="author_list" id="author_list">
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td id="beizhu">备&nbsp&nbsp&nbsp&nbsp注：</td>
+						<td>
+							<textarea id="remark" name="remark" rows="-8" cols="16"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var roles;
+		var  menus;
+		var   menuscheck;
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/role/queryRole",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        roles = dataJson.roles;
+                        for (var i = 0; i < roles.length; i++) {
+                            var role_status = roles[i].role_status;
+                            var sta;
+                            if(role_status == "enabled"){
+                                sta = "可用的";
+                            }else if (role_status == "del"){
+                                sta = "不可用的";
+                            }
+                            var is_sys = roles[i].is_sys;
+                            var sys;
+                            if(is_sys == "Y"){
+                                sys = "是";
+							}else if (is_sys == "N"){
+                                sys = "不是";
+							}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${roles[i].role_id}</td>
+										   <td>${roles[i].role_name}</td>
+										   <td>${roles[i].ctime}</td>
+										   <td>${sta}</td>
+										   <td>${sys}</td>
+										   <td>${roles[i].role_desc}</td>
+										   <td>${roles[i].remark||""}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+												<button type="button" class="del" onclick="delMsg( ${i} ,this)">删除</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 分类查询
+		$("#search").click(()=>{
+            var role_id = $("#role_id").val();
+            var role_name = $("#role_name").val();
+            var role_status = $("#role_status option:selected").val();
+            var is_sys = $("#is_sys option:selected").val();
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/role/queryRole",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"role_id":role_id,"role_name":role_name,"role_status":role_status,"is_sys":is_sys},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        roles = dataJson.roles;
+                        for (var i = 0; i < roles.length; i++) {
+                            var role_status = roles[i].role_status;
+                            var sta;
+                            if(role_status == "enabled"){
+                                sta = "可用的";
+                            }else if (role_status == "del"){
+                                sta = "不可用的";
+                            }
+                            var is_sys = roles[i].is_sys;
+                            var sys;
+                            if(is_sys == "Y"){
+                                sys = "是";
+                            }else if (is_sys == "N"){
+                                sys = "不是";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${roles[i].role_id}</td>
+										   <td>${roles[i].role_name}</td>
+										   <td>${roles[i].ctime}</td>
+										   <td>${sta}</td>
+										   <td>${sys}</td>
+										   <td>${roles[i].role_desc}</td>
+										   <td>${roles[i].remark||""}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+												<button type="button" class="del" onclick="delMsg( ${i} ,this)">删除</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+        // 获取修改内容
+        function editMsg(i){
+            $("#author_list").empty();
+            $(()=>{
+                $.ajax({
+                    url:"/operplat/menu/queryMenu",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+							menus = dataJson.menus;
+                            console.log(menus);
+                            for(var i=0;i<menus.length;i++){
+                                $("#author_list").append(`
+                                <label>${menus[i].menu_name}<input type="checkbox" name="menus" value=${menus[i].menu_id}></label>
+                                `);
+                            }
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+
+                    }
+                });
+            });
+            menuscheck = roles[i].menus;
+            var allMeuns = $("#author_list").find('input');
+            for(var p=0;p<menuscheck.length;p++){
+                for(var d = 0;d<allMeuns.length;d++){
+                    if(allMeuns[d].value == menuscheck[p].menu_id){
+                        allMeuns[d].setAttribute("checked","checked");
+                    }
+                }
+            }
+            console.log(roles);
+            console.log(i);
+            $("#role_id2").val(roles[i].role_id);
+            $("#role_name2").val(roles[i].role_name);
+            $("#remark").val(roles[i]. remark);
+            $('.class-table').show();
+        };
+        // 修改界面的显示和隐藏
+		$(()=>{
+            $(".class-table").hide();
+		    $(".open").click(()=>{
+		        $(".class-table").show();
+			});
+		    $(".shut").click(()=>{
+                $(".class-table").hide();
+            });
+		});
+        // 编辑结果提交
+        function submitEdit() {
+            $.ajax({
+                url:"/operplat/role/modifyRole",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data:$('#upload').serialize(),
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode){
+                        alert(dataJson.retMsg);
+                    }else {
+                        console.log(dataJson);
+                        alert(dataJson.retMsg);
+                        console.log(dataJson.retMsg);
+                        // window.location.reload();
+                        $(".class-table").hide();
+                        var role_id = $("#role_id").val();
+                        var role_name = $("#role_name").val();
+                        var role_status = $("#role_status option:selected").val();
+                        var is_sys = $("#is_sys option:selected").val();
+                        $(".test").empty();
+                        $.ajax({
+                            url:"/operplat/role/queryRole",
+                            context: document.body,
+                            dataType: "JSON",
+                            async: false,
+                            data:{"role_id":role_id,"role_name":role_name,"role_status":role_status,"is_sys":is_sys},
+                            success:function (dataJson,dataStatus) {
+                                if ("success" != dataJson.retCode) {
+                                    alert(dataJson.retMsg);
+                                } else {
+                                    roles = dataJson.roles;
+                                    for (var i = 0; i < roles.length; i++) {
+                                        var role_status = roles[i].role_status;
+                                        var sta;
+                                        if(role_status == "enabled"){
+                                            sta = "可用的";
+                                        }else if (role_status == "del"){
+                                            sta = "不可用的";
+                                        }
+                                        var is_sys = roles[i].is_sys;
+                                        var sys;
+                                        if(is_sys == "Y"){
+                                            sys = "是";
+                                        }else if (is_sys == "N"){
+                                            sys = "不是";
+                                        }
+                                        $(".btm_biaodan table").append(
+                                            `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${roles[i].role_id}</td>
+										   <td>${roles[i].role_name}</td>
+										   <td>${roles[i].ctime}</td>
+										   <td>${sta}</td>
+										   <td>${sys}</td>
+										   <td>${roles[i].role_desc}</td>
+										   <td>${roles[i].remark||""}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+												<button type="button" class="del" onclick="delMsg( ${i} ,this)">删除</button>
+										   </td>
+										</tr>`);
+                                    }
+                                }
+                            },
+                            error:function (req, errorMsg, exception) {
+                                alert(errorMsg);
+                            }
+                        });
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+
+                }
+            });
+        };
+        // 删除
+        function delMsg(data,that){
+            var re = confirm('确认删除此条信息？');
+            var role_id = roles[data].role_id;
+            if(re) {
+                $.ajax({
+                    url:"/operplat/role/delRole",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"role_id":role_id},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                        } else {
+                            $(that).parent().parent().hide();
+                            alert(dataJson.retMsg);
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            }else{
+                return;
+            }
+        };
+	</script>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>兑换券类型修改</title>
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/pintuer.css">
+    <link rel="stylesheet" href="../../css/mine.css" />
+    <style>
+        .total{height: 30px; line-height: 30px; margin-right: 40px; display: flex; align-items: center; font-size: 15px; font-weight: bold;}
+        .total span{  color: #000; font-size: 15px; padding: 10px ; display: block; text-align: center; font-weight: normal; line-height: 25px;}
+        /*修改删除按钮样式*/
+        .class-button{
+            width:44px;
+            height: 25px;
+            border-radius: 3px;
+            background-color: #f2f2f4;
+            color: #000;
+        }
+        .class-button+.class-button{margin-left: 5px;}
+        .btm_biaodan table tr th:last-child{
+            width: 14%;
+        }
+        /*修改内容弹出框样式pop-up*/
+        .pop-up{
+            width: 320px;
+            height: 370px;
+            position: fixed;
+            top: 30%;
+            left: 35%;
+            background-color: #FFFFFF;
+            border:3px solid grey;
+        }
+        a.shut{
+            position: absolute;
+            top: -7px;
+            right: 4px;
+            color: red;
+            font-size: 24px;
+        }
+        .pop-up form table{
+            margin-top: 25px;
+        }
+        .pop-up form table tr{
+            line-height: 72px;
+            font-size: 15px;
+        }
+        .pop-up form table tr td input,.pop-up form table tr td select{
+            width: 150px;
+            height: 30px;
+            border: none;
+            border: 1px solid #757f75;
+            border-radius: 2px;
+        }
+        .pop-up-button{
+            margin-top: 45px;
+            margin-left: 66px;
+        }
+        .pop-up-button button:last-child{
+            margin-left: 40px;
+        }
+        .pop-up-button button{
+            width: 70px;
+            height: 25px;
+            font-size: 14px;
+            border: none;
+            color: white;
+            border-radius: 3px;
+            background-color: grey;
+        }
+    </style>
+</head>
+<body class="info demo">
+    <div class="header">
+        <div class="month">
+            <label class="ml15">类型名称：
+                <input type="text" id="type_id" />
+            </label>
+            <label class="ml15">状态：
+                <select name="" id="status">
+                    <option value="">全部</option>
+                    <option value="new">新建</option>
+                    <option value="enabled">启用</option>
+                    <option value="unenabled">停用</option>
+                    <!-- <option value="del">删除</option> -->
+                </select>
+            </label>
+            <button class="btn ml15" id="search">搜索</button>
+        </div>
+    </div>
+    <div class="content btm_biaodan">
+        <table border="1" cellspacing="" cellpadding="">
+            <tr>
+                <th>序号</th>
+                <th>类型名称</th>
+                <th>创建时间</th>
+                <th>更新时间</th>
+                <th>状态</th>
+                <th>操作人名称</th>
+                <th>操作</th>
+            </tr>
+        </table>
+    </div>
+    <div class="pop-up hide">
+        <a class="shut" href="javascript:;">×</a>
+        <form action="" id="upload">
+            <table>
+        			<tr>
+                    <td>类型编码：</td>
+                    <td>
+                        <input type="text" id="voutype" readonly="readonly" name="voutype">
+                    </td>
+                </tr>
+                <tr>
+                    <td>类型名称：</td>
+                    <td>
+                        <input type="text" id="type_name" name="type_name">
+                    </td>
+                </tr>
+                <tr>
+                    <td>状&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp态：</td>
+                    <td>
+                        <select  id="status2" name="status">
+                            <!-- <option value="enabled">启用</option>
+                            <option value="unenabled">停用</option> -->
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div class="pop-up-button">
+                <button class="class_instruction shut" type="button" onclick="submitEdit()">确定</button>
+                <button class="class_instruction shut" type="button">取消</button>
+            </div>
+        </form>
+    </div>
+</body>
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <script>
+    var transtatus;
+    querytrans('','enabled,unenabled,new');
+   // load查询
+    function querytrans(type_name,status){
+        $('.test').empty();
+        $.ajax({
+            url:"/operplat/vou_type/query",
+            context: document.body,
+            dataType:'JSON',
+            data:{'type_name':type_name,'status':status},
+            async: false,
+            success: function(dataJson,dataStatus){
+                var retCode = dataJson.retCode;
+                var retMsg = dataJson.retMsg;
+                if(retCode != 'success'){
+                    alert(retMsg);
+                    return;
+                }else{
+                    trans = dataJson.types;
+                    for(var i=0; i<trans.length; i++){
+                        if(trans[i].status == 'new') transtatus = '新建';
+                        if(trans[i].status == 'enabled') transtatus = '启用';
+                        if(trans[i].status == 'unenabled') transtatus = '停用';
+                        // if(trans[i].status == 'del') transtatus = '删除';
+                        $(".btm_biaodan table").append(
+                            "<tr class='test'><td>" + (i + 1) +
+                            "</td><td>" + trans[i].type_name +
+                            "</td><td>" + trans[i].ctime +
+                            "</td><td>" + trans[i].utime +
+                            "</td><td>" + transtatus +
+                            "</td><td>" + trans[i].oper_name +
+                            "</td><td>" + '<button  class="open class-button" type="button" onclick="editMsg(' + i + ')">修改</button>' +
+                            // '<button class="class-button" type="button" onclick="delMsg('+ i +',this)">删除</button>' +
+                            "</td><tr>");
+                    }
+                }
+            },
+            error:function (req, errorMsg, exception) {
+                alert('出错啦，请稍后再试。');
+            }
+        });
+    };
+    // 分类查询
+    $('#search').click(function(){
+        var type_name = $('#type_id').val();
+        var status = $('#status option:selected').val();
+        querytrans(type_name,status);
+    });
+    //修改界面的显示和隐藏
+    $(()=>{
+        $(".pop-up").hide();
+        $(".open").on("click",()=>{
+            $(".pop-up").show();
+        });
+        $(".shut").on("click",()=>{
+            $(".pop-up").hide();
+        });
+    });
+    // 获取修改内容
+    function editMsg(i){
+        $("#voutype").val(trans[i].voutype);
+        $("#type_name").val(trans[i].type_name);
+        $("#status2").val(trans[i].status);
+        var status = trans[i]. status;
+        if (status == "new"){
+            $("#status2").empty();
+            $("#status2").append(
+                `<option value="new">新建</option>
+                    <option value="enabled">启用</option>
+                    <option value="unenabled">停用</option>`
+                //  <option value="del">删除</option>
+            );
+        }else  if (status == "enabled"){
+            $("#status2").empty();
+            $("#status2").append(
+                `<option value="enabled">启用</option>
+                    <option value="unenabled">停用</option>`
+            );
+        }else  if (status == "unenabled"){
+            $("#status2").empty();
+            $("#status2").append(
+                `<option value="unenabled">停用</option>
+                <option value="enabled">启用</option>`
+                //  <option value="del">删除</option>
+            );
+        }else if (status == "del"){
+            $("#status2").empty();
+            $("#status2").append(
+                `<option value="del">删除</option>`
+            );
+        };
+        $(".pop-up").show();
+    };
+    // 修改结果提交
+    function submitEdit() {
+        var formData = new FormData($( "#upload" )[0]);
+        $.ajax({
+            url:"/operplat/vou_type/modify",
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success:function (dataJson,dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                }else{
+                    alert('修改成功');
+                    window.location.reload();
+                }
+            },
+            error: function(req,errorMsg,exception){
+                alert("出错啦");
+            }
+        });
+    };
+    // 删除
+//     function delMsg(data,that){
+//         var re = confirm('确认删除此条信息？');
+//         var voutype = trans[data].voutype;
+//         if(re) {
+//             $.ajax({
+//                 url:"/operplat/vou_type/modify",
+//                 context: document.body,
+//                 dataType: "JSON",
+//                 async: false,
+//                 data:{"voutype":voutype,'status':'del'},
+//                 success:function (dataJson,dataStatus) {
+//                     if ("success" != dataJson.retCode) {
+//                         alert(dataJson.retMsg);
+//                     } else {
+// //                      $(that).parent().parent().hide();
+//                         window.location.reload();
+//                     }
+//                 },
+//                 error:function (req, errorMsg, exception) {
+//                     alert(errorMsg);
+//                 }
+//             });
+//         }else{
+//             return;
+//         }
+//     };
+</script>
+</html>

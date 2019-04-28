@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>收购信息发布</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <style>
+		#otherBean{
+			display: inline-block;
+			margin-left: 20px;
+		}
+		#bean_num{
+			position: relative;
+			left: 15px;
+		}
+	  </style>
+	</head>
+	<body class="add">
+		<form id="upload" enctype="multipart/form-data">
+			<label><span>信息标题：</span><input type="text" placeholder="必输项" name="title" id="title"/></label>
+			<label><span class="textarea">信息内容：</span><textarea name="content" placeholder="必输项" id="content"></textarea></label>
+			<label><span>开始时间：</span><input type="text" placeholder="请输入" name="stime" id="stime"/></label>
+			<label><span>结束时间：</span><input type="text" placeholder="请输入" name="etime" id="etime"/></label>
+			<label><p id="otherBean" class="otherBean"></p>数量：<input type="text" placeholder="必输项" name="bean_num" id="bean_num" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/></label>
+			<label><span>折扣：</span><input type="text" oninput="if(value<0)value =''" placeholder="请输入0以上的折扣" name="discount" id="discount" value="0.9"/></label>
+			<!--<label><span>商品类型：</span><input type="text" name="good_type" /></label>-->
+			<label><span>商品类型：</span>
+				<select name="good_type" id="">
+					<option value="wash_car">洗车券</option>
+				</select>
+			</label>
+			<label><span>联系人：</span><input type="text" placeholder="必输项" id="contacts" name="contacts"/></label>
+			<label><span>联系电话：</span><input type="number" placeholder="必输项" id="phoneno" name="phoneno" oninput="if(value.length>11)value=value.slice(0,11)"/></label>
+			<label><span>地址：</span><input type="text" name="address" /></label>
+			<label><span>微信号：</span><input type="text" name="wechatno" /></label>
+			<label><span>QQ号：</span><input type="text" name="qq" /></label>
+			<label><span class="textarea">备注：</span><textarea name="remark"></textarea></label>
+			<button type="button" class="btn-submit" id="submit">提交</button>
+		</form>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/laydate.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script src="../../js/platformName.js"></script>
+		<script>
+			// 执行日期插件实例
+            lay('#version').html('-v' + laydate.v);
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#stime' //指定元素
+                ,type: 'datetime'
+            });
+            lay('#version').html('-v' + laydate.v);
+            //执行一个laydate实例
+            laydate.render({
+                elem: '#etime' //指定元素
+                ,type: 'datetime'
+            });
+			// 新增内容提交
+			$("#submit").on("click",()=>{
+                var title = $("#title").val();
+                if(title == ''){
+                    alert('信息标题不能为空');
+                    return;
+                }
+                var content = $("#content").val();
+                if(content == ''){
+                    alert('信息内容不能为空');
+                    return;
+                }
+                var bean_num = $("#bean_num").val();
+                if(bean_num == ''){
+                    alert(otherBean+'不能为空');
+                    return;
+                }
+                var discount = $("#discount").val();
+                if(discount <=0){
+                    alert('请输入0以上的折扣');
+                    return;
+                }
+                var contacts = $("#contacts").val();
+                if(contacts == ''){
+                    alert('联系人不能为空');
+                    return;
+                }
+                var phone = $("#phoneno").val();
+                if(!(/^1[3456789]\d{9}$/.test(phone))){
+		        alert("联系电话有误，请重填");
+		        return false;
+		        }
+                var formData = new FormData($("#upload")[0]);
+                $.ajax({
+                    url:"/operplat/trading/release_msg",
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            console.log(dataJson);
+                            alert(dataJson.retMsg);
+                            console.log(dataJson.retMsg);
+                            window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+			});
+		</script>
+	</body>
+</html>

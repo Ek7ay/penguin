@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>发送情况查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="batchno">批次号：</lable>
+				<input type="text" id="batchno" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button><br>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>初始数量</th>
+					<th>初始金额</th>
+					<th>生成数量</th>
+					<th>生成金额</th>
+					<th>发送数量</th>
+					<th>发送金额</th>
+					<th>总数量</th>
+					<th>总金额</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		// 声明查询函数
+        function query() {
+            var batchno = $("#batchno").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/vou/cus/batch_stat_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"batchno":batchno},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										   <td>${dataJson.init_count}</td>
+										   <td>${dataJson.init_amt}</td>
+										   <td>${dataJson.create_count}</td>
+										   <td>${dataJson.create_amt}</td>
+										   <td>${dataJson.send_count}</td>
+										   <td>${dataJson.send_amt}</td>
+										   <td>${dataJson.total_count}</td>
+										   <td>${dataJson.total_amt}</td>
+										</tr>`);
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// 分类查询
+		$("#search").click(()=>{query();});
+	</script>
+</html>

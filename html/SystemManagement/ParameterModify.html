@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="renderer" content="webkit">
+    <title>参数修改</title>
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <link rel="stylesheet" href="../../css/TRconner/mine.css">
+</head>
+<style>
+    .class-table {
+        width: 375px;
+        height: 520px;
+        border: 1px solid grey;
+        position: fixed;
+        top: 10%;
+        left: 35%;
+        padding-top: 10px;
+        background-color: #FFFFFF;
+    }
+
+    .class-table form table tr {
+        font-size: 15px;
+        line-height: 40px;
+    }
+
+    .class-table form table tr td:first-child {
+        text-align: right;
+    }
+
+    .class-table form table tr td input {
+        width: 150px;
+        height: 30px;
+        border: 1px solid #757f75;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+
+    .class-table form table {
+        margin-left: 40px;
+        margin-top: 13px;
+    }
+
+    #beizhu {
+        position: absolute;
+        top: 380px;
+        left: 83px;
+    }
+
+    .class-table form table tr td select {
+        width: 150px;
+        height: 30px;
+        border: 1px solid #757f75;
+        border-radius: 3px;
+        box-sizing: border-box;
+    }
+
+    .class_instruction {
+        width: 70px;
+        height: 25px;
+        font-size: 14px;
+        border: none;
+        background-color: #818181;
+        color: white;
+        border-radius: 3px;
+    }
+
+    .pop-up-button {
+        margin-top: 0px;
+        margin-left: 89px;
+    }
+
+    .pop-up-button button:last-child {
+        margin-left: 54px;
+    }
+
+    a.shut {
+        position: absolute;
+        top: -3px;
+        right: 6px;
+        color: red;
+        font-size: 24px;
+    }
+    #par{
+        height: 90px;
+    }
+    #paraval2{
+        width: 150px;
+        height: 90px;
+        position: absolute;
+    }
+    #cg{
+        position: absolute;
+        top: 113px;
+        left: 57px;
+    }
+</style>
+<body class="info demo">
+<div class="content btm_biaodan">
+    <table border="1" cellspacing="" cellpadding="">
+        <tr>
+            <th>序号</th>
+            <th>参数编号</th>
+            <th>参数名称</th>
+            <th>参数固定值</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+    </table>
+</div>
+<div class="class-table">
+    <a class="shut" href="javascript:;">×</a>
+    <form id="upload" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td>参数编号：</td>
+                <td>
+                    <input readonly="readonly" type="text" id="paracode2" name="paracode">
+                </td>
+            </tr>
+            <tr>
+                <td>参数名称：</td>
+                <td>
+                    <input type="text" id="paraname2" name="paraname">
+                </td>
+            </tr>
+            <tr>
+                <td id="cg">参数固定值：</td>
+                <td id="par">
+                    <textarea id="paraval2" name="paraval" ></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td>参数最小值：</td>
+                <td>
+                    <input type="text" id="minval2" name="minval">
+                </td>
+            </tr>
+            <tr>
+                <td>参数最大值：</td>
+                <td>
+                    <input type="text" id="maxval2" name="maxval">
+                </td>
+            </tr>
+            <tr>
+                <td>参数生效日期：</td>
+                <td>
+                    <input type="text" name="effdate" id="effdate2" autocomplete="off" placeholder="请输入"/>
+                </td>
+            </tr>
+            <tr>
+                <td>参数失效日期：</td>
+                <td>
+                    <input type="text" name="expdate" id="expdate2" autocomplete="off" placeholder="请输入"/>
+                </td>
+            </tr>
+            <tr>
+                <td id="beizhu">备&nbsp&nbsp&nbsp&nbsp注：</td>
+                <td>
+                    <textarea id="remark2" name="remark" rows="-8" cols="15"></textarea>
+                </td>
+            </tr>
+        </table>
+        <div class="pop-up-button">
+            <button id="submit" class="class_instruction shut" onclick="submitEdit()">确定</button>
+            <button class="class_instruction shut">取消</button>
+        </div>
+    </form>
+</div>
+</body>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/laydate.js"></script>
+<script>
+    // 修改界面的显示和隐藏
+    $(() => {
+        $(".class-table").hide();
+        $(".open").click(() => {
+            $(".class-table").show();
+        });
+        $(".shut").click(() => {
+            $(".class-table").hide();
+        });
+    });
+    $("#par").parent().next().children().children().css("margin-top","7px");
+    var params;
+    // load查询
+    $(() => {
+        $.ajax({
+            url: "/operplat/param/query",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    params = dataJson.params;
+                    for (var i = 0; i < params.length; i++) {
+                        if (params[i].minval == null) {
+                            params[i].minval = "";
+                        }
+                        if (params[i].maxval == null) {
+                            params[i].maxval = "";
+                        }
+                        if (params[i].effdate == null) {
+                            params[i].effdate = "";
+                        }
+                        if (params[i].expdate == null) {
+                            params[i].expdate = "";
+                        }
+                        if (params[i].remark == null) {
+                            params[i].remark = "";
+                        }
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										   <td>${i + 1}</td>
+										   <td>${params[i].paracode}</td>
+										   <td>${params[i].paraname}</td>
+										   <td>${params[i].paraval}</td>
+										   <td>${params[i].remark}</td>
+										    <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+    });
+    // 获取修改内容
+    function editMsg(i) {
+        $("#paracode2").val(params[i].paracode);
+        $("#paraname2").val(params[i].paraname);
+        $("#paraval2").val(params[i].paraval);
+        $("#minval2").val(params[i].minval);
+        $("#maxval2").val(params[i].maxval);
+        $("#effdate2").val(params[i].effdate);
+        $("#expdate2").val(params[i].expdate);
+        $("#remark2").val(params[i].remark);
+        $('.class-table').show();
+    };
+
+    lay('#version').html('-v' + laydate.v);
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#effdate2' //指定元素
+    });
+    lay('#version').html('-v' + laydate.v);
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#expdate2' //指定元素
+    });
+    // 编辑结果提交
+    function submitEdit() {
+        var formData = new FormData($("#upload")[0]);
+        $.ajax({
+            url: "/operplat/param/modify",
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    alert('修改成功');
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert("出错啦");
+            }
+        });
+    };
+</script>
+</html>

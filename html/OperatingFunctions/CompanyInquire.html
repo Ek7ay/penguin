@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>入住公司查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			/*#img{*/
+				/*position: fixed;*/
+				/*left: 0;*/
+				/*top: 0;*/
+				/*z-index: 10;*/
+				/*padding: 5px;*/
+				/*background: rgba(0,0,0,0.5);*/
+				/*width: 100%;*/
+				/*height: 100%;*/
+				/*display: flex;*/
+				/*flex-direction: column;*/
+				/*align-items: center;*/
+				/*justify-content: center;*/
+			/*}*/
+			/*#img img{*/
+				/*color: red;*/
+				/*width: 300px;*/
+				/*height: 200px;*/
+				/*border-radius: 10px;*/
+			/*}*/
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="cpid">公司编码：</lable>
+				<input type="text" id="cpid" placeholder="请输入">
+				<lable for="cpname" class="class-lable">公司名称：</lable>
+				<input type="text" id="cpname" placeholder="请输入">
+				<lable for="mobile" class="class-lable">联系电话：</lable>
+				<input type="text" id="mobile" placeholder="请输入">
+				<lable for="pname" class="class-lable">联系人：</lable>
+				<input type="text" id="pname" placeholder="请输入">
+				<lable for="status" class="class-lable">状态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="new">新建</option>
+					<option value="enabled">启用</option>
+					<option value="unenabled">停用</option>
+					<!-- <option value="del">删除</option> -->
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>公司编码</th>
+					<th>公司名称</th>
+					<th>公司地址</th>
+					<th>联系电话</th>
+					<th>联系人</th>
+					<th>状态</th>
+					<th>加入时间</th>
+					<th>更新时间</th>
+					<th>备注</th>
+				</tr>
+			</table>
+		</div>
+		<!--<div id="img" style="display: none">-->
+			<!--<lable id="close">-->
+				<!--<img src="javascript:;" alt="" class="p_photo"/>-->
+			<!--</lable>-->
+		<!--</div>-->
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var cps;
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/company/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        cps = dataJson.cps;
+                        for (var i = 0; i < cps.length; i++) {
+                            var status = cps[i].status;
+                            var sta;
+                            if(status == "new"){
+                                sta = "新建";
+                            }else if (status == "enabled"){
+                                sta = "启用";
+                            }else if (status == "unenabled"){
+                                sta = "停用";
+							}else if (status == "del"){
+                                sta = "删除";
+							}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${cps[i].cpid}</td>
+										   <td>${cps[i].cpname}</td>
+										   <td>${cps[i].cp_address}</td>
+										   <td>${cps[i].mobile}</td>
+										   <td>${cps[i].pname}</td>
+										   <!--<td><button type="button" class="bgimg get_img" onclick="get_img(${i})">查看图片</button></td>-->
+										   <td>${sta}</td>
+										   <td>${cps[i].ctime}</td>
+										   <td>${cps[i].utime}</td>
+										   <td>${cps[i].remark}</td>
+										</tr>`);
+                            // $("#company_id").append(`<option value="${cps[i].company_id}">${cps[i].company_name}</option>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 分类查询
+		$("#search").click(()=>{
+            var cpid = $("#cpid").val();
+            var cpname = $("#cpname").val();
+            var mobile = $("#mobile").val();
+            var pname = $("#pname").val();
+            var status = $("#status option:selected").val();
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/company/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"cpid":cpid,"cpname":cpname,"mobile":mobile,"pname":pname,"status":status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        cps = dataJson.cps;
+                        for (var i = 0; i < cps.length; i++) {
+                            var status = cps[i].status;
+                            var sta;
+                            if(status == "new"){
+                                sta = "新建";
+                            }else if (status == "enabled"){
+                                sta = "启用";
+                            }else if (status == "unenabled"){
+                                sta = "停用";
+                            }else if (status == "del"){
+                                sta = "删除";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${cps[i].cpid}</td>
+										   <td>${cps[i].cpname}</td>
+										   <td>${cps[i].cp_address}</td>
+										   <td>${cps[i].mobile}</td>
+										   <td>${cps[i].pname}</td>
+										   <!--<td><button type="button" class="bgimg get_img" onclick="get_img(${i})">查看图片</button></td>-->
+										   <td>${sta}</td>
+										   <td>${cps[i].ctime}</td>
+										   <td>${cps[i].utime}</td>
+										   <td>${cps[i].remark}</td>
+										</tr>`);
+                            // $("#company_id").append(`<option value="${cps[i].company_id}">${cps[i].company_name}</option>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+        // 获取图片
+        // function get_img(i){
+        //     $('.p_photo').attr('src', 'data:image/jpg;base64,' + cps[i].logo_id);
+        //     console.log(cps[i].logo_id);
+        //     $('#img').show();
+        // }
+        // 点击目标区域以外的区域
+        // $('#img').mouseup(function(e){
+        //     var _con = $('.p_photo');   // 设置目标区域
+        //     if(!_con.is(e.target) && _con.has(e.target).length === 0){ // Mark 1
+        //         $(this).hide();
+        //     }
+        // });
+	</script>
+</html>

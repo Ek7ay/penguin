@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>商户额度变动记录查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+			.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+			.paging label{ margin: 0 15px; }
+			.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+			.btm_biaodan {height: 100%;}
+			#go{position: relative;top: -1px;}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="cusid">客户号：</lable>
+				<input type="text" id="cusid" placeholder="请输入">
+				<lable for="order_type" class="class-lable">按生成时间排序：</lable>
+					<select id="order_type">
+						<option value="">默认</option>
+						<option value="desc">倒序</option>
+						<option value="asc">正序</option>
+					</select>
+				<lable class="class-lable" for="s_date">开始日期：</lable>
+				<input type="text" id="s_date" placeholder="请输入">
+				<lable class="class-lable" for="e_date">结束日期：</lable>
+				<input type="text" id="e_date" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button>
+				<button class="btn class-lable" id="turn" style="display: none">回到商户信息修改页面</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>顺序号</th>
+					<th>客户号</th>
+					<th>操作类型</th>
+					<th>名称</th>
+					<th>流水号</th>
+					<th>变动额度</th>
+					<th>变动前金额</th>
+					<th>变动后金额</th>
+					<th>时间</th>
+				</tr>
+			</table>
+		</div>
+		<!-- 分页查询 -->
+		<div class="paging">
+			<button type="button" id="prev">上一页</button>
+			<label>
+				<input type="number" oninput="if(value<0)value =''" id="pageNum">
+				<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+			</label>
+			<button type="button" id="next">下一页</button>
+			<label id="nowPage">
+				当前第&nbsp;<span></span>&nbsp;页
+			</label>
+			<label style="margin-left: 0;" id="pageNo">
+				共&nbsp;<span></span>&nbsp;页
+			</label>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 执行日期插件实例
+		$(()=>{
+            lay('#version').html('-v' + laydate.v);
+            laydate.render({
+                elem: '#s_date'
+                // ,type: 'datetime'
+            });
+            laydate.render({
+                elem: '#e_date'
+            });
+		});
+		// 回到商户信息修改页面
+		$(()=>{
+		    $("#turn").on("click",()=>{
+                window.location.replace('./BusInfo_Edit.html');
+			});
+		});
+		// 声明全局变量
+        var changes;
+        var cusid;
+        var order_type;
+        var s_date;
+        var e_date;
+        var index = 1;
+        var pageNo;
+        var sum;
+        // 获取传入的cusid值
+        $(()=>{
+            var search=location.search;
+            function parse(search){
+                var str=search.substring(1);
+                var result={};
+                var strs=str.split("&");
+                strs.forEach(function(v){
+                    var keyvalue=v.split("=");
+                    var name=keyvalue[0];
+                    var value=keyvalue[1];
+                    result[name]=value;
+                })
+                return result;
+            }
+            var t=parse(search);
+            cusid = t.cusid;
+            console.log(cusid);
+            $("#cusid").val(cusid);
+            // load查询
+			if (cusid != undefined){
+                query(index,cusid);
+                $("#turn").show();
+			}
+        });
+		// 声明查询函数
+        function query(index,cusid) {
+            cusid = $("#cusid").val();
+            order_type = $("#order_type option:selected").val();
+            s_date = $("#s_date").val();
+            e_date = $("#e_date").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/trading_new/merchant_quota_changes",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"cusid":cusid,
+					  "order_type":order_type,
+					  "s_date":s_date,
+					  "e_date":e_date,
+					  "page_num":index,
+					  "page_count":"20"},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        changes = dataJson.changes;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        for (var i = 0; i < changes.length; i++) {
+                            var action_type = changes[i].action_type;
+                            var type;
+                            if(action_type == "recharge_add"){
+                                type = "充值增加额度";
+                            }else if (action_type == "tran_fail_add"){
+                                type = "交易失败退还额度";
+                            }else if (action_type == "tran_succ_add"){
+                                type = "交易成功减少额度";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${changes[i].cusid}</td>
+										   <td>${type}</td>
+										   <td>${changes[i].action_name}</td>
+										   <td>${changes[i].payno}</td>
+										   <td>${changes[i].amt}</td>
+										   <td>${changes[i].bf_quota}</td>
+										   <td>${changes[i].af_quota}</td>
+										   <td>${changes[i].ctime}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+            $('#pageNo span').html(pageNo);
+            $('#nowPage span').html(index);
+            $('#pageNum').val(index);
+        }
+        // 上一页
+        $("#prev").on("click",()=>{
+            if(index<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index--;
+            query(index,cusid);
+        });
+        // 下一页
+        $("#next").on("click",()=>{
+            if(index>=pageNo){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index++;
+            query(index,cusid);
+        });
+        // 输入页查询
+        $("#go").on("click",()=>{
+            index  = $("#pageNum").val();
+            if(index<=0){
+                alert("不能小于第一页！");
+                return;
+            };
+            if(index>Number(pageNo)){
+                alert("不能大于最后一页！");
+                $("#pageNum").val(1);
+                $('#nowPage span').html(1);
+                index = 1;
+                query(index,cusid);
+                return;
+            };
+            query(index,cusid);
+        });
+		// 分类查询
+		$("#search").click(()=>{
+		    index = 1;
+            query(index,cusid);
+		});
+	</script>
+</html>

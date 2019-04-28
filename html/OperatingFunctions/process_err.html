@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>发券流程错误信息</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			#fan{
+				display: block;
+				margin: 0px auto;
+				padding: 2px 80px;
+				background-color: #666;
+				color: #FFFFFF;
+				font-size: 14px;
+				border-radius: 5px;
+				outline: none;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<button type="button" id="fan">返回发券页面</button>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>手机号</th>
+					<th>错误原因</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		// 接收错误列表
+        var errors = getCookie('errors');
+        errors =  JSON.parse(errors);
+        $(()=>{
+            for (var i = 0; i < errors.length; i++) {
+                $(".btm_biaodan table").append(
+                    `<tr class="test">
+					   <td>${errors[i].phoneno}</td>
+					   <td>${errors[i].reason}</td>
+					</tr>`);
+            }
+        });
+		$("#fan").on("click",()=>{
+            window.location.replace('./process.html');
+		})
+	</script>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>兑换券激活统计</title>
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/pintuer.css">
+    <link rel="stylesheet" href="../../css/mine.css" />
+    <style>
+        h2 {
+            text-align: left;
+            margin: 5px 0 10px;
+        }
+    </style>
+</head>
+
+<body class="info demo">
+    <div class="header">
+        <h2>兑换券激活统计</h2>
+        <div class="month">
+            <label id="sy_label">
+                开始日期
+                <input type="text" id="sy_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+            </label>
+            <label id="ey_label" class="ml15">
+                结束日期
+                <input type="text" id="ey_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+            </label>
+
+            <label id="sm_label">
+                开始日期
+                <input type=" text " id="sm_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; " />
+            </label>
+            <label id="em_label" class="ml15 ">
+                结束日期
+                <input type="text " id="em_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; " />
+            </label>
+
+            <label id="sd_label">
+                开始日期
+                <input type="text " id="sd_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; " />
+            </label>
+            <label id="ed_label" class="ml15 ">
+                结束日期
+                <input type="text " id="ed_date" autocomplete="off" placeholder="请输入 " style="margin-left: 10px; " />
+            </label>
+
+            <label class="ml15 ">
+                统计周期
+                <select onchange="changeTime()" name=" " id="stat_type" style="margin-left: 10px; ">
+                    <option value="Y"> 年</option>
+                    <option value="M"> 月</option>
+                    <option value="D"> 日</option>
+                </select>
+            </label>
+            <button class="btn ml15 " id="search">查询</button>
+        </div>
+    </div>
+    <div id="container" style="min-width:400px;height:400px"></div>
+    <script src="../../js/laydate.js "></script>
+    <script src="../../js/highcharts/highcharts.js"></script>
+    <script src="../../js/highcharts/exporting.js"></script>
+    <script src="../../js/highcharts/highcharts-zh_CN.js"></script>
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <script>
+        var stat_type = "D";
+        $("#stat_type").val("D");
+        //执行一个laydate实例
+        laydate.render({
+            type: "year",
+            elem: '#sy_date' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            type: "year",
+            elem: '#ey_date' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            type: "month",
+            elem: '#sm_date' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            type: "month",
+            elem: '#em_date' //指定元素
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            type: "date",
+            elem: '#sd_date' //指定元素
+        });
+        //执行一个laydate实例
+        laydate.render({
+            type: "date",
+            elem: '#ed_date' //指定元素
+        });
+
+        $('#sm_label').css('display', 'none');
+        $('#em_label').css('display', 'none');
+
+        $('#sy_label').css('display', 'none');
+        $('#ey_label').css('display', 'none');
+
+        function changeTime() {
+
+            stat_type = $('#stat_type').val();
+            console.log(" stat_type ... " + stat_type);
+            if (stat_type == 'Y') {
+
+                $('#sy_label').css('display', 'inline');
+                $('#ey_label').css('display', 'inline');
+
+                $('#sm_label').css('display', 'none');
+                $('#em_label').css('display', 'none');
+
+                $('#sd_label').css('display', 'none');
+                $('#ed_label').css('display', 'none');
+            } else if (stat_type == 'M') {
+
+                $('#sy_label').css('display', 'none');
+                $('#ey_label').css('display', 'none');
+
+                $('#sm_label').css('display', 'inline');
+                $('#em_label').css('display', 'inline');
+
+                $('#sd_label').css('display', 'none');
+                $('#ed_label').css('display', 'none');
+
+            } else if (stat_type == 'D') {
+
+                $('#sy_label').css('display', 'none');
+                $('#ey_label').css('display', 'none');
+
+                $('#sm_label').css('display', 'none');
+                $('#em_label').css('display', 'none');
+
+                $('#sd_label').css('display', 'inline');
+                $('#ed_label').css('display', 'inline');
+            }
+        }
+        let report_lis;
+        let amt = []; //数量
+        let stat_date = []; // 时间
+        //  声明查询函数
+        // function querytrans(stat_type,s_date,e_date){
+        // 	$('.test').empty();
+        // 	$.ajax({
+        // 		url:"/operplat/stat/vou_active",
+        // 		context: document.body,
+        // 		dataType:'JSON',
+        // 		data:{'stat_type':stat_type,'s_date':s_date,'e_date':e_date},
+        // 		async: false,
+        // 		success: function(dataJson,dataStatus){
+        // 			var retCode = dataJson.retCode;
+        // 			var retMsg = dataJson.retMsg;
+        // 			if(retCode != 'success'){
+        // 		        alert(retMsg);
+        // 		        return;
+        // 		    }else{
+        //                 report_lis = dataJson.report_list;
+        // 		     	$('#totalAmt').html(dataJson.total_count);
+        // 		     	for(let i=0;i<report_lis.length;i++){
+        //                     amt.push(report_lis[i].amt);
+        // 		     		stat_date.push(report_lis[i].stat_date);
+        // 		     	}
+        //                 console.log(amt,stat_date);
+        // 				//   	console.log(amt+":"+stat_date);
+        //                 var chart = Highcharts.chart('container',{
+        //                     chart: {
+        //                         type: 'column'
+        //                     },
+        //                     title: {
+        //                         text: '兑换券激活统计'
+        //                     },
+        //                     subtitle: {
+        //                         // text: '数据来源: WorldClimate.com'
+        //                     },
+        //                     xAxis: {
+        //                         categories: stat_date,
+        //                         crosshair: true
+        //                     },
+        //                     yAxis: {
+        //                         min: 0,
+        //                         title: {
+        //                             text: '金额'
+        //                         }
+        //                     },
+        //                     tooltip: {
+        //                         // head + 每个 point + footer 拼接成完整的 table
+        //                         headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+        //                         pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+        //                         '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+        //                         footerFormat: '</table>',
+        //                         shared: true,
+        //                         useHTML: true
+        //                     },
+        //                     plotOptions: {
+        //                         column: {
+        //                             borderWidth: 0
+        //                         }
+        //                     },
+        //                     series: [{
+        //                         name: '日期',
+        //                         data: amt
+        //                     }]
+        //                 });
+        // 		    }
+        // 		},
+        // 		error:function (req, errorMsg, exception) {
+        // 			alert('出错啦，请稍后再试。');
+        // 		}
+        // 	});
+        // }
+        // querytrans("D",'2018-06-07','2018-06-17');
+
+        $("#search").on("click", () => {
+            stat_date = [];
+            amt = [];
+            console.log(stat_date);
+            console.log(amt);
+            var s_date;
+            var e_date;
+            if (stat_type == "Y") {
+                s_date = $('#sy_date').val();
+                e_date = $('#ey_date').val();
+            } else if (stat_type == "M") {
+                s_date = $('#sm_date').val();
+                e_date = $('#em_date').val();
+                let start = new Date(s_date.replace(/-/g, '/')).getTime();
+                let end = new Date(e_date.replace(/-/g, '/')).getTime();
+                let sub = window.Math.ceil(end) - window.Math.ceil(start);
+                console.log(sub);
+                if (sub > 366 * 24 * 60 * 60 * 1000) {
+                    alert('查询结果最大显示12个月');
+                    return;
+                }
+            } else if (stat_type == "D") {
+                s_date = $('#sd_date').val();
+                e_date = $('#ed_date').val();
+                let start = new Date(s_date.replace(/-/g, '/')).getTime();
+                let end = new Date(e_date.replace(/-/g, '/')).getTime();
+                let sub = window.Math.ceil(end) - window.Math.ceil(start);
+                console.log(sub);
+                if (sub > 30 * 24 * 60 * 60 * 1000) {
+                    alert('查询结果最大显示30天');
+                    return;
+                }
+            } else {
+                alert('请选择统计周期');
+                return;
+            }
+
+            if (s_date == '') {
+                alert('请输入起始日期');
+                return;
+            }
+            if (e_date == '') {
+                alert('请输入截止日期');
+                return;
+            }
+            $.ajax({
+                url: "/operplat/stat/vou_active",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data: {
+                    "s_date": s_date,
+                    "e_date": e_date,
+                    "stat_type": stat_type
+                },
+                success: function (dataJson, dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        report_lis = dataJson.report_list;
+                        console.log(report_lis);
+                        for (var i = 0; i < report_lis.length; i++) {
+                            stat_date.push(report_lis[i].stat_date);
+                            amt.push(parseInt(report_lis[i].amt));
+                        }
+                        console.log(stat_date);
+                        console.log(amt);
+                        // 执行报表实例
+                        var chart = Highcharts.chart('container', {
+                            chart: {
+                                type: 'column'
+                            },
+                            title: {
+                                text: '兑换券激活统计'
+                            },
+                            subtitle: {
+                                // text: '数据来源: WorldClimate.com'
+                            },
+                            xAxis: {
+                                categories: stat_date,
+                                crosshair: true
+                            },
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: '金额'
+                                }
+                            },
+                            tooltip: {
+                                // head + 每个 point + footer 拼接成完整的 table
+                                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                    '<td style="padding:0"><b>{point.y:.1f} 元</b></td></tr>',
+                                footerFormat: '</table>',
+                                shared: true,
+                                useHTML: true
+                            },
+                            plotOptions: {
+                                column: {
+                                    borderWidth: 0,
+                                    dataLabels:{
+                                        enabled:true, // dataLabels设为true
+                                        style:{
+                                            color:'#000',
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: '金额',
+                                data: amt
+                                // data: [49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4]
+                            }]
+                        });
+                        console.log(amt);
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

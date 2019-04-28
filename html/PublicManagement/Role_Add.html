@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>角色新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	  <style>
+		  .author{
+			  width: 250px;
+			  height: 600px;
+		  }
+		  #form-box form table tr td.author .author_list{
+			  width: 250px;
+			  height: 600px;
+			  font-size: 12px;
+		  }
+		  ul{
+			  width: 302px;
+		  }
+		  li{
+			  list-style: none;
+			  position: relative;
+			  right: 40px;
+		  }
+		  #form-box form table tr td.author .author_list input[type="checkbox"]{
+			  width: 14px;
+			  height: 14px;
+			  position: relative;
+			  top: 3px;
+		  }
+		  #form-box form table tr td.author .author_list span{
+			  cursor: pointer;
+		  }
+		  #form-box form table tr td.author .author_list img{
+			  position: relative;
+			  top: 3px;
+		  }
+		  #form-box{
+			  width: 400px;
+		  }
+		  #author_list ul{
+			  text-align: left;
+		  }
+		  #role_desc_box{
+			  height: 30px;
+		  }
+		  #role_desc{
+			  height: 25px !important;
+			  position: absolute;
+			  top: 83px;
+		  }
+	  </style>
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>角色名称:</td>
+						<td>
+							<input type="text" name="role_name">
+							<input type="hidden" id="oper_id" name="oper_id"/>
+						</td>
+					</tr>
+					<tr>
+						<td>角色描述:</td>
+						<td id="role_desc_box">
+							<textarea name="role_desc" id="role_desc"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>系统角色:</td>
+						<td>
+							<select name="is_sys">
+								<option value="Y">是</option>
+								<option value="N">不是</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>功能菜单:</td>
+						<td class="author">
+							<div class="author_list" id="author_list">
+							</div>
+						</td>
+					</tr>
+					<!--<tr>-->
+						<!--<td>备&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;注:</td>-->
+						<!--<td>-->
+							<!--<textarea name="remark"></textarea>-->
+						<!--</td>-->
+					<!--</tr>-->
+				</table>
+				<button type="button" class="btn-submit" id="submit">提交</button>
+			</form>
+		</div>
+	</body>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+			// 声明全局变量
+            var ygj;
+            var oper_id = getCookie("oper_id");
+            $('#oper_id').val(oper_id); // 赋值
+			// 获取功能菜单数组
+            function query() {
+                $.ajax({
+                    url:"/operplat/menu/queryMenuLevel",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                        } else {
+                            ygj = dataJson.menus;
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            }
+            query();
+            $('#author_list').html(recursive(ygj));
+            // 获取列表结构
+            function recursive(arr) {
+                var len = arr.length;
+                var str = '<ul>';
+                for (let i = 0; i < len; i++) {
+                    if (arr[i].has_more != 'Y') {
+                        str += `<li><input type="checkbox" name="menus" value=${arr[i].menu_id}><span>${arr[i].menu_name}</span>`;
+                        str += '</li>';
+                        continue;
+                    } else {
+                        str += `<li class="menu-fu">
+					   <input type="checkbox" name="menus" value=${arr[i].menu_id}><span>${arr[i].menu_name}<img src="../../images/jiahao.png" height="14" width="14"/></span>
+					   <ul>`;
+                        if (arr[i].childMenus != null && arr[i].childMenus.length > 0) {
+                            str += recursive(arr[i].childMenus);
+                        }
+                        str += '</ul>';
+                        str += '</li>';
+                    }
+                }
+                str += '</ul>';
+                return str;
+            };
+
+            $(function() {
+                $('.menu-fu span').toggle(function(){
+                    $(this).next().slideUp();
+			     },function(){
+                    $(this).next().slideDown();
+                });
+            });
+                // 表单提交
+                $("#submit").on("click",()=>{
+                    $.ajax({
+                        url:"/operplat/role/addRole",
+                        context: document.body,
+                        dataType: "JSON",
+                        async: false,
+                        data:$('#upload').serialize(),
+                        success:function (dataJson,dataStatus) {
+                            if ("success" != dataJson.retCode){
+                                alert(dataJson.retMsg);
+                            }else {
+                                console.log(dataJson);
+                                alert(dataJson.retMsg);
+                                console.log(dataJson.retMsg);
+                                window.location.reload();
+                            }
+                        },
+                        error:function (req, errorMsg, exception) {
+								alert(errorMsg);
+                        }
+                    });
+                });
+		</script>
+</html>

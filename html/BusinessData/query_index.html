@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>业务统计</title>  
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+	<style>
+		body,html{height: 100%}
+		.father{ height: 90%; margin-top: 45px; }
+		.father .btm_biaodan{ min-height: 45%;}
+		h2{text-align: left; margin: 5px 0 10px;}
+		#acct_type{border-radius: 5px;position: relative;top: 2px;width: 180px;}
+	</style>
+</head>
+<body class="info demo">
+	<div class="header">
+		<div class="month">
+			<lable for="acct_type">机构名称：</lable>
+			<select id="acct_type">
+				<option value="">全部</option>
+				<!--<option value="AT201806270000000001">平安直通</option>-->
+				<!--<option value="AT201807100000000002">平安综拓</option>-->
+			</select>
+			<label class="ml15">
+				开始日期<input type="text" id="s_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+			</label>
+			<label class="ml15">
+				结束日期<input type="text" id="e_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+			</label>
+			<button class="btn ml15" id="search">搜索</button>
+		</div>
+	</div>
+	<div class="father">
+		<div class="content btm_biaodan">
+			<h2>交易量</h2>
+			<table id="tab1" border="1" cellspacing="" cellpadding="">
+				<tr>	
+					<th>名称</th>
+					<th>成功笔数</th>
+					<th>成功金额</th>
+					<th>处理中数量</th>
+					<th>处理中金额</th>
+					<th>失败笔数</th>
+					<th>失败金额</th>
+				</tr>
+			</table>
+		</div>
+		<div class="content duihuan">
+			<h2>兑换量</h2>
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>数量</th>
+					<th>笔数</th>
+					<th>金额</th>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/platformName.js"></script>
+<script>
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#s_date' //指定元素
+	});
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#e_date' //指定元素
+	});
+    // 机构名称查询
+    $(()=>{
+        $.ajax({
+            url:"/operplat/acct_type/query",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            success:function (dataJson,dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    var types = dataJson.types;
+                    for(var i = 0; i<types.length; i++){
+                        $("#acct_type").append(`<option value=${types[i].acct_type}>${types[i].type_name}</option>`);
+                    }
+                }
+            },
+            error:function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+    });
+
+	$('#search').click(function(){
+		var s_date =$('#s_date').val();
+		var e_date =$('#e_date').val();
+		var acct_type = $("#acct_type option:selected").val();
+		if(s_date == '') { alert('请输入起始日期'); return; }
+		if(e_date == '') { alert('请输入截止日期'); return; }
+		queryTrans(s_date,e_date,acct_type);
+		queryVouList(s_date,e_date,acct_type);
+	});
+	
+	function queryTrans(s_date,e_date,acct_type){
+		$('.test1').empty();
+		$.ajax({
+			url:"/operplat/stat/transQuery",
+			context: document.body,
+			dataType:'JSON',
+			data:{'s_date':s_date,'e_date':e_date,'acct_type':acct_type},
+			async: false,
+			success: function(dataJson,dataStatus){
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if(retCode != 'success'){
+			        alert(retMsg);
+			        return;
+			    }else{
+			     	var trans = dataJson.trans;
+			     	console.log(trans);
+			     	$(".btm_biaodan table#tab1").append(
+						"<tr class='test1'><td>总数" +
+						"</td><td>" + dataJson.total_success_count +
+						"</td><td>" + dataJson.total_success_amt +
+                        "</td><td>" + dataJson.total_begin_count +
+                        "</td><td>" + dataJson.total_begin_amt +
+						"</td><td>" + dataJson.total_error_count +
+						"</td><td>" + dataJson.total_error_amt +
+						"</td><tr>");
+			     	for(var i=0; i<trans.length; i++){
+			     		var trantype = "";
+			     		var transtatus = "";
+			     		if(trans[i].transtatus == '00') transtatus = '成功';
+			     		if(trans[i].transtatus == '01') transtatus = '失败';
+			     		if(trans[i].transtatus == '02') transtatus = '取消';
+			     		if(trans[i].transtatus == '03') transtatus = '初始';
+
+			     		if(trans[i].trantype == '001') trantype = '中石化油卡充值';
+			     		if(trans[i].trantype == '002') trantype = '中石油油卡充值';
+			     		if(trans[i].trantype == '003') trantype = '话费充值';
+						if(trans[i].trantype == '004') trantype = '中石化油卡购买';
+						if(trans[i].trantype == '005') trantype = '中石油油卡购买';
+						if(trans[i].trantype == '006') trantype = '预留';
+			     		if(trans[i].trantype == '007') trantype = 'ETCP停车券';
+			     		if(trans[i].trantype == '008') trantype = otherBean+'回购';
+                        if(trans[i].trantype == '009') trantype = '汽车服务';
+                        if(trans[i].trantype == '010') trantype = '违章代缴';
+                        if(trans[i].trantype == '011') trantype = '消费券';
+                        if(trans[i].trantype == '012') trantype = '客户洗车券交易';
+                        if(trans[i].trantype == '013') trantype = '违章查询';
+                        if(trans[i].trantype == '014') trantype = otherBean+'转让';
+                        if(trans[i].trantype == '015') trantype = '油卡批量采购，中石化';
+						if(trans[i].trantype == '016') trantype = '油卡批量采购，中石油';
+                        if(trans[i].trantype == '017') trantype = projectName+'健康';
+                        if(trans[i].trantype == '018') trantype = '出险查询';
+                        if(trans[i].trantype == '019') trantype = '违章高发地查询';
+                        if(trans[i].trantype == '020') trantype = '二手车估值';
+                        if(trans[i].trantype == '021') trantype = '洗车套餐购买';
+                        if(trans[i].trantype == '022') trantype = '代驾服务购买';
+                        if(trans[i].trantype == '023') trantype = '车辆保修检测';
+                        if(trans[i].trantype == '024') trantype = '车辆保修';
+                        if(trans[i].trantype == '025') trantype = '车辆检测';
+                        if(trans[i].trantype == '026') trantype = '服务权益转让';
+
+			     		$(".btm_biaodan table#tab1").append(
+							"<tr class='test1'><td>" + trantype +
+							"</td><td>" + trans[i].success_count +
+							"</td><td>" + trans[i].success_amt +
+                            "</td><td>" + trans[i].begin_count +
+                            "</td><td>" + trans[i].begin_amt +
+							"</td><td>" + trans[i].error_count +
+							"</td><td>" + trans[i].error_amt +
+							"</td><tr>");
+			     	}
+			    }
+			},
+			error:function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	}
+	
+
+	function queryVouList(s_date,e_date,acct_type){
+		$('.test').empty();
+		$.ajax({
+			url:"/operplat/newvouacct/queryNewVou",
+			context: document.body,
+			dataType:'JSON',
+			data:{'s_date':s_date,'e_date':e_date,'acct_type':acct_type},
+			async: false,
+			success: function(dataJson,dataStatus){
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if(retCode != 'success'){
+			        alert(retMsg);
+			        return;
+			    }else{
+			     	var vouList = dataJson.vouList;
+			     	console.log(vouList);
+			     	$(".duihuan table").append(
+						"<tr class='test'><td>总数" +
+						"</td><td>" + dataJson.total_count +
+						"</td><td>" + dataJson.total_amt +
+						"</td><tr>");
+			     	for(var i=0; i<vouList.length; i++){
+			     		$(".duihuan table").append(
+							"<tr class='test'><td>" + vouList[i].vouden +
+							"</td><td>" + vouList[i].count +
+							"</td><td>" + vouList[i].amt +
+							"</td><tr>");
+			     	}
+			    }
+			},
+			error:function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	}
+</script>
+</html>

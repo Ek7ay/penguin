@@ -1,0 +1,147 @@
+*{margin: 0; padding: 0;}
+ul{ list-style: none; }
+.clearfix:after{content:".";display:block;height:0;clear: both;visibility:hidden;}
+.clearfix{*zoom:1;}
+.hide{ display: none;}
+a{text-decoration: none;}
+.bc_lan{ background: #00AAEE; }
+.pl45{ padding-left:48px !important;}
+
+
+.top_cont{ padding:5px; background: #577BAB;}
+.top_cont label{ font-size: 14px; height: 20px; line-height: 20px; color: #fff; }
+.top_cont label input{ height: 25px; width: 130px; border-radius: 3px; border: 1px solid darkcyan; text-align: center;}
+.top_cont label input::-ms-input-placeholder{text-align: center;}
+.top_cont label input::-webkit-input-placeholder{text-align: center;}
+.top_cont label select{ height: 28px; width: 130px; margin-left: 10px; border-radius: 3px;}
+.top_cont label select option{ border-radius: 3px;}
+.top_cont #search{ width: 170px; height: 32px; border: none; background: #00AAEE; color: #fff; font-weight: bold; border-radius: 5px; margin:5px 0px;}
+.top_cont #search:hover{ cursor: pointer; background-color: #33CCFF;}
+
+.btm_cont{ list-style: none; background: #577BAB; border-bottom: 2px solid #33CCFF;}
+.btm_cont li{ color: #fff; float: left; width: 100px; height: 40px; font-size: 14px; line-height: 40px; text-align: center;  border:1px solid #33CCFF; margin-right: -1px; -webkit-user-select:none; -moz-user-select:none; -ms-user-select:none; user-select:none; }
+.btm_cont li:hover{ cursor: pointer; background: #03B6FD; color: #fff;}
+.btm_cont li:active{ background: #03B6FD; color: #fff;}
+
+.btm_neirong{ height: 50px;  background-color: #577BAB; line-height: 50px; position: relative;}
+.btm_neirong button{ border: none; width: 60px; height: 27px; background-color: #00AAEE; color: #fff; border-radius: 3px; margin-left: 15px;}
+.btm_neirong button:hover{background-color: #33CCFF; color: #fff; cursor: pointer;}
+.btm_neirong .detail{ position: absolute; left: 190px; background: #fff; top: 0px; border:3px solid #00AAEE; }
+.btm_neirong .detail a.close{ position: absolute; top: -20px;right:-2px;color: red; font-size: 24px; }
+.btm_neirong .detail h3{ font-size: 16px; font-weight: normal; background: #f2f2f2; padding: 0 5px;}
+.btm_neirong .detail h3 p{ float: right;}
+.btm_neirong .detail h3 span{ color: red; margin-right: 5px;}
+.btm_neirong .detail .de_cont{ padding: 10px 30px 10px 10px; position: relative;}
+.btm_neirong .detail .de_cont:first-of-type{ height:110px;}
+.btm_neirong .detail .de_cont p{ height: 30px; line-height: 30px;}
+.btm_neirong .detail .de_cont p.fr{ position: absolute; right: 150px; top: 85px; font-size: 24px; color: orange; font-weight: bold;}
+.btm_neirong .detail .de_cont img{ position: absolute; display: block; right: 20px; top:5px;}
+
+.btm_neirong .complain {padding: 0 10px; position: absolute; left: 190px; background: #fff; top: 0px; border:3px solid #00AAEE; width: 550px;}
+.btm_neirong .complain p input{ height: 23px; margin-left: 10px;}
+.btm_neirong .complain p select{ margin-left: 10px; height: 25px;}
+.btm_neirong .complain p span{ position: relative; top: -140px;}
+.btm_neirong .complain p textarea{ margin-left: 10px;}
+.btm_neirong .complain p button{ text-align: center;}
+
+.btm_biaodan{height: 470px; }
+.btm_biaodan table{ width: 100%;}
+.btm_biaodan table tr:first-child{ background: #f2f2f2; height: 35px; font-size: 14px; line-height: 35px;}
+.btm_biaodan table tr:hover{ background: #08BBE1; color: #FFFFFF;}
+/*.btm_biaodan table tr th{ padding: 0 15px;}*/
+.btm_biaodan table tr th:first-child{ padding: 0 8px;}
+.btm_biaodan table tr th:nth-child(2){width: 30px;}
+.btm_biaodan table tr th:nth-child(4){ width: 60px;}
+.btm_biaodan table tr th label input{ position: relative; top: 2px; right: 3px; }
+.btm_biaodan table tr td{ text-align: center; padding:5px 6px; font-size: 14px; border-bottom: 1px solid #ccc;}
+.btm_biaodan table tr td:first-child{ text-align: center; padding-left:16px; }
+.btm_biaodan table tr td.last_td{ position: relative; padding-right: 30px;}
+.btm_biaodan table tr td.last_td .last_ss{ position: absolute; top: 5px; width: 30px; height: 15px; border: 1px solid #08BBE1; font-size: 12px; line-height: 15px; border-radius: 5px;}
+.btm_biaodan table tr td.last_td .last_xia{ top: 25px;}
+.btm_biaodan table tr:hover td.last_td a.last_ss{ color: #DDEEDD; border: 1px solid #FFF; }
+
+
+.btn-btm{ padding: 15px; width: 1170px; text-align: center;}
+.btn-btm button{ border: none; padding: 5px 10px; border-radius: 5px; background-color: #fff; border: 1px solid #999;}
+.btn-btm button:hover{ background-color: #00AAEE; color: #fff; cursor: pointer; border: 1px solid #00AAEE;}
+.btn-btm label{ font-size: 14px;}
+
+.ding_img img{width: 50px; height: 50px;}
+.de_ding{ padding: 5px 10px;}
+.de_ding p span{ position: relative; top: -139px; margin-right: 7px;}
+.de_ding p input { height: 20px; margin-left: 7px;}
+
+
+/*门票管理...........*/
+.show_table .fuck_btn { padding: 5px 10px !important;}
+.show_table .fuck_btn button{ border: none; width: 50px; height: 28px; background: #E4E4E4; color: #000; border-radius: 3px; cursor: pointer;}
+.show_table .fuck_btn button.fr_btn { float: right; background: #33CCFF; color: #FFFFFF; margin-left: 5px;}
+
+.show_table .for_table{ height: 400px; }
+.about_jingqu div p { padding:10px 0;}
+.about_jingqu div img{ width: 100px; height: 100px;}
+.about_jingqu button{ width: 140px; height: 28px; cursor: pointer; color: #fff; background: #33CCFF; font-weight: bold; font-size: 16px; border: none; margin-top: 20px; border-radius: 5px;}
+
+/*拼团订单*/
+.bianji p { padding:5px 0 ; margin: 0;}
+.bianji p img{ width: 100px; height: 100px; margin-left: 10px;}
+.bianji p input{ height: 22px; margin-left: 10px;}
+.bianji p textarea{ margin-left: 10px;}
+.bianji p a{ margin-left: 10px; border:1px solid #000; font-size: 14px; padding:3px;}
+.bianji button{ width: 140px; height: 28px; cursor: pointer; color: #fff; background: #33CCFF; font-weight: bold; font-size: 16px; border: none; margin-top: 20px; border-radius: 5px;}
+.bianji p span.upup{ position: relative; top: -139px;}
+.pintuanguanli .for_table td img { width: 50px ; height: 50px;}
+
+
+/*商家管理*/
+.btm_biaodan .zhengjian span{ position: relative; top: -80px;}
+.btm_biaodan .zhengjian label{ display: inline-block; text-align: center;}
+.btm_biaodan .zhengjian label b{ display: block; }
+/*商家账户*/
+.account .money{ border-bottom: 1px solid #E4E4E4; padding: 10px 20px; }
+.account .money .mon_left{ float: left; }
+.account .money .mon_left p{ margin-bottom: 5px; font-size: 16px;}
+.account .money .mon_left h3{ font-size: 36px; color: #FF9900;  font-family: "微软雅黑";}
+.account .money .mon_right{ float: right; margin-right: 15px;}
+.account .money .mon_right p a{ color: #33CCFF; font-size: 16px;}
+.account .money .mon_right p a:hover{ color: #00AA00;}
+.account .money .mon_right p a+a{ margin-left: 10px;}
+.account .money .mon_right button{ float: right; border: none; text-align: center; width: 140px; height: 40px; color: #FFFFFF; font-weight: bold; line-height: 30px; background: #33CCFF; letter-spacing: 5px; border-radius: 5px; font-size: 15px;}
+.account .money .mon_right button:hover{ background: #577BAB;}
+.account .acc_num { padding: 10px 20px;}
+.account .acc_num h3{ font-size: 16px; margin-bottom: 10px;}
+.account .acc_num .bangding{}
+.account .acc_num .bangding p{ display: inline-block ; line-height: 60px;}
+.account .acc_num .bangding p a{ color: #33CCFF;}
+.account .acc_num .bangding p+p{ margin-left: 35px;}
+.account .acc_num .bangding img{ height: 60px;}
+.account .acc_num ul li{ height: 60px; line-height: 60px; background: #EBFAFF; padding: 0 15px; margin-bottom: 10px;}
+.account .acc_num ul li img{ width: 40px; height: 40px; line-height: 40px; display: inline-block; position: relative; top: -11px;}
+.account .acc_num ul li span{ margin-left: 30px;}
+.account .acc_num ul li span.bankcard{ font-weight: bold; }
+.account .acc_num ul li a{ float: right; color: #33CCFF; margin-right: 20px;}
+
+.hide_table{ padding:10px 15px;}
+.hide_table p label{ padding:7px 3px;}
+.hide_table p>input{ margin-left: 9px;}
+
+.mingxi{ position: absolute;top: 120px; right: 30px; background: #F9F9F9; display: none;}
+.mingxi table {text-align: center; border:2px solid #33CCFF;}
+.mingxi table tr th{ padding: 7px 5px;}
+.mingxi table tr td{ padding: 7px 5px;}
+.mingxi table td span{ color: #999;}
+.mingxi table td a{ padding: 0 3px;}
+.mingxi a.close{ position: absolute; top: -5px; right: 0;}
+
+.same_input{ border:2px solid #33CCFF; position: absolute;top: 120px; right: 30px; display: none; background: #FCFCFC;}
+.same_input p{margin-bottom: 8px; }
+.same_input p.btn{ margin-top: 25px;}
+.same_input p input{ margin-left: 10px;}
+.same_input p button{ border: none; width: 120px; border-radius: 3px; height: 32px; margin-left: 15px; font-weight: bold; color: #fff; background: #33CCFF; letter-spacing: 3px; }
+
+.chongzhi { width: 550px; padding:10px 10px 30px;}
+.chongzhi img{ width: 200px;}
+.bangding { width: 330px; padding: 10px;}
+.tixian{ padding: 10px 10px 10px 60px; width: 550px;}
+.tixian img{ width: 200px;}
+.addBankCard { width: 550px; padding: 10px;}

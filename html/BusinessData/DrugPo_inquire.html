@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>药联资金池情况查询</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	  <style>
+		  #upload table{
+			  width: 600px;
+		  }
+		  #upload table:first-child{
+			  width: 561px;
+		  }
+		  #x{
+			  position: relative;
+			  left: 77px;
+		  }
+		  .fj-box{
+			  height: 21px;
+		  }
+		  .fj{
+			  position: absolute;
+			  left: 63px;
+			  color: #4ba9f7;
+		  }
+		  #query{
+			  padding: 5px 30px;
+			  background-color: #4ba9f7;
+			  color: #FFFFFF;
+			  font-size: 14px;
+			  border-radius: 5px;
+			  border: none;
+			  margin-left: 217px;
+			  outline: none;
+		  }
+		  #form-box #upload table tr td input{
+			  height: 27px;
+		  }
+		  input{
+			  border: none !important;
+			  outline: none;
+		  }
+	  </style>
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>当前资金池余额:</td>
+						<td>
+							<input readonly="readonly" id="currentPoolBalance"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span class="qier"></span>健康卡购买全部激活后余额:</td>
+						<td>
+							<input readonly="readonly" id="buyBalanceAfterActivation"/>
+						</td>
+					</tr>
+				</table>
+				<div class="fj-box">
+					<div class="fj">——————————资金池当前情况——————————</div>
+				</div>
+				<table id="x">
+					<tr>
+						<td>权益池总金额:</td>
+						<td>
+							<input readonly="readonly" id="nominalValue"/>
+						</td>
+					</tr>
+					<tr>
+						<td>已分配金额:</td>
+						<td>
+							<input readonly="readonly" id="allocatedValue"/>
+						</td>
+					</tr>
+					<tr>
+						<td>权益开始时间:</td>
+						<td>
+							<input readonly="readonly" id="availableFrom"/>
+						</td>
+					</tr>
+					<tr>
+						<td>权益结束时间:</td>
+						<td>
+							<input readonly="readonly" id="availableTo"/>
+						</td>
+					</tr>
+				</table>
+				<div class="fj-box">
+					<div class="fj">————————<span class="qier"></span>健康卡今日交易情况————————</div>
+				</div>
+				<table>
+					<tr>
+						<td>今日<span class="qier"></span>健康卡购买:</td>
+						<td>
+							<input readonly="readonly" id="todayBuyTotal"/>
+						</td>
+					</tr>
+					<tr>
+						<td>今日<span class="qier"></span>健康卡激活:</td>
+						<td>
+							<input readonly="readonly" id="todayTotalActive"/>
+						</td>
+					</tr>
+					<tr>
+						<td>今日<span class="qier"></span>健康卡购买未激活:</td>
+						<td>
+							<input readonly="readonly" id="todayTotalNotActive"/>
+						</td>
+					</tr>
+				</table>
+				<div class="fj-box">
+					<div class="fj">————————<span class="qier"></span>健康卡累计交易情况————————</div>
+				</div>
+				<table>
+					<tr>
+						<td><span class="qier"></span>健康卡累计购买:</td>
+						<td>
+							<input readonly="readonly" id="accumulativeBuyTotal"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span class="qier"></span>健康卡累计激活:</td>
+						<td>
+							<input readonly="readonly" id="accumulativeTotalActive"/>
+						</td>
+					</tr>
+					<tr>
+						<td><span class="qier"></span>健康卡累计购买未激活:</td>
+						<td>
+							<input readonly="readonly" id="accumulativeTotalNotActive"/>
+						</td>
+					</tr>
+				</table>
+				<button type="button" id="query">查询</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/laydate.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script src="../../js/platformName.js"></script>
+		<script>
+			// 查询数据
+			$(()=>{
+			    $("#query").on("click",()=>{
+                    $.ajax({
+                        url:"/operplat/drug/queryCapitalPool",
+                        context: document.body,
+                        dataType: "JSON",
+                        async: false,
+                        success:function (dataJson,dataStatus) {
+                            if ("success" != dataJson.retCode) {
+                                alert(dataJson.retMsg);
+                            } else {
+								$("#currentPoolBalance").val(dataJson.currentPoolBalance);
+								$("#buyBalanceAfterActivation").val(dataJson.buyBalanceAfterActivation);
+								$("#nominalValue").val(dataJson.nominalValue);
+								$("#allocatedValue").val(dataJson.allocatedValue);
+                                $("#availableFrom").val(dataJson.availableFrom);
+                                $("#availableTo").val(dataJson.availableTo);
+								$("#todayBuyTotal").val(dataJson.todayBuyTotal);
+								$("#todayTotalActive").val(dataJson.todayTotalActive);
+								$("#todayTotalNotActive").val(dataJson.todayTotalNotActive);
+								$("#accumulativeBuyTotal").val(dataJson.accumulativeBuyTotal);
+								$("#accumulativeTotalActive").val(dataJson.accumulativeTotalActive);
+								$("#accumulativeTotalNotActive").val(dataJson.accumulativeTotalNotActive);
+                            }
+                        },
+                        error:function (req, errorMsg, exception) {
+                            alert(errorMsg);
+                        }
+                    });
+				});
+			});
+		</script>
+	</body>
+</html>

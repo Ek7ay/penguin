@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>客户限制信息新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	</head>
+	<body>
+		<div id="form-box">
+				<form id="upload" enctype="multipart/form-data">
+					<table>
+						<tr>
+							<td>限制手机号:</td>
+							<td>
+								<input placeholder="必输项" id="limit_phone" name="limit_phone"
+									   onkeyup="this.value=this.value.replace(/\D/g,'')"
+									   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+									   oninput="if(value.length>11)value=value.slice(0,11)"
+								/>
+							</td>
+						</tr>
+						<tr>
+							<td>开始日期:</td>
+							<td>
+								<input placeholder="必输项" autocomplete="off" id="std_date" name="std_date"/>
+							</td>
+						</tr>
+						<tr>
+							<td>结束日期:</td>
+							<td>
+								<input placeholder="必输项" autocomplete="off" id="end_date" name="end_date"/>
+							</td>
+						</tr>
+						<tr>
+							<td>限制类型:</td>
+							<td>
+								<select name="limit_type">
+									<option value="STOP">终止交易</option>
+									<option value="WARN">提示</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td>限制原因:</td>
+							<td>
+								<textarea name="limit_reason" id="limit_reason"></textarea>
+							</td>
+						</tr>
+						<tr>
+							<td>备注:</td>
+							<td>
+								<textarea name="remark"></textarea>
+							</td>
+						</tr>
+					</table>
+					<button type="button" class="btn-submit" id="submit" @click="submit">提交</button>
+				</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/laydate.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+            // 执行日期插件实例
+			$(()=>{
+				laydate.render({
+					elem: '#std_date'
+				});
+				laydate.render({
+					elem: '#end_date'
+				});
+			});
+			// 获取当前日期
+			var now;
+			$(() => {
+				function nowTime(){
+					var date = new Date(); //创建时间对象
+					var year = date.getFullYear(); //获取年
+					var month = date.getMonth()+1;//获取月
+					var day = date.getDate(); //获取当日
+					var time = year+"-"+month+"-"+day; //组合时间
+					return time;
+				}
+				now = nowTime();
+				$("#std_date").val(now);
+				$("#end_date").val(now)
+			});
+			// 确认提交
+            $("#submit").on("click",()=>{
+				var std_date = $("#std_date").val();
+				var end_date = $("#end_date").val();
+				if (std_date == ""){
+					alert("开始日期不能为空");
+					return;
+				}
+				if (end_date == "") {
+					alert("结束日期不能为空");
+					return;
+				}
+				var ostd_date = new Date(std_date);
+				var oend_date = new Date(end_date);
+				var onow = new Date(now);
+				if (ostd_date.getTime() > oend_date.getTime()) {
+					alert("开始日期不能大于结束日期");
+					return;
+				}
+				if (ostd_date.getTime() < onow.getTime()) {
+					alert("开始日期不能小于当前日期");
+					return;
+				}
+				if (oend_date.getTime() < onow.getTime()) {
+					alert("结束日期不能小于当前日期");
+					return;
+				}
+				var limit_phone = $("#limit_phone").val();
+				if(!(/^1[3456789]\d{9}$/.test(limit_phone))){
+					alert("手机号码有误，请重填");
+					return false;
+				}
+				var limit_reason = $("#limit_reason").val();
+				if (limit_reason == "") {
+					alert("限制原因不能为空");
+					return;
+				}
+				var formData = new FormData($("#upload")[0]);
+				$.ajax({
+					url:"/operplat/black/limitadd",
+					type: 'POST',
+					data: formData,
+					async: false,
+					cache: false,
+					contentType: false,
+					processData: false,
+					success:function (dataJson,dataStatus) {
+						if ("success" != dataJson.retCode){
+							alert(dataJson.retMsg);
+						}else {
+							alert(dataJson.retMsg);
+							window.location.reload();
+						}
+					},
+					error:function (req, errorMsg, exception) {
+						alert(errorMsg);
+					}
+				});
+            });
+		</script>
+	</body>
+</html>

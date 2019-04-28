@@ -1,0 +1,52 @@
+#form-box{
+    width: 386px;
+    height: 855px;
+}
+#form-box form table tr td input,#form-box form table tr td select{
+    width: 212px;
+    height: 35px;
+    border: 1px solid #958888;
+    border-radius: 5px;
+}
+#form-box form table tr td textarea{
+    width: 200px;
+    height: 80px;
+    border: 1px solid #958888;
+    border-radius: 5px;
+    padding: 5px;
+}
+#form-box form table tr td.author .author_list{
+    display: flex;
+    flex-direction: column;
+    width: 212px;
+    height: 300px;
+    overflow-y: scroll;
+    border: 1px solid #958888;
+    border-radius: 5px;
+}
+#form-box form table tr td.author .author_list label{
+    margin-top: 5px;
+    text-align: right;
+}
+#form-box form table tr td.author .author_list label input{
+    position: relative;
+    margin-right: 10px;
+    top: 3px;
+}
+#form-box form table tr td.author .author_list label input{
+    width: 15px;
+    height: 15px;
+}
+#form-box form table{
+    margin: 30px auto;
+}
+#form-box form table tr td{
+    padding: 5px 0px;
+}
+#form-box form table tr td:first-child{
+    text-align: right;
+    padding-right: 30px;
+}
+#submit{
+    margin-left: 134px;
+}

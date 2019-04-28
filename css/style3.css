@@ -1,0 +1,20 @@
+@charset "utf-8";
+li{list-style:none;}
+a{text-decoration:none;cursor:pointer;}
+#dymenu{width:180px;line-height:25px;overflow: hidden;}
+#dymenu #rtmenu{position: absolute; z-index: -1; width: 100%; height:1000px; }
+#dymenu .root li{position:relative;border:1px solid #eee;border-width:1px 1px 0 0;background:#fff;}
+#dymenu .root>li>h4{ padding: 14px; text-align: left;}
+#dymenu .root>li>a{ padding: 14px; font-size: 16px; text-align: left;}
+#dymenu .root>li>ul{ position: absolute !important; left: 180px !important; }
+#dymenu .root li li{width: 150px;}
+#dymenu .root li li:first-child{ border-top: 1px solid #7E86AD; }
+#dymenu .root li li:not(:first-child){ border-left: 1px solid #7E86AD; border-right: 1px solid #7E86AD; border-bottom: 1px solid #7E86AD; }
+#dymenu .root li li h4{ font-size: 14px !important;}
+#dymenu .root a{display:block;zoom:1;padding:12px;background:#fff;color:#333;vertical-align:top;}
+#dymenu .root h4{padding:10px;*padding:0;background:#fff;*background:none;color:#000;font-weight:normal;cursor:pointer; /*transition: color 0.5s ease-in-out*/;}
+#dymenu .root a:hover{background:#007CC0;color:#fff;}
+#dymenu .root li:hover>h4{background:#007CC0;color:#fff;}
+#dymenu .root ul,#dymenu a:hover a ul,#dymenu a:hover a:hover a ul,#dymenu a:hover a:hover a:hover a ul,#dymenu a:hover a:hover a:hover a:hover a ul,#dymenu a:hover a:hover a:hover a:hover a:hover a ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a:hover a ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover a ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover a ul{display:none;margin:-1px 0 0 0;_margin-top:0;background:#EEE;}
+#dymenu a:hover ul,#dymenu a:hover a:hover ul,#dymenu a:hover a:hover a:hover ul,#dymenu a:hover a:hover a:hover a:hover ul,#dymenu a:hover a:hover a:hover a:hover a:hover ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a:hover ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover ul,#dymenu a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover a:hover ul{display:block;position:absolute;left:149px;top:0;width:150px;}
+#dymenu .root li:hover>ul{display:block;position:absolute;left:149px;top:0;width:150px;margin-top:-1px;background:#EEE;}

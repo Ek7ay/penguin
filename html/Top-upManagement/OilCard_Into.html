@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>油卡信息批量导入</title>
+  <style>
+	    button{ cursor: pointer;}
+  		button a{
+			width: 100%;
+			line-height: 35px;
+			display: block;
+			text-decoration:none;
+			color: white;
+		}
+  		.disabled{
+			background: #AA99AB;
+			color: #fff;
+			margin: 40px 60px;
+			width: 200px;
+			text-align: center;
+			font-size: 14px;
+		}
+	  	#oil_batch_file{
+			background: #AA99AB;
+			color: #fff;
+			margin: 40px 60px;
+			width: 200px;
+			text-align: center;
+			font-size: 14px;
+		}
+		  #btn{
+			  background: #AA99AB;
+			  color: #fff;
+			  margin: 0px 40px 40px 60px;
+			  width: 100px;
+			  height: 30px;
+			  text-align: center;
+			  font-size: 14px;
+		  }
+	       #ys{
+			   font-size: 14px;
+			   position: relative;
+			   bottom: 104px;
+			   left: 63px;
+			   color: #AA99AB ;
+		   }
+		   #errors{
+				/*border: 1px solid #AA99AB;*/
+			    width: 900px;
+			    margin-left:57px;
+			    margin-top: 20px;
+		   }
+		   #errors table{
+			   width: 100%;
+			   border-top: 1px solid #AA99AB;
+			   border-left: 1px solid #AA99AB;
+		   }
+		   #errors table tr:first-child{
+			   background-color: #AA99AB;
+		   }
+	       #errors table tr td{
+			   border-right: 1px solid #AA99AB;
+			   border-bottom: 1px solid #AA99AB;
+			   text-align: center;
+		   }
+		   /* 说明 */
+		   #ins-box{
+			   width: 425px;
+			   height: 251px;
+			   position: absolute;
+			   top: 49px;
+			   left: 327px;
+			   background-color:#cff7f7;
+		   }
+		   #ins-box p{
+			white-space: pre;
+			color:#994a4a;
+		   }
+		   #ins-box p span{
+			   display: inline-block;
+			   font-size: 16px;
+			   font-weight: bold;
+			   margin-left: 112px;
+			   position: relative;
+			   bottom: 10px;
+		   }
+  </style>
+</head>
+<body>
+	<form action="" id="upload">
+		<button type="button" class="btn-submit disabled" disabled="disabled"><a href="javascript:;" id="download">油卡信息批量上传模板下载</a></button>
+	</form>
+	<div>
+		<table>
+			<form id="upload2" enctype="multipart/form-data" >
+				<input type="file" value="" id="oil_batch_file" name="oil_batch_file"/>
+			</form>
+		</table>
+		<div>
+			<p id="ys">油卡信息上传</p>
+			<button id="btn" type="button" onclick="up()">上传油卡信息</button>
+		</div>
+	</div>
+	<div id="errors" style="display: none">
+		<table>
+			<tr>
+				<th>序号</th>
+				<th>卡号</th>
+				<th>错误原因</th>
+			</tr>
+		</table>
+	</div>
+	<div id="ins-box">
+		<p>	
+	<span>上传油卡信息说明</span>
+	卡号:  最大长度20位；
+		  例如：90000000000000000001；
+		  不得输入科学记数法（例如：1.23E+13）；
+	卡类型：中石化-zsh，中石油-zsy，其他-other
+		  例如：zsh；
+	生效日期和失效日期格式：
+		  例如：2018-08-01或者2018/08/01；
+		</p>
+	</div>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/common.js"></script>
+	<script>
+        // 声明一个全局变量接受批次号
+        $('#download').click(function(){
+        		$(this).attr('href','/operplat/template/download');
+        });
+		function up(){
+		    $(".test").remove();
+            var formData = new FormData($("#upload2")[0]);
+            $.ajax({
+                url:"/operplat/oil_card/batch_imp",
+                type: 'POST',
+                data: formData,
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode){
+                        alert(dataJson.retMsg);
+                    }else {
+                        console.log(dataJson);
+                        alert(dataJson.retMsg);
+                        $("#oil_batch_file").val("");
+						var errors =dataJson.errors;
+						if(errors != "" ){
+                            $("#errors").show();
+						}
+                        for (var i = 0; i < errors.length; i++) {
+                            $("#errors table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${errors[i].cardid}</td>
+										   <td>${errors[i].reason}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    $("#oil_batch_file").val("");
+                    alert(errorMsg);
+                }
+            });
+        }
+	</script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>站豆转让明细查询</title>
+		<link rel="stylesheet" href="../../js/layui/css/layui.css">
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			#app-box{
+				display: flex;
+				justify-content: center;
+			}
+			.test{
+				font-size: 12px;
+			}
+			.test,#class-h{
+				white-space:nowrap;
+			}
+			.btm_biaodan{
+				overflow-x: auto;
+			}
+			.month{
+				min-width: 900px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="s_date">开始日期：</lable>
+				<input type="text" id="s_date" autocomplete="off" placeholder="请选择开始日期">
+				<lable class="class-lable" for="e_date">结束日期：</lable>
+				<input type="text" id="e_date" autocomplete="off" placeholder="请选择结束日期">
+				<lable class="class-lable" for="status">状态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="success">成功</option>
+					<option value="fail">失败</option>
+					<option value="inHand">处理中</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr id="class-h">
+					<th>序号</th>
+					<th>订单编号</th>
+					<th>客户号</th>
+					<th>银行名称</th>
+					<th>户名</th>
+					<th>银行卡号</th>
+					<th>转让金额</th>
+					<th>状态</th>
+					<th>操作状态</th>
+					<th>创建时间</th>
+					<th>结束时间</th>
+				</tr>
+			</table>
+		</div>
+		<div id="app-box">
+			<div id="app"></div>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/layui/layui.js"></script>
+	<script>
+        // 执行日期插件实例
+		$(()=>{
+            laydate.render({
+                elem: '#s_date'
+            });
+            laydate.render({
+                elem: '#e_date'
+            });
+		});
+		// 声明分页实例化函数
+        var index = 1;
+        var count;
+        function paging(){
+            layui.use('laypage', function(){
+                var laypage = layui.laypage;
+                //执行一个laypage实例
+                laypage.render({
+                    elem: 'app' //注意，这里的 test1 是 ID，不用加 # 号
+                    ,count:count //数据总数，从服务端得到
+                    ,limit:20
+                    ,groups: 5
+                    ,theme: '#ff473a'
+                    ,layout: [ 'prev', 'page', 'next', 'skip', 'count']
+                    ,jump: function(obj, first){
+                        //首次不执行
+                        if(!first){
+                            //do something
+                            index = obj.curr;
+                            query(index);
+                            //obj包含了当前分页的所有参数，比如：
+                            console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
+                            console.log(obj.limit); //得到每页显示的条数
+                        }
+                    }
+                });
+            });
+        }
+		// 声明查询函数
+        function query(index) {
+            var s_date = $("#s_date").val();
+            var e_date = $("#e_date").val();
+            var status = $("#status").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/stat/beansTrans/queryDetail",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"sdate":s_date, "edate":e_date,"status":status,"page_num":index,"page_count":20},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var orders = dataJson.orders;
+                        count = dataJson.sum;
+                        var pageNo = dataJson.pageNo;
+                        for (var i = 0; i < orders.length; i++) {
+                            var sta;
+                            if (orders[i].status == "wait_pay") {sta = "处理中"}
+                            if (orders[i].status == "wait_pay_result") {sta = "处理中"}
+                            if (orders[i].status == "success") {sta = "成功"}
+                            if (orders[i].status == "pay_failed") {sta = "失败"}
+                            if (orders[i].status == "time_out") {sta = "失败"}
+                            var oper;
+                            if (orders[i].oper_status == "init") {oper = "初始状态"}
+                            if (orders[i].oper_status == "send") {oper = "发送到支付平台"}
+                            if (orders[i].oper_status == "finish") {oper = "完成"}
+                            if (orders[i].oper_status == "oper_init") {oper = "手动划豆"}
+                            if (orders[i].oper_status == "oper_send") {oper = "手动划款"}
+                            if (orders[i].oper_status == "oper_finish") {oper = "手动处理完成"}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${orders[i].order_id}</td>
+										   <td>${orders[i].cusid}</td>
+										   <td>${orders[i].bank_name}</td>
+										   <td>${orders[i].cus_name}</td>
+										   <td>${orders[i].card_no}</td>
+										   <td>${orders[i].discount_amt}</td>
+										   <td>${sta}</td>
+										   <td>${oper}</td>
+										   <td>${orders[i].ctime}</td>
+										   <td>${orders[i].utime}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+        // 默认查询
+        query(index);
+        paging();
+        // 分类查询
+		$("#search").click(() => {
+		    index = 1;
+		    query(index);
+            paging();
+		});
+	</script>
+</html>

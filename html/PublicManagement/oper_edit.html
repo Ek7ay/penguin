@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>操作人员修改</title>
+    <link rel="stylesheet" href="../../css/mine.css" />
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <style>
+        .class-button {
+            width: 44px;
+            height: 25px;
+            border-radius: 3px;
+            background-color: #f2f2f4;
+            color: #000;
+        }
+        .detail {
+            position: fixed;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            left: 30%;
+            background: #fff;
+            top: 15%;
+            border: 3px solid #00AAEE;
+            padding: 40px 35px 40px 20px;
+        }
+
+        .detail a.close {
+            position: absolute;
+            top: -7px;
+            right: 0px;
+            color: red;
+            font-size: 24px;
+        }
+
+        .deInfo {
+            padding: 30px;
+        }
+        #role2{
+            position: relative;
+            left: 26px;
+        }
+
+        #role-box{
+            width: 230px;
+            position: fixed;
+            top: 12%;
+            left: 5%;
+            border: 1px solid #3b4249;
+            background-color: whitesmoke;
+            font-size: 12px;
+            display: none;
+        }
+        ul{
+            width: 200px;
+        }
+        li{
+            list-style: none;
+            position: relative;
+            right: 5px;
+        }
+        .rol{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="info demo">
+    <div class="header">
+        <div class="month">
+            <label>
+                人员编码
+                <input type="text" id="operNo" placeholder="请输入" style="margin-left: 10px;" />
+            </label>
+
+            <label>
+                员工编码
+                <input type="text" id="empNo" placeholder="请输入" style="margin-left: 10px;" />
+            </label>
+
+            <label>
+                角色
+                <select name="" id="role" style="margin-left: 10px;">
+                </select>
+            </label>
+
+            <label>
+                状态
+                <select name="" id="status" style="margin-left: 10px;">
+                    <option value="">全部</option>
+                    <option value="normal">正常</option>
+                    <option value="lock">锁定</option>
+                    <option value="del">删除</option>
+                </select>
+            </label>
+
+            <label>
+                人员类型
+                <select id="userType" style="margin-left: 10px;">
+                    <option value=""> 全部 </option>
+                    <option value="view"> 查看 </option>
+                    <option value="oper"> 运维 </option>
+                    <option value="admin"> 系统管理 </option>
+                    <option value="sys"> Boss </option>
+                </select>
+            </label>
+            <button class="btn ml15" id="search" onclick="queryUsers()">搜索</button>
+        </div>
+    </div>
+    <div class="content btm_biaodan">
+        <table border="1" cellspacing="" cellpadding="">
+            <tr>
+                <th>人员编码</th>
+                <th>员工编码</th>
+                <th>人员姓名</th>
+                <th>登录名称</th>
+                <th>创建时间</th>
+                <th>角色</th>
+                <th>状态</th>
+                <th>人员类型</th>
+                <th>首次登录</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+        </table>
+    </div>
+    <!--详细信息-->
+    <div class="detail deInfo hide" style="height: 235px;overflow-y: scroll;">
+
+        <a class="close" href="javascript:;"> × </a>
+        <div class="month" style="margin-bottom: 10px;">
+            <label class="ml15">
+                人员编号:
+                <input id="operNo2" style="margin-left: 10px;border:#e3e3e3 solid 1px;padding: 1px 3px;" readonly="readonly"></input>
+            </label>
+        </div>
+
+        <div class="month" style="margin-bottom: 10px;">
+            <label class="ml15">
+                人员姓名:
+                <input id="operName2" style="margin-left: 10px;border:#e3e3e3 solid 1px;padding: 1px 3px;"></input>
+            </label>
+        </div>
+
+        <div class="month" style="margin-bottom: 10px;">
+            <label class="ml15" style="margin-bottom: 10px">
+                登录名称:
+                <input id="loginName2" style="margin-left: 10px;border:#e3e3e3 solid 1px;padding: 1px 3px"></input>
+            </label>
+        </div>
+
+        <div class="month" style="margin-bottom: 10px;">
+            <label class="ml15">
+                角色:
+                <select id="role2" style="margin-left: 10px;">
+                </select>
+            </label>
+        </div>
+
+        <div class="month" style="margin-bottom: 10px;">
+            <label class="ml15">
+                人员类型:
+                <select id="userType2" style="margin-left: 10px;">
+                    <option value="view"> 查看 </option>
+                    <option value="oper"> 运维 </option>
+                    <option value="admin"> 系统管理 </option>
+                    <option value="sys"> Boss </option>
+                </select>
+            </label>
+        </div>
+
+
+        <div style="display: flex;align-items: center;justify-content: center;margin-top: 40px">
+            <button class="btn ml15" id="update" onclick="updateItem()">修改</button>
+        </div>
+    </div>
+    <!--显示角色对应菜单权限-->
+    <div id="role-box"></div>
+</body>
+<script>
+    $('.detail a.close').click(function () {
+        $(this).parent().hide();
+    });
+    $.ajax({
+        url: "/operplat/role/queryRole",
+        context: document.body,
+        dataType: 'JSON',
+        data: {
+            'role_status': 'enabled'
+        },
+        async: false,
+        success: function (dataJson, dataStatus) {
+            var retCode = dataJson.retCode;
+            var retMsg = dataJson.retMsg;
+            if (retCode != 'success') {
+                alert(retMsg);
+                return;
+            } else {
+                var roles = dataJson.roles;
+                var htmlStr = '';
+                for (var i = 0; i < roles.length; i++) {
+                    htmlStr += '<option value=' + roles[i].role_id + '>' + roles[i].role_name +
+                        '</option>';
+                }
+                $("#role").html('<option value="">全部</option>' + htmlStr);
+                $("#role2").html(htmlStr);
+            }
+        },
+        error: function (req, errorMsg, exception) {
+            alert('出错啦，请稍后再试。');
+        }
+    });
+        var gloablUsers;
+        queryUsers();
+        function queryUsers() {
+            var status = $('#status option:selected').val();
+            var role = $('#role option:selected').val();
+            var userType = $('#userType option:selected').val();
+            $('.test').empty();
+            $.ajax({
+                url: "/operplat/user/queryUser",
+                context: document.body,
+                dataType: 'JSON',
+                data: {
+                    'oper_id': $("#operNo").val(),
+                    'emp_id': $("#empNo").val(),
+                    'role_id': role,
+                    'user_type': userType,
+                    'status': status
+                },
+                async: false,
+                success: function (dataJson, dataStatus) {
+                    var retCode = dataJson.retCode;
+                    var retMsg = dataJson.retMsg;
+                    if (retCode != 'success') {
+                        alert(retMsg);
+                        return;
+                    } else {
+                        gloablUsers = dataJson.users;
+                        users = dataJson.users;
+                        for (var i = 0; i < users.length; i++) {
+                            var status = "";
+                            var userType = "";
+                            var firstLogin = "";
+                            if (users[i].status == 'normal') status = '正常';
+                            if (users[i].status == 'lock') status = '锁定';
+                            if (users[i].status == 'del') status = '删除';
+
+                            if (users[i].first_login == 'Y') firstLogin = '是';
+                            if (users[i].first_login == 'N') firstLogin = '否';
+
+                            if (users[i].user_type == 'view') userType = '查看';
+                            if (users[i].user_type == 'oper') userType = '运维';
+                            if (users[i].user_type == 'admin') userType = '系统管理者';
+                            if (users[i].user_type == 'sys') userType = 'Boss';
+
+                            $(".btm_biaodan table").append(
+                                "<tr class='test'><td>" + users[i].oper_id +
+                                "</td><td>" + users[i].emp_id +
+                                "</td><td>" + users[i].oper_name +
+                                "</td><td>" + users[i].login_name +
+                                "</td><td>" + users[i].ctime +
+                                "</td><td class='rol' data-role="+users[i].role_id+">" + users[i].role_name +
+                                "</td><td>" + status +
+                                "</td><td>" + userType +
+                                "</td><td>" + firstLogin +
+                                "</td><td>" + users[i].remark +
+                                "</td><td>" +
+                                '<button class="class-button" type="button" onclick="showUpdateItem(' +
+                                i + ')">修改</button>' +
+                                "</td><tr>");
+                        }
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert('出错啦，请稍后再试。');
+                }
+            });
+        }
+        function showUpdateItem(index) {
+            var item = gloablUsers[index];
+            $('.deInfo').show();
+            $('#operNo2').val(item.oper_id);
+            $('#operName2').val(item.oper_name);
+            $('#loginName2').val(item.login_name);
+            $('#role2').val(item.role_id);
+            $('#userType2').val(item.user_type);
+        }
+        function updateItem() {
+
+            var role2 = $('#role2 option:selected').val();
+            var userType2 = $('#userType2 option:selected').val();
+
+            $.ajax({
+                url: "/operplat/user/modifyUser",
+                context: document.body,
+                dataType: 'JSON',
+                data: {
+                    'oper_id': $('#operNo2').val(),
+                    'login_name': $('#loginName2').val(),
+                    'oper_name': $('#operName2').val(),
+                    'role_id': role2,
+                    'user_type': userType2,
+                },
+                async: false,
+                success: function (dataJson, dataStatus) {
+                    var retCode = dataJson.retCode;
+                    var retMsg = dataJson.retMsg;
+                    if (retCode != 'success') {
+                        alert(retMsg);
+                        return;
+                    } else {
+                        $('.detail a.close').parent().hide();
+                        queryUsers();
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert('出错啦，请稍后再试。');
+                }
+            });
+        }
+        // =======自动加载对应角色权限=======
+        // 获取全部菜单数组
+        var ygj ;
+        var role_menus;
+        $.ajax({
+            url: "/operplat/menu/queryMenuLevel",
+            context: document.body,
+            dataType: 'JSON',
+            async: false,
+            success:function (dataJson,dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    ygj = dataJson.menus;
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+        // 获取列表结构
+        function recursive(arr) {
+            var len = arr.length;
+            var str = '<ul>';
+            for (let i = 0; i < len; i++) {
+                if (arr[i].has_more != 'Y') {
+                    str += `<li style="display: none"><span>${arr[i].menu_name}</span>`;
+                    str += '</li>';
+                    continue;
+                } else {
+                    str += `<li class="menu-fu" style="display: none">
+					   <span>${arr[i].menu_name}<img src="../../images/jiahao.png" height="14" width="14"/></span>
+					   <ul>`;
+                    if (arr[i].childMenus != null && arr[i].childMenus.length > 0) {
+                        str += recursive(arr[i].childMenus);
+                    }
+                    str += '</ul>';
+                    str += '</li>';
+                }
+            }
+            str += '</ul>';
+            return str;
+        };
+        // 鼠标触发blur事件，获取相应角色的role_id
+        $(() => {
+            $(".rol").live({
+                mouseenter: function () {
+                    var role_id = $(this).attr("data-role");
+                    $('#role-box').html(recursive(ygj));
+                    queryrole(role_id);
+                    comparess();
+                    Amerger();
+                    $("#role-box").show();
+                },
+                mouseleave: function () {
+                    $("#role-box").hide();
+                    $('#role-box').empty();
+                }
+            });
+        });
+        // 声明菜单的展开与合并的控制函数
+        function Amerger() {
+            $('.menu-fu span').toggle(function(){
+                $(this).next().slideUp();
+            },function(){
+                $(this).next().slideDown();
+            });
+        }
+        // 获取对应角色菜单权限
+        function queryrole(role_id) {
+            $.ajax({
+                url: "/operplat/role/queryRole",
+                context: document.body,
+                dataType: 'JSON',
+                data: {"role_id":role_id},
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        role_menus = dataJson.roles[0].menus;
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+        // 菜单比较的辅助函数
+        function comparess() {
+            var yangarr = $("#role-box").find('span');
+            for (var p = 0; p < role_menus.length; p++) {
+                for (var d = 0; d < yangarr.length; d++) {
+                    if (yangarr[d].innerText == role_menus[p].menu_name) {
+                        yangarr[d].parentElement.style.display = "block";
+                    }
+                }
+            }
+        }
+    </script>
+</html>

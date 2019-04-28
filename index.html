@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>企鹅车务运维平台</title>
+    <link rel="stylesheet" href="css/pintuer.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/style3.css" />
+    <link rel="stylesheet" href="css/animite.min.css" />
+    <style>
+        ::-webkit-scrollbar {
+          display: none;
+        }
+
+        .element::-webkit-scrollbar { width: 0 !important }
+        .element { -ms-overflow-style: none; }
+        .element { overflow: -moz-scrollbars-none; }
+
+        .choose { background: #055dc0; color: #FFFFFF !important;}
+        ul{padding-left: 0;}
+        .leftnav>h3{font-size: 14px; display: flex; padding: 15px 20px; box-sizing: border-box; align-items: center; align-content: center;}
+        .leftnav>h3>a{color:#b7d9ff;margin-left: 10px;}
+        .leftnav>h3:hover>a{color:#FFFFFF;}
+        .menus ul li{ display: flex; flex-direction: row; flex-wrap: wrap; padding-bottom: 10px; color: #b7d9ff; align-items: center;}
+        .menus ul li:first-of-type{padding-top: 10px;}
+        .menus ul li.menu-fu>ul{ width: 98%;}
+        .menus ul li.menu-fu>ul li:last-of-type{padding-bottom: 0;}
+        .menus ul li.menu-fu>ul{ display: none; margin-left: 14px;}
+        .menus ul li h3{cursor: pointer; font-size: 14px;
+        		-webkit-touch-callout: none; /* iOS Safari */
+			-webkit-user-select: none; /* Chrome/Safari/Opera */
+			-khtml-user-select: none; /* Konqueror */
+			-moz-user-select: none; /* Firefox */
+			-ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+            line-height: 60px;
+		}
+		.menus ul li h3:hover{color: #FFFFFF;}
+		.menus ul li a{font-size: 14px; color: #b7d9ff;}
+		.menus ul li a:hover{color: #FFFFFF;}
+        .menus ul li img{ width: 25px; height: 15px;padding-right: 10px;}
+		.admin{background:#fff;position:fixed;z-index:-1;border-left:solid 1px #b5cfd9;right:0;bottom:0;top:70px;left:220px; padding-bottom:0px; /*overflow:auto;*/ border-top:1px solid #b5cfd9; /*padding-right:15px;*/}
+        
+    </style>
+    <script src="js/jquery-1.8.3.min_2.js"></script>
+</head>
+<body>
+    <div class="header bg-main clearfix" style="padding-left: 20px;">
+        <img src="images/logo.png" alt="" style="margin:12px 0px;width: 220px"/>
+
+        <div class="head-l" style="margin-top: 22px;margin-right: 30px">
+                <!-- 	<a class="button button-little bg-green" href="" target="_blank"><span class="icon-file-word-o"></span> 帮助</a> &nbsp;&nbsp; -->
+                
+                <a id="exit" href="login.html" style="color: #fff; "> 
+                    <img src="images/retreat-from.png"  style="padding-right:10px;color: #fff;width: 25px;height: 15px ">
+                    <span>退出</span></a> 
+        </div>
+     
+        <div class="logo margin-big-left fadein-top head-r">
+            <h1 style="font-size: 14px"><img src="images/User-avatar.png" class="radius-circle rotate-hover" height="50" alt="" />
+                您好,<span id="userName"></span></h1>
+        </div>
+        
+    </div>
+    <div class="leftnav">
+    		<h3><img src="images/home-page.png" alt="" /><a href="welcome.html" target="right">首页</a></h3>
+    		<div class="menus element" style="height: 85%;overflow-x: hidden; overflow-y: scroll;padding-left: 20px">
+    			<ul>
+    				<!--<li class="menu-fu">
+    					<img src="css/zTreeStyle/img/diy/1_close.png" alt="" />
+    					<h3>一级父菜单</h3>
+    					<ul>
+						<li class="menu-fu">
+							<img src="css/zTreeStyle/img/diy/1_close.png" alt="" />
+							<h3>二级父菜单</h3>
+							<ul>
+								<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单2</a></li>
+								<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单2</a></li>
+								<li class="menu-fu">
+									<img src="css/zTreeStyle/img/diy/1_close.png" alt="" />
+									<h3>三级父菜单</h3>
+									<ul>
+										<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单3</a></li>
+										<li class="menu-fu">
+											<img src="css/zTreeStyle/img/diy/1_close.png" alt="" />
+											<h3>四级父菜单</h3>
+											<ul>
+												<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单4</a></li>
+												<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单4</a></li>
+											</ul>
+										</li>
+										<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单3</a></li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+						<li class="menu-fu">
+							<img src="css/zTreeStyle/img/diy/1_close.png" alt="" />
+							<h3>二级父菜单</h3>
+							<ul>
+								<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单2</a></li>
+								<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单2</a></li>
+							</ul>
+						</li>
+						<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单1</a></li>
+					</ul> 
+    				</li>
+    				<li class="menu-fu">
+					<img src="css/zTreeStyle/img/diy/1_close.png" alt="" />
+					<h3>一级父菜单</h3>
+					<ul>
+						<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单2</a></li>
+						<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">子菜单2</a></li>
+					</ul>
+				</li>
+				<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">父菜单1</a></li>
+				<li class="menu-list"><img src="css/zTreeStyle/img/diy/1_close.png" /><a href="oldindex.html" target="right">父菜单1</a></li>  					-->
+    			</ul>
+    		</div>
+    </div>
+    <script src="js/jquery-1.8.3.min_2.js"></script>
+    <script src="js/cookie.js"></script>
+    <script type="text/javascript">
+        $(function() {
+	        	$('.menu-fu h3').toggle(function(){
+				$(this).next().slideDown();
+                $(this).children().attr("src","images/spread.png");
+                $(this).parent().addClass('choose');
+			},function(){
+				$(this).next().slideUp();
+                $(this).children().attr("src","images/Not-expanded.png");
+				$(this).parent().removeClass('choose');
+			});
+            
+            $(".leftnav h3 a").click(function() {
+                $("#a_leader_txt").attr('href', '');
+                var url = $(this).attr('href');
+                $("#a_leader_txt").attr('href', url);
+                $("#a_leader_txt").text($(this).text());
+                $(".leftnav h3 a").removeClass("choose");
+                $(this).addClass("choose");
+            })	
+        });
+        
+        var operplat_sess_id = getCookie('operplat_sess_id'); //全局验证
+        if (operplat_sess_id == '') {
+             setTimeout(function() {
+                 alert('验证已过，请重新登录');
+                 window.location.replace('./login.html');
+             }, 500);
+        }
+        var oper_name = getCookie('oper_name'); //全局验证
+        $("#userName").text(oper_name);
+        $('#exit').click(function() {
+            // clearAllCookie();
+        });
+        // 检测关闭浏览器后  清除session
+//      window.onbeforeunload = function (e) {
+            // return (e || window.event).returnValue = '有信息未保存，确认离开？！';
+//          clearAllCookie();
+//      }
+
+        let menus; // 菜单全局变量
+        var oper_id = getCookie("oper_id");
+        getMenus();
+        // 获取菜单列表
+        function getMenus() {
+            menus = null; // 初始化菜单
+            $.ajax({
+                url: "/operplat/user/menuQry",
+                context: document.body,
+                dataType: "JSON",
+                data: {
+                    "oper_id": oper_id
+                },
+                async: false,
+                success: function(dataJson, dataStatus) {
+                    if (dataJson.retCode != "success") {
+                        if(operplat_sess_id != ''){
+                            alert(dataJson.retMsg);
+                        }
+                    } else {
+                        menus = dataJson.menus;
+                    }
+                },
+                error: function(req, errorMsg, exception) {
+                    alert('验证已过，请重新登录');
+                    window.location.replace('./login.html');
+                }
+            });
+        }
+
+        function render(arr) {
+
+            var len = arr.length;
+            var str = '<ul>';
+            for (let i = 0; i < len; i++) {
+                if (arr[i].has_more != 'Y') {
+                    str += `<li><img src="${arr[i].menu_icon}"/><a href=${arr[i].menu_url} class="flipInX animated" target="right">${arr[i].menu_name}</a>`;
+                    str += '</li>';
+                    continue;
+                } else {
+                    str += `<li class="menu-fu">
+                    	   <img src="${arr[i].menu_icon}" />
+					   <h3 data-menuId=${arr[i].menu_id} class="" >${arr[i].menu_name} <img src="images/Not-expanded.png" style="width:22px;height:8px;margin-bottom:25px;margin-left:10px;" /></h3>
+					   <ul>`;
+                    if (arr[i].childMenus != null && arr[i].childMenus.length > 0) {
+                        str += render(arr[i].childMenus);
+                    }
+                    str += '</ul>';
+                    str += '</li>';
+                }
+            }
+            str += '</ul>';
+            return str;
+        }
+        $('.leftnav .menus').html(render(menus));
+        
+        var now_name;	
+        function findid(arr,id) {
+		   var len = arr.length;
+		   for(var i=0;i<len;i++){
+		   	  if(arr[i].menu_id != id){
+		   	  	  if(arr[i].childMenus != null && arr[i].childMenus.length > 0){
+		   	  	  	  findid(arr[i].childMenus,id);
+		   	  	  }
+		   	  }else{
+		   	  	  now_name = arr[i].up_menu;
+		   	  }
+		   }
+		}
+        findid(menus,"M001002002"); // 限额修改
+        console.log(now_name);
+	</script>
+    <div class="admin">
+        <iframe scrolling="auto" rameborder="0" src="welcome.html" name="right" width="100%" height="100%"></iframe>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>账户类型查询</title>
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/mine.css" />
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+
+    <style>
+        .detail {
+            position: fixed;
+            left: 30%;
+            background: #fff;
+            top: 15%;
+            border: 3px solid #00AAEE;
+            padding: 40px 35px 40px 20px;
+        }
+        
+        .detail a.close {
+            position: absolute;
+            top: -7px;
+            right: 0px;
+            color: red;
+            font-size: 24px;
+        }
+        
+        .deInfo {
+            padding: 30px;
+        }
+        .class-button{
+            width:44px;
+            height: 25px;
+            border-radius: 3px;
+            background-color: #f2f2f4;
+            color: #000;
+        }
+        #acctTypeName{
+            display: inline-block;
+            width: 158px;
+            height: 30px;
+            line-height: 30px;
+            color: #000;
+            border: 1px solid #e3d9d9;
+        }
+        .textarea{
+            position: absolute;
+            bottom: 167px;
+            left: 46px;
+        }
+        #update{
+            position: absolute;
+        }
+        #ml1{
+            margin-top: 10px;
+        }
+        #option_flag{
+            border: 1px solid #E3D9D9;
+            width: 158px;
+            height: 30px;
+            position: relative;
+            left: 19px;
+        }
+    </style>
+
+    <script>
+        $(function() {
+            $.ajax({
+                url: "/operplat/company/query",
+                context: document.body,
+                dataType: "JSON",
+                data: {
+                    'status': 'enabled'
+                },
+                async: false,
+                success: function(dataJson, dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                        return;
+                    } else {
+                        cpsGloable = dataJson.cps;
+                        for (let i = 0; i < dataJson.cps.length; i++) {
+                            $('#companyName').append('<option value="' + dataJson.cps[i].cpid + '" >' + dataJson.cps[i].cpname + '</option>');
+                        }
+                    }
+                },
+                error: function(req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+    </script>
+
+</head>
+
+<body class="info demo">
+    <div class="header">
+
+        <div class="month">
+            <label class="ml15">
+                公司名称<select id="companyName" style="margin-left: 10px; ">
+                <option value="" > 全部</option>
+                </select>
+            </label>
+
+            <label class="ml15">
+                    账户类型<input id="acctType" style="margin-left: 10px; "/>
+                </label>
+
+            <label class="ml15">
+                账户状态<select id="acctStatus" style="margin-left: 10px; ">
+                <option value="new,enabled,unenabled"> 全部</option>
+                <option value="new" > 新建</option>
+                <option value="enabled" > 启用</option>
+                <option value="unenabled" > 停用</option>
+                <!-- <option value="del" > 删除</option> -->
+                </select>
+            </label>
+
+            <label class="ml15">
+                    操作人号<input type="text " id="operId" placeholder="请输入 " style="margin-left: 10px; " />
+            </label>
+
+            <button class="btn ml15" id="search">搜索</button>
+        </div>
+
+    </div>
+
+    <div class="content btm_biaodan">
+        <table border="1" cellspacing="" cellpadding="">
+            <tr>
+                <th>公司名称</th>
+                <th>账户类型</th>
+                <th>优先级</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>更新时间</th>
+                <th>操作人</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+        </table>
+    </div>
+
+    <!--详细信息-->
+    <div class="detail deInfo hide" style="height: 300px;overflow-y: scroll;">
+        <a class="close" href="javascript:;">×</a>
+        <div class="month">
+            <label class="ml15">
+                    类型名称:<span id="acctTypeName" style="margin-left: 10px"></span>
+            </label>
+        </div>
+
+        <div class="month"  id="ml1">
+            <label class="ml15">
+                优先级:
+                <!--<span id="option_flag" style="margin-left: 10px"></span>-->
+                <input type="text" id="option_flag" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+            </label>
+        </div>
+
+        <div class="month">
+            <label class="ml15">
+                账户状态:<select  id="acctStatus2" style="margin-left: 10px;margin-top: 10px ">
+                <!-- <option value="new" > 新建</option>
+                <option value="enabled" > 启用</option>
+                <option value="unenabled" > 停用</option> -->
+                </select>
+        </label>
+        </div>
+
+        <div class="month">
+            <label class="ml15">
+                    <span class="textarea">备注：</span>
+                    <textarea  id="remark" style="height:100px; border:1px solid #ddd;margin-top: 30px;margin-left: 65px;"></textarea>
+        </label>
+        </div>
+
+        <div style="display: flex;align-items: center;justify-content: center;margin-top: 40px">
+            <button class="btn ml15" id="update">修改</button>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    var typesGloable;
+    var indexGloable;
+    $('#search').click(function() {
+        queryAccts();
+    });
+	queryAccts();
+    $('.detail a.close').click(function() {
+        $(this).parent().hide();
+    });
+
+    $("#update").click(function() {
+        updateItem(indexGloable);
+    });
+
+    function queryAccts() {
+
+        var cpid = $('#companyName option:selected').val();
+        var acctType = $('#acctType').val();
+        var acctStatus = $('#acctStatus option:selected').val();
+        var operId = $('#operId').val();
+        $('.test').empty();
+        $.ajax({
+            url: "/operplat/acct_type/query",
+            context: document.body,
+            dataType: 'JSON',
+            data: {
+                'type_name': acctType,
+                'cpid': cpid,
+                'status': acctStatus,
+                'oper_id': operId
+            },
+            async: false,
+            success: function(dataJson, dataStatus) {
+                var retCode = dataJson.retCode;
+                var retMsg = dataJson.retMsg;
+                if (retCode != 'success') {
+                    alert(retMsg);
+                    return;
+                } else {
+                    typesGloable = dataJson.types;
+                    console.log(dataJson.types);
+                    listHtml(typesGloable);
+                }
+            },
+            error: function(req, errorMsg, exception) {
+                alert('出错啦，请稍后再试。');
+            }
+        });
+    }
+
+    function listHtml(types) {
+        for (var i = 0; i < types.length; i++) {
+            var status = types[i].status;
+            if (status == "new") {
+                status = "新建";
+            } else if (status == "enabled") {
+                status = "启用";
+            } else if (status == "unenabled") {
+                status = "停用";
+            } else if (status == "del") {
+                status = "删除";
+            } else {
+                status = "未知状态";
+            }
+
+            $(".btm_biaodan table").append(
+                "<tr class='test'><td>" + types[i].cpname +
+                "</td><td>" + types[i].type_name +
+                "</td><td>" + types[i].option_flag +
+                "</td><td>" + status +
+                "</td><td>" + types[i].ctime +
+                "</td><td>" + types[i].utime +
+                "</td><td>" + types[i].oper_name +
+                "</td><td>" + types[i].remark +
+                // "</td><td>" + '<a href="javascript:;" class="class-button" onclick="showUpdateItem(' + i + ')">修改</a>' +
+                "</td><td>" + '<button  class="class-button" type="button" onclick="showUpdateItem(' + i + ')">修改</button>' +
+                // '<a href="javascript:;" onclick="deleteItem(' + i + ')">删除</a>' +
+                "</td><tr>");
+        }
+    }
+
+    function showUpdateItem(index) {
+        indexGloable = index;
+        $('.deInfo').show();
+        $('#acctTypeName').text(typesGloable[indexGloable].type_name);
+        $("#option_flag").val(typesGloable[indexGloable].option_flag);
+        $("#remark").val(typesGloable[indexGloable].remark);
+        // $('#acctTypeName').val(types[i].type_name);
+        var status = typesGloable[indexGloable].status;
+            if (status == "new"){
+                $("#acctStatus2").empty();
+				$("#acctStatus2").append(
+				    `<option value="new">新建</option>
+					 <option value="enabled">启用</option>
+					 <option value="unenabled">停用</option>`
+					//  <option value="del">删除</option>
+				);
+			}else  if (status == "enabled"){
+                $("#acctStatus2").empty();
+                $("#acctStatus2").append(
+                    `<option value="enabled">启用</option>
+ 					 <option value="unenabled">停用</option>`
+                );
+			}else  if (status == "unenabled"){
+                $("#acctStatus2").empty();
+                $("#acctStatus2").append(
+                    `<option value="unenabled">停用</option>
+					<option value="enabled">启用</option>`
+ 					//  <option value="del">删除</option>
+                );
+			}else if (status == "del"){
+                $("#acctStatus2").empty();
+                $("#acctStatus2").append(
+                    `<option value="del">删除</option>`
+                );
+			};
+    }
+
+    function updateItem() {
+        var acctStatus = $('#acctStatus2 option:selected').val();
+        var option_flag = $("#option_flag").val();
+        var remark = $('#remark').val();
+
+        $.ajax({
+            url: "/operplat/acct_type/modify",
+            context: document.body,
+            dataType: 'JSON',
+            data: {
+                'acct_type': typesGloable[indexGloable].acct_type,
+                'type_name': typesGloable[indexGloable].type_name,
+                "option_flag":option_flag,
+                'status': acctStatus,
+                'remark': remark
+            },
+            async: false,
+            success: function(dataJson, dataStatus) {
+                var retCode = dataJson.retCode;
+                var retMsg = dataJson.retMsg;
+                if (retCode != 'success') {
+                    alert(retMsg);
+                    return;
+                } else {
+                    $('.detail a.close').parent().hide();
+                    window.location.reload();
+                }
+            },
+            error: function(req, errorMsg, exception) {
+                alert('出错啦，请稍后再试。');
+            }
+        });
+    }
+    // 删除
+    // function deleteItem(index) {
+    //     var isSure = confirm('确认删除该账户吗');
+    //     if (isSure) {
+    //         $.ajax({
+    //             url: "/operplat/acct_type/modify",
+    //             context: document.body,
+    //             dataType: 'JSON',
+    //             data: {
+    //                 'acct_type': typesGloable[index].acct_type,
+    //                 'type_name': typesGloable[index].type_name,
+    //                 'status': "del"
+    //             },
+    //             async: false,
+    //             success: function(dataJson, dataStatus) {
+    //                 var retCode = dataJson.retCode;
+    //                 var retMsg = dataJson.retMsg;
+    //                 if (retCode != 'success') {
+    //                     alert(retMsg);
+    //                     return;
+    //                 } else {
+    //                     window.location.reload();
+    //                 }
+    //             },
+    //             error: function(req, errorMsg, exception) {
+    //                 alert('出错啦，请稍后再试。');
+    //             }
+    //         });
+    //     } else {
+    //         console.log('the user clicked cancel');
+    //     }
+
+    // }
+</script>
+
+</html>

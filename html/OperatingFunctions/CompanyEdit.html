@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>入住公司修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			/*#img{*/
+				/*position: fixed;*/
+				/*left: 0;*/
+				/*top: 0;*/
+				/*z-index: 10;*/
+				/*padding: 5px;*/
+				/*background: rgba(0,0,0,0.5);*/
+				/*width: 100%;*/
+				/*height: 100%;*/
+				/*display: flex;*/
+				/*flex-direction: column;*/
+				/*align-items: center;*/
+				/*justify-content: center;*/
+			/*}*/
+			/*#img img{*/
+				/*color: red;*/
+				/*width: 300px;*/
+				/*height: 200px;*/
+				/*border-radius: 10px;*/
+			/*}*/
+			.class-table{
+				width: 375px;
+				height: 470px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			/*.up{*/
+				/*border-style: none !important;*/
+			/*}*/
+			#beizhu{
+				position: absolute;
+				top: 268px;
+				left: 83px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			/*.class-table #defaultImg{*/
+				/*width: 150px;*/
+				/*height: 100px;*/
+				/*position: relative;*/
+				/*left: 148px;*/
+				/*margin-top: 10px;*/
+				/*margin-bottom: 20px;*/
+			/*}*/
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="cpid">公司编码：</lable>
+				<input type="text" id="cpid" placeholder="请输入">
+				<lable for="cpname" class="class-lable">公司名称：</lable>
+				<input type="text" id="cpname" placeholder="请输入">
+				<lable for="mobile" class="class-lable">联系电话：</lable>
+				<input type="text" id="mobile" placeholder="请输入">
+				<lable for="pname" class="class-lable">联系人：</lable>
+				<input type="text" id="pname" placeholder="请输入">
+				<lable for="status" class="class-lable">状态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="new">新建</option>
+					<option value="enabled">启用</option>
+					<option value="unenabled">停用</option>
+					<!-- <option value="del">删除</option> -->
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>公司编码</th>
+					<th>公司名称</th>
+					<th>公司地址</th>
+					<th>联系电话</th>
+					<th>联系人</th>
+					<th>状态</th>
+					<th>加入时间</th>
+					<th>更新时间</th>
+					<th>备注</th>
+					<th>操作</th>
+				</tr>
+				<!--<tr>-->
+					<!--<th>1</th>-->
+					<!--<th>safds</th>-->
+					<!--<th>asfas</th>-->
+					<!--<th>sadf</th>-->
+					<!--<th>asdf</th>-->
+					<!--<th>sadfa</th>-->
+					<!--<th>sadfsaf</th>-->
+					<!--<th>dsafasf</th>-->
+					<!--<th>sdfafdsadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>-->
+						<!--<button type="button" class="class_button open" >修改</button>-->
+						<!--<button type="button" class="class_button open" >删除</button>-->
+					<!--</th>-->
+				<!--</tr>-->
+			</table>
+		</div>
+		<!--<div id="img" style="display: none">-->
+			<!--<lable id="shut">-->
+				<!--<img src="javascript:;" alt="" class="p_photo"/>-->
+			<!--</lable>-->
+		<!--</div>-->
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>公司编码：</td>
+						<td>
+							<input readonly="readonly" type="text" id="cpid2" name="cpid">
+						</td>
+					</tr>
+					<tr>
+						<td>公司名称：</td>
+						<td>
+							<input type="text" id="cpname2" name="cpname">
+						</td>
+					</tr>
+					<tr>
+						<td>公司地址：</td>
+						<td>
+							<input type="text" id="cp_address" name="cp_address">
+						</td>
+					</tr>
+					<tr>
+						<td>联系电话：</td>
+						<td>
+							<input type="text" id="mobile2" name="mobile">
+						</td>
+					</tr>
+					<tr>
+						<td>联系人：</td>
+						<td>
+							<input type="text" id="pname2" name="pname">
+						</td>
+					</tr>
+					<tr>
+						<td>状&nbsp&nbsp&nbsp&nbsp态：</td>
+						<td>
+							<select  id="status2" name="status">
+								<!--<option value="">全部</option>-->
+								<!--<option value="new">新建</option>-->
+								<!--<option value="enabled">启用</option>-->
+								<!--<option value="unenabled">停用</option>-->
+								<!--<option value="del">删除</option>-->
+							</select>
+						</td>
+					</tr>
+					<!--<tr>-->
+						<!--<td>logo图片：</td>-->
+						<!--<td>-->
+							<!--<input type="file" class="up" accept="image/png, image/jpeg, image/gif, image/jpg*" value="上传" id="image" name="image"/>-->
+						<!--</td>-->
+					<!--</tr>-->
+					<!--<tr>-->
+						<!--<td><img src="images/zhanweitu.jpg" alt="我是图片" id="defaultImg"/></td>-->
+					<!--</tr>-->
+					<tr>
+						<td id="beizhu">备&nbsp&nbsp&nbsp&nbsp注：</td>
+						<td>
+							<textarea id="remark" name="remark" rows="-8" cols="15"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button class="class_instruction shut" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var cps;
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/company/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        cps = dataJson.cps;
+                        for (var i = 0; i < cps.length; i++) {
+                            var status = cps[i].status;
+                            var sta;
+                            if(status == "new"){
+                                sta = "新建";
+                            }else if (status == "enabled"){
+                                sta = "启用";
+                            }else if (status == "unenabled"){
+                                sta = "停用";
+							}else if (status == "del"){
+                                sta = "删除";
+							}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${cps[i].cpid}</td>
+										   <td>${cps[i].cpname}</td>
+										   <td>${cps[i].cp_address}</td>
+										   <td>${cps[i].mobile}</td>
+										   <td>${cps[i].pname}</td>
+										   <!--<td><button type="button" class="bgimg get_img" onclick="get_img(${i})">查看图片</button></td>-->
+										   <td>${sta}</td>
+										   <td>${cps[i].ctime}</td>
+										   <td>${cps[i].utime}</td>
+										   <td>${cps[i].remark}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+												<!--<button type="button" onclick="delMsg( ${i} ,this)">删除</button>-->
+										   </td>
+										</tr>`);
+                            // $("#company_id").append(`<option value="${cps[i].company_id}">${cps[i].company_name}</option>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 分类查询
+		$("#search").click(()=>{
+            var cpid = $("#cpid").val();
+            var cpname = $("#cpname").val();
+            var mobile = $("#mobile").val();
+            var pname = $("#pname").val();
+            var status = $("#status option:selected").val();
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/company/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"cpid":cpid,"cpname":cpname,"mobile":mobile,"pname":pname,"status":status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        cps = dataJson.cps;
+                        for (var i = 0; i < cps.length; i++) {
+                            var status = cps[i].status;
+                            var sta;
+                            if(status == "new"){
+                                sta = "新建";
+                            }else if (status == "enabled"){
+                                sta = "启用";
+                            }else if (status == "unenabled"){
+                                sta = "停用";
+                            }else if (status == "del"){
+                                sta = "删除";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${cps[i].cpid}</td>
+										   <td>${cps[i].cpname}</td>
+										   <td>${cps[i].cp_address}</td>
+										   <td>${cps[i].mobile}</td>
+										   <td>${cps[i].pname}</td>
+										   <!--<td><button type="button" class="bgimg get_img" onclick="get_img(${i})">查看图片</button></td>-->
+										   <td>${sta}</td>
+										   <td>${cps[i].ctime}</td>
+										   <td>${cps[i].utime}</td>
+										   <td>${cps[i].remark}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+												<!--<button type="button" onclick="delMsg( ${i} ,this)">删除</button>-->
+										   </td>
+										</tr>`);
+                            // $("#company_id").append(`<option value="${cps[i].company_id}">${cps[i].company_name}</option>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+        // 获取修改内容
+        function editMsg(i){
+            // $("#shujub").empty();
+            $("#cpid2").val(cps[i].cpid);
+            $("#cpname2").val(cps[i].cpname);
+            $("#cp_address").val(cps[i].cp_address);
+            $("#mobile2").val(cps[i].mobile);
+            $("#pname2").val(cps[i]. pname);
+            $("#status2").val(cps[i]. status);
+            var status = cps[i]. status;
+            if (status == "new"){
+                $("#status2").empty();
+				$("#status2").append(
+				    `<option value="new">新建</option>
+					 <option value="enabled">启用</option>
+					 <option value="unenabled">停用</option>`
+					//  <option value="del">删除</option>
+				);
+			}else  if (status == "enabled"){
+                $("#status2").empty();
+                $("#status2").append(
+                    `<option value="enabled">启用</option>
+ 					 <option value="unenabled">停用</option>`
+                );
+			}else  if (status == "unenabled"){
+                $("#status2").empty();
+                $("#status2").append(
+                    `<option value="unenabled">停用</option>
+					<option value="enabled">启用</option>`
+ 					//  <option value="del">删除</option>
+                );
+			}else if (status == "del"){
+                $("#status2").empty();
+                $("#status2").append(
+                    `<option value="del">删除</option>`
+                );
+			};
+            // $('#defaultImg').attr('src', 'data:image/jpg;base64,' + cps[i].logo_id);
+            $("#remark").val(cps[i]. remark);
+            $('.class-table').show();
+        };
+        // 修改界面的显示和隐藏
+		$(()=>{
+            $(".class-table").hide();
+		    $(".open").click(()=>{
+		        $(".class-table").show();
+			});
+		    $(".shut").click(()=>{
+		        $(".class-table").hide();
+			});
+		});
+        // 编辑结果提交
+        function submitEdit() {
+            var formData = new FormData($( "#upload" )[0]);
+            $.ajax({
+                url:"/operplat/company/modify",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    }else{
+                        alert('修改成功');
+                    }
+                },
+                error: function(req,errorMsg,exception){
+                    alert("出错啦");
+                }
+            });
+        };
+        // 删除
+        // function delMsg(data,that){
+        //     var re = confirm('确认删除此条信息？');
+        //     var cpid = cps[data].cpid;
+        //     if(re) {
+        //         $.ajax({
+        //             url:"/operplat/company/modify",
+        //             context: document.body,
+        //             dataType: "JSON",
+        //             async: false,
+        //             data:{"cpid":cpid,"status":"del"},
+        //             success:function (dataJson,dataStatus) {
+        //                 if ("success" != dataJson.retCode) {
+        //                     alert(dataJson.retMsg);
+        //                 } else {
+        //                     $(that).parent().parent().hide();
+        //                     alert(dataJson.retMsg);
+        //                 }
+        //             },
+        //             error:function (req, errorMsg, exception) {
+        //                 alert(errorMsg);
+        //             }
+        //         });
+        //     }else{
+        //         return;
+        //     }
+        // };
+        // 获取图片
+        // function get_img(i){
+        //     $('.p_photo').attr('src', 'data:image/jpg;base64,' + cps[i].logo_id);
+        //     console.log(cps[i].logo_id);
+        //     $('#img').show();
+        // };
+        // 点击目标区域以外的区域
+        // $('#img').mouseup(function(e){
+        //     var _con = $('.p_photo');   // 设置目标区域
+        //     if(!_con.is(e.target) && _con.has(e.target).length === 0){ // Mark 1
+        //         $(this).hide();
+        //     }
+        // });
+        //图片返显功能
+        // var fileInput = document.querySelector('input[type=file]'),previewImg = document.querySelector('#defaultImg');
+        // fileInput.addEventListener('change', function () {
+        //     var file = this.files[0];
+        //     var reader = new FileReader();
+        //     // 监听reader对象的的onload事件，当图片加载完成时，把base64编码賦值给预览图片
+        //     reader.addEventListener("load", function () {
+        //         previewImg.src = reader.result;
+        //     }, false);
+        //     // 调用reader.readAsDataURL()方法，把图片转成base64
+        //     reader.readAsDataURL(file);
+        // }, false);
+	</script>
+</html>

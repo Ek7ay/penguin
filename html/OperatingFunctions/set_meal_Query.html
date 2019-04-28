@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="renderer" content="webkit">
+    <title>套餐查询</title>
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <link rel="stylesheet" href="../../css/TRconner/mine.css">
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <script src="../../js/cookie.js"></script>
+    <style>
+        .btn_ss{
+            width: 75px;
+            height: 25px;
+            border-radius: 3px;
+            color: #ffffff;
+            background-color: #00a0e9;
+        }
+    </style>
+</head>
+<body class="info demo">
+<div class="content btm_biaodan">
+    <table border="1" cellspacing="" cellpadding="" id="set-meal-list">
+        <tr>
+            <th>序号</th>
+            <th>套餐编号</th>
+            <th>套餐类型</th>
+            <th>套餐名称</th>
+            <th>对外价格</th>
+            <th>实际价格</th>
+            <th>创建时间</th>
+            <th>创建人</th>
+            <th>状态</th>
+            <th>备注</th>
+            <th>操作</th>
+        </tr>
+
+    </table>
+
+</div>
+
+<script>
+    var groups;
+    // load查询
+    $(() => {
+        $.ajax({
+            url: "/operplat/sv_group/query",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            data:{"status":"normal"},
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    groups = dataJson.groups;
+                    var type;
+                    for (var i = 0; i < groups.length; i++) {
+                        if(groups[i].group_desc == null) {
+                            groups[i].group_desc = "";
+                        }
+                        if(groups[i].remark == null) {
+                            groups[i].remark = "";
+                        }
+
+                        if(groups[i].status == "normal") {
+                            type = "正常"
+                        } else {
+                            type = "删除"
+                        }
+                        $(".btm_biaodan #set-meal-list").append(
+                            `<tr class="test">
+										   <td>${i + 1}</td>
+										   <td>${groups[i].group_code}</td>
+										   <td>${groups[i].group_type}</td>
+										   <td>${groups[i].group_name}</td>
+										   <td>${groups[i].out_price}</td>
+										   <td>${groups[i].sell_price}</td>
+										   <td>${groups[i].ctime}</td>
+										   <td>${groups[i].oper_id}</td>
+										   <td>${type}</td>
+										    <td>${groups[i].remark}</td>
+										         <td><button type="button" class="btn_ss" onclick="chan( ${i} )">查看详情</button></td>
+										</tr>`);
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+    });
+    // 跳转到商户额度变动记录查询
+    function chan(i) {
+        var group_code = groups[i].group_code;
+        window.location.replace('./set_meal_query_Details.html?group_code='+ group_code);
+    }
+</script>
+</body>
+</html>

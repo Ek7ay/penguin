@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="renderer" content="webkit">
+	<title>客户信息查询</title>
+	<link rel="stylesheet" href="../../css/reset.css" />
+	<link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+	<style>
+		body,
+		html {
+			height: 100%
+		}
+
+		.father {
+			height: 90%;
+			margin-top: 45px;
+		}
+
+		.father .btm_biaodan {
+			min-height: 18%;
+		}
+
+		h2 {
+			text-align: left;
+			margin: 10px;
+		}
+
+		.divFlex {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.xfbox {
+			position: relative;
+			cursor: pointer;
+		}
+
+		.xf {
+			border: 1px solid #B19BA8;
+			background-color: #ffffff;
+			width: 100%;
+			line-height: 50px;
+			position: absolute;
+			bottom: 26px;
+			left:0px;
+			z-index: 10;
+			display: none;
+		}
+
+		.xf span {
+			position: relative;
+			top: 1px;
+		}
+		.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+		.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+		.paging label{ margin: 0 15px; }
+		.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+		.btm_biaodan {height: 100%;}
+		#go,#go1,#go2{position: relative;top: -1px;}
+	</style>
+</head>
+
+<body class="info demo" style="padding: 0px;margin: 0px">
+	<div style="overflow: auto;position: fixed;width: 100%;background: #fff;padding: 20px;margin: 0px;z-index: 999;">
+	<div class="header">
+		<div class="month">
+			<label>手机号
+				<input type="number" id="phone" placeholder="请输入" style="margin-left: 10px;" maxlength="11" />
+			</label>
+			<label style="margin-left: 10px;">流水号
+				<input type="number" id="payno" placeholder="请输入" style="margin-left: 10px;" />
+			</label>
+			<button class="btn ml15" id="search">搜索</button>
+
+			<label style="margin-left: 10px;float: right;">充值号码
+				<input type="number" id="rechno" placeholder="请输入" style="margin-left: 10px;" />
+				<button class="btn ml15" id="searchRechno">查询</button>
+			</label>
+		</div>
+
+		<div style="float: right;">
+			<label class="ml15">
+				注册人信息
+				<select id="contacts" style="margin-left: 15px; ">
+					<option> 请先查询充值号码！ </option>
+				</select>
+			</label>
+		</div>
+	</div>
+
+	<div class="content btm_biaodan">
+			<h2>客户信息</h2>
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>客户编号</th>
+					<th>手机号</th>
+					<th><span class="otherBean"></span></th>
+					<th>微信昵称</th>
+					<th>注册时间</th>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+
+	<div class="father" style="margin-top: 180px;padding: 0px 7px 20px 20px">
+
+		<div class="divFlex">
+			<div style="width: 48%">
+				<h2>客户账户变动信息</h2>
+				<div class="content biandong-title" style="width: 99%">
+					<table>
+						<tr>
+							<th style="width: 30%">流水号</th>
+							<th style="width: 10%">类型</th>
+							<th style="width: 23.5%">名称</th>
+							<th style="width: 10%">金额</th>
+							<th style="width: 27%">时间</th>
+						</tr>
+					</table>
+				</div>
+
+				<div class="content biandong" style="height: 300px;overflow: auto;margin-top: 0px">
+					<table border="1" cellspacing="" cellpadding=""></table>
+					<!-- 分页查询 -->
+					<div class="paging">
+						<button type="button" id="prev1">上一页</button>
+						<label>
+							<input type="number" oninput="if(value<0)value =''" id="pageNum1">
+							<button type="button" style="margin-left: 10px; width: 50px;" id="go1">跳转</button>
+						</label>
+						<button type="button" id="next1">下一页</button>
+						<label id="nowPage1">
+							当前第&nbsp;<span></span>&nbsp;页
+						</label>
+						<label style="margin-left: 0;" id="pageNo1">
+							共&nbsp;<span></span>&nbsp;页
+						</label>
+					</div>
+				</div>
+			</div>
+
+			<div style="width: 48%">
+				<h2>客户激活券信息</h2>
+				<div class="content jihuo-title" style="width: 99%">
+					<table>
+						<tr>
+							<th style="width: 23%">兑换码</th>
+							<th style="width: 10%">面额</th>
+							<th style="width: 18%">激活日期</th>
+							<th style="width: 14%">到期日期</th>
+						</tr>
+					</table>
+
+				</div>
+
+				<div class="content jihuo" style="height: 300px;overflow: auto;margin-top: 0px">
+					<table border="1" cellspacing="" cellpadding=""></table>
+					<!-- 分页查询 -->
+					<div class="paging">
+						<button type="button" id="prev2">上一页</button>
+						<label>
+							<input type="number" oninput="if(value<0)value =''" id="pageNum2">
+							<button type="button" style="margin-left: 10px; width: 50px;" id="go2">跳转</button>
+						</label>
+						<button type="button" id="next2">下一页</button>
+						<label id="nowPage2">
+							当前第&nbsp;<span></span>&nbsp;页
+						</label>
+						<label style="margin-left: 0;" id="pageNo2">
+							共&nbsp;<span></span>&nbsp;页
+						</label>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<h2>客户交易信息</h2>
+		<div class="content duihuan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>订单号</th>
+					<th>充值号码</th>
+					<th>交易时间</th>
+					<th>交易完成时间</th>
+					<th>交易类型</th>
+					<th>交易渠道</th>
+					<th>交易金额</th>
+					<th>支付类型</th>
+					<th>交易状态</th>
+					<th>失败原因</th>
+				</tr>
+			</table>
+		</div>
+		<!-- 分页查询 -->
+		<div class="paging">
+			<button type="button" id="prev">上一页</button>
+			<label>
+				<input type="number" oninput="if(value<0)value =''" id="pageNum">
+				<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+			</label>
+			<button type="button" id="next">下一页</button>
+			<label id="nowPage">
+				当前第&nbsp;<span></span>&nbsp;页
+			</label>
+			<label style="margin-left: 0;" id="pageNo">
+				共&nbsp;<span></span>&nbsp;页
+			</label>
+		</div>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/pintuer.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/platformName.js"></script>
+<script>
+    // 获取平台名字
+    var projectName = getCookie("projectName");
+    var index = 1;
+	var merchs;
+	var trans;
+    var pageNo;
+    var pageNo1;
+    var pageNo2;
+
+	$('#search').click(function () {
+		var mob = $('#phone').val();
+        index = 1;
+		queryPhone(mob,index);
+		queryAcctsChange(mob,index);
+		queryCoupon(mob,index);
+	});
+
+	$('#searchRechno').click(function () {
+		queryContacts();
+	});
+
+	$('#contacts').change(function () {
+		var phone = $('#contacts option:selected').val();
+		$("#phone").val(phone);
+		$("#payno").val("");
+        index = 1;
+		queryPhone(phone,index);
+		queryAcctsChange(phone,index);
+		queryCoupon(phone,index);
+	})
+
+	function queryPhone(phone,index) {
+        var sum;
+		$('.test').empty();
+		$.ajax({
+			url: "/operplat/cus/query_cus_info",
+			context: document.body,
+			dataType: 'JSON',
+			data: {
+				'phoneno': phone,
+				'payno': $('#payno').val(),
+                "page_num":index,
+                "page_count":"20"
+			},
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					// alert(retMsg);
+					return;
+				} else {
+					merchs = dataJson.cusInfos;
+					trans = dataJson.trans;
+                    sum = dataJson.sum;
+                    pageNo = dataJson.pageNo;
+					for (var i = 0; i < merchs.length; i++) {
+						var wx_name = merchs[i].wx_name;
+                        function b64DecodeUnicode(str) { return decodeURIComponent(atob(str).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')); }
+                        wx_name = b64DecodeUnicode(wx_name);
+						$(".btm_biaodan table").append(
+							"<tr class='test'><td>" + (i + 1) +
+							"</td><td>" + merchs[i].cusid +
+							"</td><td>" + merchs[i].phoneno +
+							"</td><td>" + merchs[i].balance +
+							"</td><td>" + wx_name +
+                            "</td><td>" + merchs[i].ctime +
+							"</td><tr>");
+					}
+
+					for (var i = 0; i < trans.length; i++) {
+						var tran_type = "";
+						var transtatus = "";
+
+						if (trans[i].transtatus == 'intercept') {
+							transtatus = `<span style="color: red;font-style:italic">拦截<span/>`;
+						}
+
+						if (trans[i].transtatus == '00') transtatus = '成功';
+						if (trans[i].transtatus == '01') transtatus = '充值中';
+						if (trans[i].transtatus == '02') transtatus = '未受理';
+						if (trans[i].transtatus == '03') transtatus = '失败，已冲正';
+						if (trans[i].transtatus == 'begin') transtatus = '初始';
+
+						// 012客户洗车券交易
+						if (trans[i].transtatus == 'wait_pay') transtatus = '待付款';
+						if (trans[i].transtatus == 'success') transtatus = '成功';
+
+						if (trans[i].transtatus == 'wait_pay_result') transtatus = '买家确认并支付';
+						if (trans[i].transtatus == 'pay_failed') transtatus = '支付失败';
+						if (trans[i].transtatus == 'time_out') transtatus = '超时';
+						// 加油卡交易状态
+						if (trans[i].transtatus == 'succ') transtatus = '成功';
+						if (trans[i].transtatus == 'refused') transtatus = '未受理';
+						if (trans[i].transtatus == 'deal') transtatus = '处理中';
+						if (trans[i].transtatus == 'fail') transtatus = '订单失败';
+						if (trans[i].transtatus == 'running') transtatus = '充值中';
+						// 药联
+                        if (trans[i].transtatus == 'not_active') transtatus = '未激活';
+                        if (trans[i].transtatus == 'active') transtatus = '激活';
+
+                        //购买套餐
+                        if (trans[i].transtatus == 'unused') transtatus = '未使用';
+                        if (trans[i].transtatus == 'used') transtatus = '已经使用';
+                        if (trans[i].transtatus == 'out_date') transtatus = '超时';
+                        if (trans[i].transtatus == 'exp') transtatus = '过期';
+
+                        if (trans[i].transtatus == 'not_accept') transtatus = '未受理';
+
+                        if (trans[i].transtatus == 'checking') transtatus = '检测中';
+                        if (trans[i].transtatus == 'passed') transtatus = '通过';
+                        if (trans[i].transtatus == 'pass_fail') transtatus = '未通过';
+                        if (trans[i].transtatus == 'cancel') transtatus = '取消';
+                        if (trans[i].transtatus == 'wait_sign') transtatus = '待签字';
+
+                        if (trans[i].transtatus == 'unsign') transtatus = '超时未签字';
+                        if (trans[i].transtatus == 'check_cancel') transtatus = '检测取消';
+                        if (trans[i].transtatus == 'warranty_cance') transtatus = '延保取消';
+                        if (trans[i].transtatus == 'check_fail') transtatus = '检测未通过';
+                        if (trans[i].transtatus == 'no_passed') transtatus = '检测不通过';
+
+                        if (trans[i].transtatus == 'init') transtatus = '初始';
+                        if (trans[i].transtatus == 'wait_check') transtatus = '等待检测 ';
+                        if (trans[i].transtatus == 'finish') transtatus = '完成 ';
+
+
+
+						if (trans[i].tran_type == '001') tran_type = '中石化油卡充值';
+						if (trans[i].tran_type == '002') tran_type = '中石油油卡充值';
+						if (trans[i].tran_type == '003') tran_type = '话费充值';
+						if (trans[i].tran_type == '004') tran_type = '中石化油卡购买';
+						if (trans[i].tran_type == '005') tran_type = '中石油油卡购买';
+						if (trans[i].tran_type == '006') tran_type = '预留';
+						if (trans[i].tran_type == '007') tran_type = 'ETCP停车券';
+						if (trans[i].tran_type == '008') tran_type = otherBean+'回购';
+						if (trans[i].tran_type == '009') tran_type = '洗车服务';
+						if (trans[i].tran_type == '010') tran_type = '违章代缴';
+						if (trans[i].tran_type == '011') tran_type = '消费券';
+						if (trans[i].tran_type == '012') tran_type = '客户洗车券交易';
+                        if (trans[i].tran_type == '013') tran_type = '违章查询';
+                        if (trans[i].tran_type == '014') tran_type = otherBean+'转让';
+                        if (trans[i].tran_type == '015') tran_type = '油卡批量采购-中石化';
+						if (trans[i].tran_type == '016') tran_type = '油卡批量采购-中石油';
+                        if (trans[i].tran_type == '017') tran_type = projectName+'健康';
+                        if (trans[i].tran_type == '018') tran_type = '出险查询';
+                        if (trans[i].tran_type == '019') tran_type = '违章高发地查询';
+                        if (trans[i].tran_type == '020') tran_type = '二手车估值';
+                        if (trans[i].tran_type == '021') tran_type = '洗车套餐购买';
+                        if (trans[i].tran_type == '022') tran_type = '代驾服务购买';
+                        // if (trans[i].tran_type == '023') tran_type = '车辆保修检测';
+                        if (trans[i].tran_type == '024') tran_type = '车辆保修';
+                        if (trans[i].tran_type == '025') tran_type = '车辆检测';
+                        if (trans[i].tran_type == '026') tran_type = '服务权益转让';
+
+
+                        var pay_type = trans[i].pay_type;
+
+						if (pay_type == "bean") {
+							pay_type = otherBean;
+						} else if (pay_type == "wxpay") {
+							pay_type = "微信";
+						} else if (pay_type == "alipay") {
+							pay_type = "支付宝";
+						} else {
+							pay_type = "";
+						}
+
+						$(".duihuan table").append(
+							`<tr class="test">
+							<td>${i+1}</td>
+							<td class="xfbox">${trans[i].tran_id}<div class="xf">流水号：<span>${trans[i].payno}</span><div/></td>
+							<td>${trans[i].rechNo}</td>
+							<td>${trans[i].trandt}</td>
+							<td>${trans[i].utime}</td>
+							<td>${tran_type}</td>
+							<td>${trans[i].channel}</td>
+							<td>${trans[i].tran_amt}</td>
+							<td>${pay_type}</td>
+							<td>${transtatus}</td>
+							<td>${trans[i].failMsg}</td>
+							</tr>`
+						);
+					}
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+        $('#pageNo span').html(pageNo);
+        $('#nowPage span').html(index);
+        $('#pageNum').val(index);
+	}
+    // 上一页
+    $("#prev").on("click",()=>{
+        if(index<=1){
+            alert("已经是第一页了！");
+            return;
+        };
+        index--;
+        var mob = $('#phone').val();
+        queryPhone(mob,index);
+    });
+    // 下一页
+    $("#next").on("click",()=>{
+        if(index>=pageNo){
+            alert("已经是最后一页了！");
+            return;
+        };
+        index++;
+        var mob = $('#phone').val();
+        queryPhone(mob,index);
+    });
+    // 输入页查询
+    $("#go").on("click",()=>{
+        index  = $("#pageNum").val();
+        if(index<=0){
+            alert("不能小于第一页！");
+            return;
+        };
+        if(index>Number(pageNo)){
+            alert("不能大于最后一页！");
+            $("#pageNum").val(1);
+            $('#nowPage span').html(1);
+            index = 1;
+            var mob = $('#phone').val();
+            queryPhone(mob,index);
+            return;
+        };
+        var mob = $('#phone').val();
+        queryPhone(mob,index);
+    });
+
+	$(() => {
+		$(".xfbox").live({
+			mouseenter: function () {
+				$(this).children(".xf").show();
+			},
+			mouseleave: function () {
+				$(this).children(".xf").hide();
+			}
+		});
+	});
+
+	function queryAcctsChange(phone,index) {
+        var sum;
+		$('.test2').empty();
+		$.ajax({
+			url: "/operplat/cus/act_change_list",
+			context: document.body,
+			dataType: 'JSON',
+			data: {
+				'phoneno': phone,
+                "page_num":index,
+                "page_count":"20"
+			},
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					// alert(retMsg);
+					return;
+				} else {
+                    sum = dataJson.sum;
+                    pageNo1 = dataJson.pageNo;
+					var changes = dataJson.changes;
+
+					for (var i = 0; i < changes.length; i++) {
+
+						var tran_type = changes[i].tran_type;
+
+						if (tran_type == "01") {
+							tran_type = "兑换券";
+						} else if (tran_type == "02") {
+							tran_type = "兑换码";
+						} else if (tran_type == "03") {
+							tran_type = "消费";
+						} else if (tran_type == "04") {
+							tran_type = "退款";
+						} else {
+							tran_type = "";
+						}
+
+						var tranno = changes[i].tranno;
+						if (tranno == null) {
+							tranno = "";
+						}
+
+						$(".biandong table").append(
+							"<tr class='test2'><td>" + tranno +
+							"</td><td>" + tran_type +
+							"</td><td>" + changes[i].action_name +
+							"</td><td>" + changes[i].tran_amt +
+							"</td><td>" + changes[i].trandt +
+							"</td><tr>");
+					}
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+        $('#pageNo1 span').html(pageNo1);
+        $('#nowPage1 span').html(index);
+        $('#pageNum1').val(index);
+	}
+    // 上一页
+    $("#prev1").on("click",()=>{
+        if(index<=1){
+            alert("已经是第一页了！");
+            return;
+        };
+        index--;
+        var mob = $('#phone').val();
+        queryAcctsChange(mob,index);
+    });
+    // 下一页
+    $("#next1").on("click",()=>{
+        if(index>=pageNo1){
+            alert("已经是最后一页了！");
+            return;
+        };
+        index++;
+        var mob = $('#phone').val();
+        queryAcctsChange(mob,index);
+    });
+    // 输入页查询
+    $("#go1").on("click",()=>{
+        index  = $("#pageNum1").val();
+        if(index<=0){
+            alert("不能小于第一页！");
+            return;
+        };
+        if(index>pageNo1){
+            alert("不能大于最后一页！");
+            $("#pageNum1").val(1);
+            $('#nowPage1 span').html(1);
+            index = 1;
+            var mob = $('#phone').val();
+            queryAcctsChange(mob,index);
+            return;
+        };
+        var mob = $('#phone').val();
+        queryAcctsChange(mob,index);
+    });
+
+	function queryCoupon(phone,index) {
+        var sum;
+		$('.test3').empty();
+		$.ajax({
+			url: "/operplat/cus/vou_list",
+			context: document.body,
+			dataType: 'JSON',
+			data: {
+				'phoneno': phone,
+                "page_num":index,
+                "page_count":"20"
+			},
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					// alert(retMsg);
+					return;
+				} else {
+
+					var vous = dataJson.vous;
+                    sum = dataJson.sum;
+                    pageNo2 = dataJson.pageNo;
+					for (var i = 0; i < vous.length; i++) {
+
+						var status = vous[i].voustatus;
+						if (status == "01") {
+							status = "未激活";
+						} else if (status == "02") {
+							status = "已激活";
+						} else {
+							status = "";
+						}
+
+						$(".jihuo table").append(
+							"<tr class='test3'><td>" + vous[i].vouid +
+							"</td><td>" + vous[i].vouden +
+							"</td><td>" + vous[i].actdt +
+                            "</td><td>" + vous[i].expdate +
+							"</td><tr>");
+					}
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+        $('#pageNo2 span').html(pageNo2);
+        $('#nowPage2 span').html(index);
+        $('#pageNum2').val(index);
+	}
+    // 上一页
+    $("#prev2").on("click",()=>{
+        if(index<=1){
+            alert("已经是第一页了！");
+            return;
+        };
+        index--;
+        var mob = $('#phone').val();
+        queryCoupon(mob,index);
+    });
+    // 下一页
+    $("#next2").on("click",()=>{
+        if(index>=pageNo2){
+            alert("已经是最后一页了！");
+            return;
+        };
+        index++;
+        var mob = $('#phone').val();
+        queryCoupon(mob,index);
+    });
+    // 输入页查询
+    $("#go2").on("click",()=>{
+        index  = $("#pageNum2").val();
+        if(index<=0){
+            alert("不能小于第一页！");
+            return;
+        };
+        if(index>pageNo2){
+            alert("不能大于最后一页！");
+            $("#pageNum2").val(1);
+            $('#nowPage2 span').html(1);
+            index = 1;
+            var mob = $('#phone').val();
+            queryCoupon(mob,index);
+            return;
+        };
+        var mob = $('#phone').val();
+        queryCoupon(mob,index);
+    })
+
+	function queryContacts() {
+		$("#contacts").html('<option value="">请先查询充值号码！</option>');
+		$.ajax({
+			url: "/operplat/cus/query_cus_info_by_rechano",
+			context: document.body,
+			dataType: 'JSON',
+			data: {
+				'rechno': $('#rechno').val()
+			},
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					// alert(retMsg);
+					return;
+				} else {
+
+					var custs = dataJson.custs;
+					var htmlStr = '';
+					for (var i = 0; i < custs.length; i++) {
+						var name = custs[i].cusname;
+						if (name == null) {
+							name = "";
+						}
+						htmlStr += '<option value=' + custs[i].phoneno + '>' + name + "   " + custs[i].phoneno +
+							'</option>';
+					}
+					$("#contacts").html('<option value="">请选择注册人信息</option>' + htmlStr);
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	}
+</script>
+
+</html>

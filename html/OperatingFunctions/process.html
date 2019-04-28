@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>发券流程</title>
+  <style>
+	.main{
+		width: 100%;
+		height: 545px;
+	}
+	.le,.midd,.rig{
+		width: 300px;
+		height: 500px;
+		background-color: #c9f7e3;
+		border: 1px solid #666;
+		float: left;
+	}
+	.midd,.rig{
+		margin-left: 50px;
+	}
+	.main table{
+		width: 100%;
+		color: white;
+	}
+	.main table tr td:first-child{
+		width: 100px;
+		text-align: right;
+	}
+	.main table tr td{
+		height: 30px;
+		background-color: #666;
+	}
+	.main table tr td input,.main table tr td select{
+		width: 186px;
+		height: 25px;
+		outline: none;
+	}
+	.bug{
+		display: block;
+		margin: 15px auto;
+		padding: 2px 80px;
+		background-color: #666;
+		color: #FFFFFF;
+		font-size: 14px;
+		border-radius: 5px;
+		outline: none;
+	}
+	#return,#return2,#return3{
+		margin-top: 50px;
+	}
+	#import{
+		margin-top: 51px;
+	}
+	#generate,#send,#import4{
+		margin-top: 84px;
+	}
+	#err{
+		padding: 2px 51px;
+		margin-top: 70px;
+		background-color: red;
+		color: #FFFFFF;
+		outline: none;
+		border-radius: 5px;
+		margin-left: 53px;
+		display: none;
+	}
+  </style>
+	<script src="../../js/cookie.js"></script>
+</head>
+<body>
+	<div class="main">
+		<div class="le">
+			<form id="ticket" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>导入模板：</td>
+						<td>
+							<input type="file" name="cus_vou_file">
+						</td>
+					</tr>
+					<tr>
+						<td>公司编码：</td>
+						<td>
+							<select name="cpid"></select>
+						</td>
+					</tr>
+				</table>
+			</form>
+			<button type="button" id="import" class="bug">导入</button>
+			<table id="return">
+				<tr>
+					<td>批次号：</td>
+					<td><span id="batchno"></span></td>
+				</tr>
+				<tr>
+					<td>成功：</td>
+					<td><span id="successNum"></span>条</td>
+				</tr>
+				<tr>
+					<td>成功总金额：</td>
+					<td><span id="successAmt"></span></td>
+				</tr>
+			</table>
+			<button type="button" id="err">显示错误信息</button>
+		</div>
+		<div class="midd">
+			<table>
+				<tr>
+					<td>批次号：</td>
+					<td>
+						<input name="batchno2" type="text">
+					</td>
+				</tr>
+			</table>
+			<button type="button" id="generate" class="bug">生成</button>
+			<table id="return2">
+				<tr>
+					<td>批次号：</td>
+					<td><span id="batchno2"></span></td>
+				</tr>
+				<tr>
+					<td>生成的数量：</td>
+					<td><span id="vou_count2"></span></td>
+				</tr>
+				<tr>
+					<td>生成的金额：</td>
+					<td><span id="vou_amt2"></span></td>
+				</tr>
+				<tr>
+					<td>兑换券数量：</td>
+					<td><span id="cus_count2"></span></td>
+				</tr>
+				<tr>
+					<td>兑换券金额：</td>
+					<td><span id="cus_amt2"></span></td>
+				</tr>
+			</table>
+		</div>
+		<div class="rig">
+			<table>
+				<tr>
+					<td>批次号：</td>
+					<td>
+						<input type="text" name="batchno3">
+					</td>
+				</tr>
+			</table>
+			<button type="button" id="send" class="bug">发送</button>
+			<table id="return3">
+				<tr>
+					<td>初始数量：</td>
+					<td><span id="init_count"></span></td>
+				</tr>
+				<tr>
+					<td>初始金额：</td>
+					<td><span id="init_amt"></span></td>
+				</tr>
+				<tr>
+					<td>生成数量：</td>
+					<td><span id="create_count"></span></td>
+				</tr>
+				<tr>
+					<td>生成金额：</td>
+					<td><span id="create_amt"></span></td>
+				</tr>
+				<tr>
+					<td>发送数量：</td>
+					<td><span id="send_count"></span></td>
+				</tr>
+				<tr>
+					<td>发送金额：</td>
+					<td><span id="send_amt"></span></td>
+				</tr>
+				<tr>
+					<td>总数量：</td>
+					<td><span id="total_amt"></span></td>
+				</tr>
+				<tr>
+					<td>总金额：</td>
+					<td><span id="total_count"></span></td>
+				</tr>
+			</table>
+		</div>
+	</div>
+	<div class="main">
+		<div class="le">
+			<form id="ticket4" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>批次号：</td>
+						<td>
+							<input name="batchno">
+						</td>
+					</tr>
+					<tr>
+						<td>手机号：</td>
+						<td>
+							<input name="phoneno">
+						</td>
+					</tr>
+					<tr>
+						<td>金额：</td>
+						<td>
+							<input name="amt">
+						</td>
+					</tr>
+				</table>
+			</form>
+			<button type="button" id="import4" class="bug">导入</button>
+		</div>
+	</div>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/common.js"></script>
+	<script>
+		// 加载公司编码
+        $(()=>{
+            $.ajax({
+                url:"/operplat/company/query",
+                context: document.body,
+                dataType: "JSON",
+                data:{"status":"enabled"},
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var cps = dataJson.cps;
+                        for (var i = 0; i < cps.length; i++){
+                            $("select[name='cpid']").append(`<option value=${cps[i].cpid}>${cps[i].cpname}</option>`)
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+		// 导入
+		var errors;
+		$("#import").on("click",()=>{
+             var formData = new FormData($("#ticket")[0]);
+             if ($("input[name='cus_vou_file']").val() == ""){alert("模板文件不能为空");return;}
+             $.ajax({
+                 url:"/operplat/vou/cus/imp",
+                 type: 'POST',
+                 data: formData,
+                 async: true,
+                 cache: false,
+                 contentType: false,
+                 processData: false,
+                 success:function (dataJson,dataStatus) {
+                     if (dataJson.retCode == "error" || dataJson.retCode == "success"){
+                         alert(dataJson.retMsg);
+                         $("#batchno").empty().html(dataJson.batchno);
+                         $("#successNum").empty().html(dataJson.successNum);
+                         $("#successAmt").empty().html(dataJson.successAmt);
+                         $("input[name='cus_vou_file']").val() == "";
+                     }else if (dataJson.retCode == "check_not_pass"){
+                         $("#err").show();
+                         $("#batchno").empty().html(dataJson.batchno);
+                         $("#successNum").empty().html(dataJson.successNum);
+                         $("#successAmt").empty().html(dataJson.successAmt);
+						 errors = dataJson.errors;
+					 }
+                 },
+                 error:function (req, errorMsg, exception) {
+                     alert(errorMsg);
+                 }
+             });
+		 });
+		 //单个导入
+        $("#import4").on("click",()=>{
+            var formData = new FormData($("#ticket4")[0]);
+            $.ajax({
+                url:"/operplat/vou/cus/imp_one",
+                type: 'POST',
+                data: formData,
+                async: true,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode){
+                        alert(dataJson.retMsg);
+                    }else {
+                        alert(dataJson.retMsg);
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+		 // 生成
+		$("#generate").on("click",()=>{
+		     var batchno = $("input[name='batchno2']").val();
+		     if (batchno == ""){alert("批次号不能为空");}
+             $("#batchno2").empty().html(batchno);
+             $.ajax({
+                 url:"/operplat/vou/cus/create",
+                 context: document.body,
+                 dataType: "JSON",
+                 async: false,
+                 data:{"batchno":batchno},
+                 success:function (dataJson,dataStatus) {
+                     if ("success" != dataJson.retCode) {
+                         alert(dataJson.retMsg);
+                     } else {
+                         alert(dataJson.retMsg);
+                         $("#vou_count2").empty().html(dataJson.vou_count);
+                         $("#vou_amt2").empty().html(dataJson.vou_amt);
+                         $("#cus_count2").empty().html(dataJson.cus_count);
+                         $("#cus_amt2").empty().html(dataJson.cus_amt);
+                     }
+                 },
+                 error:function (req, errorMsg, exception) {
+                     alert(errorMsg);
+                 }
+             });
+		 });
+		 // 发送
+		$("#send").on("click",()=>{
+             var batchno = $("input[name='batchno3']").val();
+             if (batchno == ""){alert("批次号不能为空")}
+             $("#batchno3").empty().html(batchno);
+             $.ajax({
+                 url:"/operplat/vou/cus/send",
+                 context: document.body,
+                 dataType: "JSON",
+                 async: false,
+                 data:{"batchno":batchno},
+                 success:function (dataJson,dataStatus) {
+                     if ("success" != dataJson.retCode) {
+                         alert(dataJson.retMsg);
+                     } else {
+                         batch_stat_query(batchno);
+                     }
+                 },
+                 error:function (req, errorMsg, exception) {
+                     alert(errorMsg);
+                 }
+             });
+		 });
+		// 声明批次状态查询函数
+		function batch_stat_query(batchno) {
+            $.ajax({
+                url:"/operplat/vou/cus/batch_stat_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data:{"batchno":batchno},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        alert(dataJson.retMsg);
+                        $("#init_count").empty().html(dataJson.init_count);
+                        $("#init_amt").empty().html(dataJson.init_amt);
+                        $("#create_count").empty().html(dataJson.create_count);
+                        $("#create_amt").empty().html(dataJson.create_amt);
+                        $("#send_count").empty().html(dataJson.send_count);
+                        $("#send_amt").empty().html(dataJson.send_amt);
+                        $("#total_amt").empty().html(dataJson.total_count);
+                        $("#total_count").empty().html(dataJson.total_amt);
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        };
+		// 声明错误查询函数
+		$("#err").on("click",()=>{
+            window.location.replace('./process_err.html');
+            errors = JSON.stringify(errors);
+            setCookie("errors",errors);
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>收购信息修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 375px;
+				height: 580px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 369px;
+				left: 83px;
+			}
+			#neirong{
+				position: absolute;
+				top: 75px;
+				left: 71px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="buy_id">信息编码：</lable>
+				<input type="text" id="buy_id" placeholder="请输入">
+				<lable for="title" class="class-lable">信息标题：</lable>
+				<input type="text" id="title" placeholder="请输入">
+				<lable for="ctime" class="class-lable">创建时间：</lable>
+				<input type="text" id="ctime" placeholder="请输入">
+				<lable for="status" class="class-lable">状态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="useable">可用</option>
+					<option value="unuseable">不可用</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>信息编码</th>
+					<th>信息标题</th>
+					<th>信息内容</th>
+					<th>创建时间</th>
+					<th><span class="otherBean"></span>数量</th>
+					<th>折扣</th>
+					<th>商品类型</th>
+					<th>状态</th>
+					<th>联系人</th>
+					<th>电话</th>
+					<th>备注</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>信息标题：</td>
+						<td>
+							<input readonly="readonly" type="text" id="title2" name="title">
+							<input readonly="readonly" style="display: none" type="text" id="buy_id2" name="buy_id">
+						</td>
+					</tr>
+					<tr>
+						<td id="neirong">信息内容：</td>
+						<td>
+							<textarea id="content" name="content" rows="-8" cols="16"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>折扣：</td>
+						<td>
+							<input type="text" id="discount" name="discount">
+						</td>
+					</tr>
+					<tr>
+						<td>商品类型：</td>
+						<td>
+							<!--<input type="text" id="good_type" name="good_type">-->
+							<select  id="good_type" name="good_type">
+								<option value="wash_car">洗车券</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>联系人：</td>
+						<td>
+							<input type="text" id="contacts" name="contacts">
+						</td>
+					</tr>
+					<tr>
+						<td>联系电话：</td>
+						<td>
+							<input type="number" id="phoneno" name="phoneno" oninput="if(value.length>11)value=value.slice(0,11)"/>
+						</td>
+					</tr>
+
+					<tr>
+						<td>状&nbsp&nbsp&nbsp&nbsp态：</td>
+						<td>
+							<select  id="status2" name="status">
+								<!--<option value="">全部</option>-->
+								<!--<option value="useable">可用</option>-->
+								<!--<option value="unuseable">不可用</option>-->
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td id="beizhu">备&nbsp&nbsp&nbsp&nbsp注：</td>
+						<td>
+							<textarea id="remark" name="remark" rows="-8" cols="16"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script src="../../js/platformName.js"></script>
+	<script>
+        // 执行日期插件实例
+        lay('#version').html('-v' + laydate.v);
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#ctime' //指定元素
+        });
+		var msgs;
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/trading/release_msg_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        msgs = dataJson.msgs;
+                        for (var i = 0; i < msgs.length; i++) {
+                            var status = msgs[i].status;
+                            var sta;
+                            if(status == "useable"){
+                                sta = "可用的";
+                            }else if (status == "unuseable"){
+                                sta = "不可用的";
+                            }
+                            var good_type = msgs[i].good_type;
+                            var good;
+                            if(good_type == "wash_car"){
+								good = "洗车券";
+							}
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${msgs[i].buy_id}</td>
+										   <td>${msgs[i].title}</td>
+										   <td>${msgs[i].content}</td>
+										   <td>${msgs[i].ctime}</td>
+										   <td>${msgs[i].bean_num}</td>
+										   <td>${msgs[i].discount}</td>
+										   <td>${good}</td>
+										   <td>${sta}</td>
+										   <td>${msgs[i].contacts}</td>
+										   <td>${msgs[i].phoneno}</td>
+										   <td>${msgs[i].remark}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 分类查询
+		$("#search").click(()=>{
+            var buy_id = $("#buy_id").val();
+            var title = $("#title").val();
+            var ctime = $("#ctime").val();
+            var status = $("#status option:selected").val();
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/trading/release_msg_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"buy_id":buy_id,"title":title,"ctime":ctime,"status":status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        msgs = dataJson.msgs;
+                        for (var i = 0; i < msgs.length; i++) {
+                            var status = msgs[i].status;
+                            var sta;
+                            if(status == "useable"){
+                                sta = "可用的";
+                            }else if (status == "unuseable"){
+                                sta = "不可用的";
+                            }
+                            var good_type = msgs[i].good_type;
+                            var good;
+                            if(good_type == "wash_car"){
+                                good = "洗车券";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${msgs[i].buy_id}</td>
+										   <td>${msgs[i].title}</td>
+										   <td>${msgs[i].content}</td>
+										   <td>${msgs[i].ctime}</td>
+										   <td>${msgs[i].bean_num}</td>
+										   <td>${msgs[i].discount}</td>
+										   <td>${good}</td>
+										   <td>${sta}</td>
+										   <td>${msgs[i].contacts}</td>
+										   <td>${msgs[i].phoneno}</td>
+										   <td>${msgs[i].remark}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+        // 获取修改内容
+        function editMsg(i){
+            // $("#shujub").empty();
+            $("#title2").val(msgs[i].title);
+            $("#buy_id2").val(msgs[i].buy_id);
+            $("#content").val(msgs[i].content);
+            $("#discount").val(msgs[i].discount);
+            $("#good_type").val(msgs[i].good_type);
+            $("#contacts").val(msgs[i].contacts);
+            $("#phoneno").val(msgs[i]. phoneno);
+            var status = msgs[i].status;
+            if (status == "useable"){
+                $("#status2").empty();
+                $("#status2").append(`
+                <option value="useable">可用</option>
+				<option value="unuseable">不可用</option>
+                `);
+			}else if (status == "unuseable"){
+                $("#status2").empty();
+                $("#status2").append(`
+				 <option value="unuseable">不可用</option>
+                 <option value="useable">可用</option>
+                `);
+			}
+            $("#remark").val(msgs[i]. remark);
+            $('.class-table').show();
+        };
+        // 修改界面的显示和隐藏
+		$(()=>{
+            $(".class-table").hide();
+		    $(".open").click(()=>{
+		        $(".class-table").show();
+			});
+		    $(".shut").click(()=>{
+                $(".class-table").hide();
+            });
+		});
+        // 编辑结果提交
+        function submitEdit() {
+            var phone = $("#phoneno").val();
+            if(!(/^1[3456789]\d{9}$/.test(phone))){
+                alert("手机号码有误，请重填");
+                return false;
+            }
+            var formData = new FormData($( "#upload" )[0]);
+            $.ajax({
+                url:"/operplat/trading/release_msg_modify",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    }else{
+                        alert('修改成功');
+                    }
+                    $(".class-table").hide();
+                    window.location.reload();
+                },
+                error: function(req,errorMsg,exception){
+                    alert("出错啦");
+                }
+            });
+        };
+	</script>
+</html>

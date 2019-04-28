@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>交易拦截配置修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 375px;
+				height: 220px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 225px;
+				left: 101px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table tr td textarea{
+				border-radius: 3px;
+			}
+			.class-table form table tr:last-child td{
+				padding:10px 0px;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+			.class-table form table tr td.author .author_list{
+				display: flex;
+				flex-direction: column;
+				width: 151px;
+				height: 300px;
+				overflow-y: scroll;
+				border: 1px solid #958888;
+				border-radius: 5px;
+			}
+			.class-table form table tr td.author .author_list label{
+				margin-top: 5px;
+				text-align: right;
+			}
+			.class-table form table tr td.author .author_list label input{
+				position: relative;
+				margin-right: 5px;
+				top: 3px;
+				width: 15px;
+				height: 15px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>显示序号</th>
+					<th>序号</th>
+					<th>交易类型</th>
+					<th>交易名称</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<!--修改表单-->
+		<!--<div class="class-table">-->
+			<!--<a class="shut" href="javascript:;">×</a>-->
+			<!--<form id="upload" enctype="multipart/form-data">-->
+				<!--<table>-->
+					<!--<tr>-->
+						<!--<td>序号：</td>-->
+						<!--<td>-->
+							<!--<input readonly="readonly" type="text" id="pid" name="pid">-->
+						<!--</td>-->
+					<!--</tr>-->
+					<!--<tr>-->
+						<!--<td>交易类型：</td>-->
+						<!--<td>-->
+							<!--<select id="tran_type" name="tran_type">-->
+								<!--&lt;!&ndash;<option value=""></option>&ndash;&gt;-->
+							<!--</select>-->
+						<!--</td>-->
+					<!--</tr>-->
+				<!--</table>-->
+				<!--<div class="pop-up-button">-->
+					<!--<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>-->
+					<!--<button class="class_instruction shut">取消</button>-->
+				<!--</div>-->
+			<!--</form>-->
+		<!--</div>-->
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 修改界面的显示和隐藏
+        // $(()=>{
+        //     $(".class-table").hide();
+        //     $(".open").click(()=>{
+        //         $(".class-table").show();
+        //     });
+        //     $(".shut").click(()=>{
+        //         $(".class-table").hide();
+        //     });
+        // });
+        var intercepts;
+		// 声明查询函数
+        function query() {
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/intercept/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        intercepts = dataJson.intercepts;
+                        for (var i = 0; i < intercepts.length; i++) {
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${intercepts[i].pid}</td>
+										   <td>${intercepts[i].tran_type}</td>
+										   <td>${intercepts[i].tran_name}</td>
+										   <td>
+												<!--<button type="button" onclick="editMsg( ${i} )">修改</button>-->
+												<button type="button" class="del" onclick="delMsg( ${i} ,this)">删除</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+		$(()=>{query();});
+        // 获取修改内容
+        // function editMsg(i){
+        //     $("#pid").val(intercepts[i].pid);
+        //     $.ajax({
+        //         url:"/operplat/tranType/query",
+        //         context: document.body,
+        //         dataType: "JSON",
+        //         async: false,
+        //         success:function (dataJson,dataStatus) {
+        //             if ("success" != dataJson.retCode) {
+        //                 alert(dataJson.retMsg);
+        //             } else {
+        //                 var tranTypes;
+        //                 tranTypes = dataJson.tranTypes;
+        //                 console.log(tranTypes);
+        //                 for (var i = 0; i < tranTypes.length; i++) {
+        //                     $("#tran_type").append(`<option value=${tranTypes[i].tran_type}>${tranTypes[i].tran_name}</option>`);
+        //                 }
+        //             }
+        //         },
+        //         error:function (req, errorMsg, exception) {
+        //             alert(errorMsg);
+        //         }
+        //     });
+        //     $('.class-table').show();
+        // };
+        // 编辑结果提交
+        // function submitEdit() {
+        //     var formData = new FormData($( "#upload" )[0]);
+        //     $.ajax({
+        //         url:"/operplat/tranType/modify",
+        //         type: 'POST',
+        //         data: formData,
+        //         async: false,
+        //         cache: false,
+        //         contentType: false,
+        //         processData: false,
+        //         success:function (dataJson,dataStatus) {
+        //             if ("success" != dataJson.retCode) {
+        //                 alert(dataJson.retMsg);
+        //             }else{
+        //                 alert(dataJson.retMsg);
+        //                 $(".class-table").hide();
+        //                 // window.location.reload();
+        //                 query();
+        //             }
+        //         },
+        //         error: function(req,errorMsg,exception){
+        //             alert("出错啦");
+        //         }
+        //     });
+        // };
+        // 删除功能
+        function delMsg(data,that){
+            var re = confirm('确认删除此条信息？');
+            var pid = intercepts[data].pid;
+            if(re) {
+                $.ajax({
+                    url:"/operplat/intercept/del",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"pid":pid},
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                            return;
+                        } else {
+                            alert(dataJson.retMsg);
+                            $(that).parent().parent().hide();
+                            window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+							alert(errorMsg);
+                    }
+                });
+            }
+        };
+	</script>
+</html>

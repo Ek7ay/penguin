@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>油卡信息新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+		<style>
+			#form-box{ width: 420px;}
+		</style>
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>批次号:</td>
+						<td>
+							<textarea name="batchs" id="pici"></textarea>
+						</td>
+						<td style="padding: 5px 10px;">
+							<button type="button" id="queryAmt" class="btn-submit" >查询</button>
+						</td>
+					</tr>
+					<tr>
+						<td>总金额:</td>
+						<td>
+							<input placeholder="" id="amt" readonly name="total_amt" />
+						</td>
+					</tr>
+					<tr>
+						<td>公司:</td>
+						<td>
+							<select name="cpid" id="compony">
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>备注:</td>
+						<td>
+							<textarea name="remark"></textarea>
+						</td>
+					</tr>
+				</table>
+				<button type="button" class="btn-submit" id="submit">提交</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+
+			var records;
+
+            $("#submit").on("click",()=>{
+                var pici = $("#pici").val();
+                if(pici == ''){
+                    alert('批次号不能为空');
+                    return;
+                }
+                var amt = $("#amt").val();
+                if(amt == ''){
+                    alert('金额不能为空，需要先查询批次号');
+                    return;
+                }
+
+                var formData = new FormData($("#upload")[0]);
+                $.ajax({
+                    url:"/operplat/vouid/send2cp",
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            console.log(dataJson);
+                            alert(dataJson.retMsg);
+                            console.log(dataJson.retMsg);
+                            window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            });
+
+
+
+            $.get("/operplat/company/query",{
+                "status":"enabled"
+            },function(data,status){
+                if(data.retCode != 'success'){
+                    alert(data.retMsg);
+                    return;
+                }else{
+                    data.cps.forEach((val,ind) => {
+						$('#compony').append(`
+                        	<option value="${val.cpid}">${val.cpname}</option>
+                        `);
+					});
+
+					console.log(data);
+                }
+            });
+
+            $("#queryAmt").on("click",()=>{
+                var pici = $('#pici').val();
+                console.log(pici);
+                $.get("/operplat/vouid/send2cpqueryamt",{
+                    "batchs":pici
+				},function(data,status){
+                    if(data.retCode != 'success'){
+						alert(data.retMsg);
+						return;
+					}else{
+                        $('#amt').val('');
+                        $('#amt').val(data.amt);
+                    }
+                });
+			});
+		</script>
+	</body>
+</html>

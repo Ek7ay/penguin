@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="expires" content="0">
+		<title>客户过期站豆手动延期</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="phoneno" class="class-lable">手机号：</lable>
+				<input type="text" id="phoneno" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>过期金额</th>
+					<th>激活日期</th>
+					<th>到期日期</th>
+					<th>是否存量用户</th>
+					<th>是否已经提醒客户</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+		var exp;
+		// 声明查询函数
+        function query() {
+            var phoneno = $("#phoneno").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/term_exp/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"phoneno":phoneno},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        exp = dataJson.exp;
+                        var j = 0;
+                        var arr = [];
+                        for (var i = 0; i < exp.length; i++){
+                            var oldUser = exp[i].oldUser;
+                            var oldU;
+							if(oldUser=="old"){ oldU = "存量用户"}
+							if(oldUser=="new"){ oldU = "新用户"}
+                            var remind = exp[i].remind;
+                            var rem;
+                            if (remind == "noremind" || remind == "remind"||remind == "delayed") {
+                                if (remind == "noremind") {rem = "没有提醒";}
+                                if (remind == "remind") {rem = "已经提醒";}
+                                if (remind == "delayed") {rem = "已经延过期";}
+                                arr.push(i);
+                                j++;
+                                $(".btm_biaodan table").append(
+                                    `<tr class="test">
+										   <td>${j}</td>
+										   <td>${exp[i].expAmt}</td>
+										   <td>${exp[i].actDate}</td>
+										   <td>${exp[i].expDate}</td>
+										   <td>${oldU}</td>
+										   <td>${rem}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">延期</button>
+										   </td>
+										</tr>`);
+                            }
+						}
+						if (!arr.length){
+						    alert("查询无记录");
+						}
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// 分类查询
+		$("#search").click(()=>{query();});
+        // 获取修改内容
+        function editMsg(i) {
+            var cusid = exp[i].cusid;
+            var actDate = exp[i].actDate;
+            var re = confirm('您确认延期吗？');
+            if (re){
+                $.ajax({
+                    url: "/operplat/term_exp/oper_delay",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: false,
+                    data:{"cusid":cusid,"actDate":actDate},
+                    success: function (dataJson, dataStatus) {
+                        if ("success" != dataJson.retCode) {
+                            alert(dataJson.retMsg);
+                        } else {
+                            alert(dataJson.retMsg);
+                            query();
+                        }
+                    },
+                    error: function (req, errorMsg, exception) {
+                        alert("出错啦");
+                    }
+                });
+			}
+        };
+	</script>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title></title>  
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+	<link rel="stylesheet" href="../../css/TRconner/style.css">
+
+	<style>
+	</style>
+</head>
+<body class="info demo">
+	<div class="add" style="margin-left: 30%;margin-top: 10px;margin-right: 30%;z-index: 100;position: absolute;background:#ffffff;border:solid 1px #c1c1c1" id="header">
+		<form id="upload" enctype="multipart/form-data" style="padding-right: 50px;">
+			<label><span>任务编码：</span><input type="text"  placeholder="必输项" name="task_code" id="task_code"/>
+			</label>
+			<label><span>任务名称：</span><input type="text"  placeholder="必输项" name="task_name" id="task_name"/>
+			</label>
+			<label><span>任务开关：</span><select name="task_switch" id="task_switch">
+				<option value="on">打开</option>
+				<option value="off">关闭</option>
+				</select>
+			</label>
+			<label><span>启用状态：</span><select name="status" id="status">
+				<option value="useable">可用</option>
+				<option value="unuseable">不可用</option>
+			</select></label>
+
+			<label><span class="textarea">备注：</span><textarea name="remark" id="remark" placeholder="请认真填写备注信息"></textarea></label>
+			<button type="button" class="btn-submit" id="cance">取消修改</button>
+			<button type="button" class="btn-submit" id="submit">确认修改</button>
+			<div style="margin-bottom: 50px;"></div>
+		</form>
+	</div>
+	<div class="content btm_biaodan">
+		<table border="1" cellspacing="" cellpadding="">
+			<tr>
+				<th>序号</th>
+				<th>编码序号</th>
+				<th>任务编码</th>	
+				<th>任务名称</th>
+				<th>任务开关</th>
+				<th>状态</th>
+				<th>备注</th>
+				<th>操作</th>
+
+			</tr>
+		</table>
+		
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script>
+	
+	function querytrans(){
+		$.ajax({
+			url:"/operplat/timer_config/query",
+			context: document.body,
+			dataType:'JSON',
+			data:{},
+			async: false,
+			success: function(dataJson,dataStatus){
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if(retCode != 'success'){
+			        alert(retMsg);
+			        return;
+			    }else{
+			     	timers = dataJson.timers;
+			     	console.log(timers);
+			     	for(var i=0; i<timers.length; i++){
+			     		var type_s='';
+			     		var status='';
+			     		var re = timers[i].remark;
+			     		var re_t = typeof(re);
+			     		if (re_t=='undefined') re=''; 
+			     		if(timers[i].task_switch == 'on') type_s = '打开';
+			     		if(timers[i].task_switch == 'off') type_s = '关闭';
+			     		if(timers[i].status == 'useable') status = '可用';
+			     		if(timers[i].status == 'unuseable') status = '不可用';
+
+			     		$(".btm_biaodan table").append(
+							"<tr class='test'><td>" + (i + 1) +
+							"</td><td>" + timers[i].pid+
+							"</td><td>" + timers[i].task_code+
+							"</td><td>" + timers[i].task_name+
+							"</td><td>" + type_s+
+							"</td><td>" + status+
+							"</td><td>" + re+
+							"</td>"+
+							`<td><button type="button" onclick="editMsg( ${i} )">修改</button></td>`+
+							"<tr>");
+			     	}
+			    }
+			},
+			error:function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	}
+	$("#header").hide();
+	querytrans();
+    // 修改界面的显示和隐藏
+    $("#cance").on("click",()=>{
+		$("#header").hide();
+	});
+    var flag = true;
+	function editMsg(i){
+		$("#header").show();
+		$("#task_code").val(timers[i].task_code);
+		$("#task_name").val(timers[i].task_name);
+		$("#task_switch").val(timers[i].task_switch);
+		$("#status").val(timers[i].status);
+ 		$("#remark").val(timers[i].remark);
+
+ 
+ 			$("#submit").on("click",()=>{
+				if ($('#task_code').val()=='') {
+					alert('请输入任务编码');
+					return;
+				}
+				if ($('#task_name').val()=='') {
+					alert('请输入任务名称');
+					return;
+				}								
+			    var formData = new FormData($("#upload")[0]);
+			    formData.append("pid", timers[i].pid);
+			    if (flag==true) {
+			    	flag=false;
+	                $.ajax({
+	                    url:"/operplat/timer_config/modify",
+	                    type: 'POST',
+	                    data: formData,
+	                    async: false,
+	                    cache: false,
+	                    contentType: false,
+	                    processData: false,
+	                    success:function (dataJson,dataStatus) {
+	                    	flag=true;
+	                        if ("success" != dataJson.retCode){
+	                            alert(dataJson.retMsg);
+	                        }else {
+	                        	$("#header").hide();
+	                            alert(dataJson.retMsg);
+	                            window.location.reload();
+
+	                        }
+	                    },
+	                    error:function (req, errorMsg, exception) {
+	                    	flag=true;
+	                        alert(errorMsg);
+	                    }
+	                });
+	            }
+			});
+
+
+	}
+</script>
+</html>

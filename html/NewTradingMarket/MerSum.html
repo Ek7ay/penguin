@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>商户交易汇总查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="phoneno">商户注册手机号：</lable>
+				<input type="text" id="phoneno" placeholder="请输入">
+				<button class="btn class-lable" id="search">搜索</button><br>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>顺序号</th>
+					<th>手机号</th>
+					<th>客户号</th>
+					<th>客户姓名</th>
+					<th>额度</th>
+					<th><span class="otherBean"></span>数量</th>
+					<th>待划转<span class="otherBean"></span>数量</th>
+					<th>待划转金额</th>
+					<th>处理中订单数</th>
+					<th>成功订单数</th>
+					<th>失败订单数</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script src="../../js/platformName.js"></script>
+	<script>
+		// 声明查询函数
+        function query() {
+            var phoneno = $("#phoneno").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/trading_new/merchant_trans_count_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"phoneno":phoneno},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var merchants = dataJson.merchants;
+                        for (var i = 0; i < merchants.length; i++) {
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${merchants[i].phoneno}</td>
+										   <td>${merchants[i].cusid}</td>
+										   <td>${merchants[i].cus_name}</td>
+										   <td>${merchants[i].quota}</td>
+										   <td>${merchants[i].beans}</td>
+										   <td>${merchants[i].wait_transfer_bean}</td>
+										   <td>${merchants[i].wait_transfer_amt}</td>
+										   <td>${merchants[i].wait_orders}</td>
+										   <td>${merchants[i].succ_orders}</td>
+										   <td>${merchants[i].fail_orders}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+        $(()=>{query();});
+		// 分类查询
+		$("#search").click(()=>{query();});
+	</script>
+</html>

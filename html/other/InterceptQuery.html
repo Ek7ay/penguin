@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>交易拦截查询</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.second{
+				margin-top: 10px;
+			}
+			#status{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+			.second .sec{
+				margin-left: 7px;
+			}
+			.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+			.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+			.paging label{ margin: 0 15px; }
+			.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+			.btm_biaodan {height: 100%;}
+			#go{position: relative;top: -1px;}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="phoneNo">电话号码：</lable>
+				<input type="text" id="phoneNo"
+					   placeholder="请输入"
+					   onkeyup="this.value=this.value.replace(/\D/g,'')"
+					   onafterpaste="this.value=this.value.replace(/\D/g,'')"
+					   oninput="if(value.length>11)value=value.slice(0,11)"
+				>
+				<lable for="status" class="class-lable">状&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="init">未处理</option>
+					<option value="finish">已处理</option>
+				</select>
+				<lable for="page_count" class="class-lable">每页条数：</lable>
+				<select id="page_count">
+					<option value="20">20条</option>
+					<option value="30">30条</option>
+					<option value="50">50条</option>
+					<option value="100">100条</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button><br>
+				<div class="second">
+					<lable for="sdate">开始时间：</lable>
+					<input type="text" id="sdate" placeholder="请输入">
+					<lable class="sec" for="edate">结束时间：</lable>
+					<input type="text" id="edate" placeholder="请输入">
+				</div>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>顺序号</th>
+					<th>交易流水号</th>
+					<th>客户号</th>
+					<th>支付类型</th>
+					<th>手机号</th>
+					<th>油卡号</th>
+					<th>交易金额</th>
+					<th>真实金额</th>
+					<th>交易类型</th>
+					<th>状态</th>
+				</tr>
+			</table>
+		</div>
+		<!-- 分页查询 -->
+		<div class="paging">
+			<button type="button" id="prev">上一页</button>
+			<label>
+				<input type="number" oninput="if(value<0)value =''" id="pageNum">
+				<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+			</label>
+			<button type="button" id="next">下一页</button>
+			<label id="nowPage">
+				当前第&nbsp;<span></span>&nbsp;页
+			</label>
+			<label style="margin-left: 0;" id="pageNo">
+				共&nbsp;<span></span>&nbsp;页
+			</label>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script src="../../js/platformName.js"></script>
+	<script>
+        // 执行日期插件实例
+		$(()=>{
+            laydate.render({
+                elem: '#sdate'
+            });
+            laydate.render({
+                elem: '#edate'
+            });
+		});
+		// 获得当前日期
+		var now;
+		$(() => {
+			function nowTime(){
+				var date = new Date(); //创建时间对象
+				var year = date.getFullYear(); //获取年
+				var month = date.getMonth()+1;//获取月
+				var day = date.getDate(); //获取当日
+				var time = year+"-"+month+"-"+day; //组合时间
+				return time;
+			}
+			now = nowTime();
+			$("#sdate").val(now);
+			$("#edate").val(now);
+		});
+
+		// 声明全局变量
+        var trans;
+        var phoneNo;
+        var status;
+        var sdate;
+        var edate;
+        var index = 1;
+        var pageNo;
+        var sum;
+        var page_count = 20;
+		// 声明查询函数
+        function query(index) {
+            phoneNo = $("#phoneNo").val();
+			if (phoneNo != "") {
+				if(!(/^1[3456789]\d{9}$/.test(phoneNo))){
+					alert("手机号码有误，请重填");
+					return false;
+				}
+			}
+            status = $("#status option:selected").val();
+            sdate = $("#sdate").val();
+            edate = $("#edate").val();
+			var osdate = new Date(sdate);
+			var oedate = new Date(edate);
+			if (osdate.getTime() > oedate.getTime()) {
+				alert("开始日期不能大于结束日期")
+			}
+			page_count =  $("#page_count").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/transFilter/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"phoneNo":phoneNo,
+					  "sdate":sdate,
+					  "status":status,
+					  "edate":edate,
+					  "page_num":index,
+					  "page_count":page_count
+				},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        trans = dataJson.trans;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        for (var i = 0; i < trans.length; i++) {
+                            var status = trans[i].status;
+                            var sta;
+                            if(status == "init"){
+                                sta = "未处理";
+                            }else if (status == "finish"){
+                                sta = "已处理";
+                            }
+                            var pay_type = trans[i].pay_type;
+                            var pay;
+                            if(pay_type == "bean"){
+                                pay = otherBean;
+                            }else if (pay_type == "wxpay"){
+                                pay = "微信";
+                            }else if (pay_type == "alipay"){
+                                pay = "支付宝";
+                            }
+
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${trans[i].payno}</td>
+										   <td>${trans[i].cusid}</td>
+										   <td>${pay}</td>
+										   <td>${trans[i].phone_no}</td>
+										   <td>${trans[i].card_no}</td>
+										   <td>${trans[i].tran_amt}</td>
+										   <td>${trans[i].real_amt}</td>
+										   <td>${trans[i].tran_type}</td>
+										   <td>${sta}</td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+            $('#pageNo span').html(pageNo);
+            $('#nowPage span').html(index);
+            $('#pageNum').val(index);
+        }
+		// load查询
+		query(index);
+        // 上一页
+        $("#prev").on("click",()=>{
+            if(index<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index--;
+            query(index);
+        });
+        // 下一页
+        $("#next").on("click",()=>{
+            if(index>=pageNo){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index++;
+            query(index);
+        });
+        // 输入页查询
+        $("#go").on("click",()=>{
+            index  = $("#pageNum").val();
+            if(index<=0){
+                alert("不能小于第一页！");
+                return;
+            };
+            if(index>Number(pageNo)){
+                alert("不能大于最后一页！");
+                $("#pageNum").val(1);
+                $('#nowPage span').html(1);
+                index = 1;
+                query(index);
+                return;
+            };
+            query(index);
+        });
+		// 分类查询
+		$("#search").click(()=>{
+		    index = 1;
+            query(index);
+		});
+	</script>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="renderer" content="webkit">
+    <title>牛毛订单查询</title>
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <link rel="stylesheet" href="../../css/TRconner/mine.css">
+    <style>
+        .paging {
+            width: 100%;
+            text-align: center !important;
+            margin-top: 30px;
+        }
+
+        .paging button {
+            width: 80px !important;
+            height: 30px;
+            color: #fff;
+            background: #00aaee;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .paging label {
+            margin: 0 15px;
+        }
+
+        .paging label input {
+            height: 25px;
+            width: 60px;
+            text-align: center;
+            border-radius: 5px;
+            margin-left: 5px;
+            border: 1px solid #F2F2F2;
+            position: relative;
+            top: -2px;
+            left: -4px
+        }
+
+        .btm_biaodan {
+            height: 100%;
+        }
+
+        #go {
+            position: relative;
+            top: -1px;
+        }
+
+        #check input, #checkd input {
+            margin-top: 4px;
+            width: 15px;
+            height: 15px;
+        }
+
+        #checkd {
+            width: 50px;
+        }
+
+        #s-up {
+            background-color: #0099cc;
+            color: white;
+            margin-left: 240px;
+        }
+
+        #mo {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+    </style>
+</head>
+<body class="info demo">
+<div class="header">
+    <div class="month">
+        <lable for="s_date">开始日期：</lable>
+        <input type="text" id="s_date" placeholder="请输入">
+        <lable class="class-lable" for="e_date">结束日期：</lable>
+        <input type="text" id="e_date" placeholder="请输入">
+        <lable class="class-lable" for="order_id">订单编码：</lable>
+        <input type="text" id="order_id" placeholder="请输入">
+        <button class="btn class-lable" id="search">搜索</button>
+    </div>
+    <div class="month">
+        <lable for="oper_status">操作状态：</lable>
+        <select id="oper_status">
+            <option value="">全部</option>
+            <option value="init">初始状态</option>
+            <option value="send">发送中</option>
+            <option value="finish">完成</option>
+        </select>
+        <lable class="class-lable" for="status">状态：</lable>
+        <select id="status">
+            <option value="">全部</option>
+            <option value="wait_pay">卖家提交，等待买家付款</option>
+            <option value="wait_pay_result">买家确认并支付</option>
+            <option value="success">成功</option>
+            <option value="pay_failed">支付失败</option>
+            <option value="time_out">超时</option>
+        </select>
+        <lable class="class-lable" for="order_type">按生成时间排序：</lable>
+        <select id="order_type">
+            <option value="">默认</option>
+            <option value="desc">倒叙</option>
+            <option value="asc">正序</option>
+        </select>
+    </div>
+</div>
+<div class="content btm_biaodan">
+    <form id="upload" enctype="multipart/form-data">
+        <table border="1" cellspacing="" cellpadding="">
+            <tr>
+                <th>序号</th>
+                <th>订单编码</th>
+                <th>交易流水号</th>
+                <th>牛毛编码</th>
+                <th>客户姓名</th>
+                <th>牛毛面值</th>
+                <th>黄牛额度</th>
+                <th>状态</th>
+                <th>操作状态</th>
+                <th>创建时间</th>
+            </tr>
+        </table>
+    </form>
+</div>
+<!-- 分页查询 -->
+<div class="paging">
+    <button type="button" id="prev">上一页</button>
+    <label>
+        <input type="number" oninput="if(value<0)value =''" id="pageNum">
+        <button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+    </label>
+    <button type="button" id="next">下一页</button>
+    <label id="nowPage">
+        当前第&nbsp;<span></span>&nbsp;页
+    </label>
+    <label style="margin-left: 0;" id="pageNo">
+        共&nbsp;<span></span>&nbsp;页
+    </label>
+</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script src="../../js/cookie.js"></script>
+<script>
+    $(() => {
+        index = 1;
+        query(index);
+    });
+    // 执行日期插件实例
+    $(() => {
+        laydate.render({
+            elem: '#s_date'
+        });
+        laydate.render({
+            elem: '#e_date'
+        });
+    });
+    // 全选框的处理
+    $("#checkd input").on("change", () => {
+        if ($("#checkd input").attr("checked") == "checked") {
+            $("#check input").attr("checked", true);
+        }
+        if ($("#checkd input").attr("checked") != "checked") {
+            $("#check input").attr("checked", false);
+        }
+    });
+    // 声明全局变量
+    var orders;
+    var index = 1;
+    var pageNo;
+    var sum;
+
+    // 声明查询函数
+    function query(index) {
+        var s_date = $("#s_date").val();
+        var e_date = $("#e_date").val();
+        var order_id = $("#order_id").val();
+        var status = $("#status").val();
+        var oper_status = $("#oper_status").val();
+        var order_type = $("#order_type").val();
+        $('.test').empty();
+        $.ajax({
+            url: "/operplat/cattle/order_query",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            data: {
+                "s_date": s_date,
+                "e_date": e_date,
+                "order_id": order_id,
+                "status": status,
+                "oper_status": oper_status,
+                "order_type": order_type,
+                "page_num":index,
+                "page_count": "20"
+            },
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    pageNo = "0";
+                    alert(dataJson.retMsg);
+                } else {
+                    orders = dataJson.orders;
+                    sum = dataJson.sum;
+                    pageNo = dataJson.pageNo;
+                    var status;
+                    for (var i = 0; i < orders.length; i++) {
+                        if (orders[i].status == "wait_pay") {
+                            status = "卖家提交，等待买家付款"
+                        }
+                        if (orders[i].status == "wait_pay_result") {
+                            status = "买家确认并支付"
+                        }
+                        if (orders[i].status == "success") {
+                            status = "成功"
+                        }
+                        if (orders[i].status == "pay_failed") {
+                            status = "支付失败"
+                        }
+                        if (orders[i].status == "time_out") {
+                            status = "超时"
+                        }
+                        var oper_status;
+                        if (orders[i].oper_status == "init") {
+                            oper_status = "初始状态"
+                        }
+                        if (orders[i].oper_status == "send") {
+                            oper_status = "发送中"
+                        }
+                        if (orders[i].oper_status == "finish") {
+                            oper_status = "完成"
+                        }
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										   <td>${i + 1}</td>
+										   <td>${orders[i].order_id}</td>
+										   <td>${orders[i].payno}</td>
+									       <td>${orders[i].cowhair_id}</td>
+										   <td>${orders[i].cus_name}</td>
+										   <td>${orders[i].cowhair_amt}</td>
+										   <td>${orders[i].quota}</td>
+										   <td>${status}</td>
+										   <td>${oper_status}</td>
+										   <td>${orders[i].ctime}</td>
+										</tr>`);
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+        $('#pageNo span').html(pageNo);
+        $('#nowPage span').html(index);
+        $('#pageNum').val(index);
+    }
+
+    // 分页查询
+        // 上一页
+        var pageNo = $('#pageNo span').val();
+        $("#prev").on("click",()=>{
+            if (pageNo !== "") {
+                if(index<=1){
+                    alert("已经是第一页了！");
+                    return;
+                }
+                index--;
+                query(index);
+            }
+
+        });
+        // 下一页
+        $("#next").on("click",()=>{
+
+                if(index>=pageNo){
+                    alert("已经是最后一页了！");
+                    return;
+                }
+                index++;
+                query(index);
+
+        });
+        // 输入页查询
+        $("#go").on("click",()=>{
+            if (pageNo !== ""){
+                index  = $("#pageNum").val();
+                if(index<=0){
+                    alert("不能小于第一页！");
+                    return;
+                };
+                if(index>Number(pageNo)){
+                    alert("不能大于最后一页！");
+                    $("#pageNum").val(1);
+                    $('#nowPage span').html(1);
+                    index = 1;
+                    query(index);
+                    return;
+                }
+                query(index);
+            }
+        });
+        // 分类查询
+        $("#search").click(()=>{
+            index = 1;
+            query(index);
+    });
+</script>
+</html>

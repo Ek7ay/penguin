@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>菜单新增</title>
+	  <link rel="stylesheet" href="../../js/layui/css/layui.css">
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <style>
+		  .add form label span{width: 115px !important;}
+		  #up_menu,#is_show,#has_more{ width: 210px; height: 33px; background: #F2F2F2;border-radius: 5px}
+		  form label select{
+			  margin-left: 0px !important;
+		  }
+		  #lll{
+			  position: relative;
+			  right: 4px;
+		  }
+  	  </style>
+	</head>
+	<body class="add">
+		<form id="upload" enctype="multipart/form-data">
+			<label><span>菜单名称：</span><input type="text" placeholder="必输项" name="menu_name" id="menu_name"/>
+				<!--<input type="hidden" id="oper_id" name="oper_id"/>-->
+			</label>
+			<label class="layui-form">
+				<span>选择上级菜单：</span>
+				<div class="layui-input-inline" id="lll">
+					<select lay-filter="up_menu" name="up_menu" id="up_menu" lay-search>
+						<option value="0" data-menuLevel="0">主菜单</option>
+					</select>
+				</div>
+			</label>
+			<label><span>当前菜单级别：</span><input type="text" readonly name="menu_level" value="1" id="menu_level"/></label>
+			<label><span>是否显示：</span><select name="is_show" id="is_show">
+				<option value="Y">是</option>
+				<option value="N">否</option>
+			</select></label>
+			<label><span>是否有子菜单：</span><select name="has_more" id="has_more">
+				<option value="Y">是</option>
+				<option value="N">否</option>
+			</select></label>
+			<label><span>菜单地址：</span><input type="text" name="menu_url" id="menu_url"/></label>
+			<label><span>图标地址：</span><input type="text" name="menu_icon"/></label>
+			<label><span class="textarea">备注：</span><textarea name="remark"></textarea></label>
+			<button type="button" class="btn-submit" id="submit">提交</button>
+		</form>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script src="../../js/layui/layui.js"></script>
+		<script>
+            layui.use(['form'], function(){
+                var form = layui.form;
+                form.on('select(up_menu)',function (data1) {
+					var menuid = data1.value;
+                    $.ajax({
+                        url:"/operplat/menu/queryMenu",
+                        context: document.body,
+                        dataType: "JSON",
+						data:{"menu_id":menuid},
+                        async: false,
+                        success:function (dataJson,dataStatus) {
+                            if ("success" != dataJson.retCode){
+                                alert(dataJson.retMsg);
+                            }else {
+                                let menu_level = dataJson.menus[0].menu_level;
+                                let level = Number(menu_level) + 1;
+                                $('#menu_level').empty().val(level);
+                            }
+                        },
+                        error:function (req, errorMsg, exception) {
+                            alert(errorMsg);
+                        }
+                    });
+                })
+            });
+
+			$.ajax({
+                url:"/operplat/menu/queryMenu",
+                context: document.body,
+	            dataType: "JSON",
+	            async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode){
+                        alert(dataJson.retMsg);
+                    }else {
+                        let menus = dataJson.menus;
+                        for(let i=0;i<menus.length;i++){
+                        		let menu = menus[i];
+                        		$('#up_menu').append(
+	                        		`<option value="${menu.menu_id}" data-menuLevel="${menu.menu_level}">${menu.menu_name}${menu.menu_level}级</option>`
+	                        );
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+			$("#submit").on("click",()=>{
+			    var formData = new FormData($("#upload")[0]);
+                $.ajax({
+                    url:"/operplat/menu/addMenu",
+                    type: 'POST',
+                    // data: $('#upload').serialize(),
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            alert(dataJson.retMsg);
+                         window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+			});
+		</script>
+	</body>
+</html>

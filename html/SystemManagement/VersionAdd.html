@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>版本新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	</head>
+	<body>
+		<div id="form-box">
+			<form
+				id="upload"
+				ref="upload"
+				enctype="multipart/form-data"
+			>
+				<table>
+					<tr>
+						<td>版本内容:</td>
+						<td>
+							<textarea
+								name="version_value"
+								ref="version_value"
+								v-model = "version_value"
+							></textarea>
+						</td>
+					</tr>
+				</table>
+				<button
+					type="button"
+					class="btn-submit"
+					id="submit"
+					@click="submit"
+				>提交</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/laydate.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script>
+			new Vue({
+				el: '#form-box',
+				data() {
+					return{
+						version_value: ""
+					}
+				},
+				methods: {
+					submit() {
+						var a = this.$refs.version_value;
+						this.version_value = a._value;
+						if(this.version_value == ''){
+							alert('版本内容不能为空');
+							return;
+						}
+						var formData = new FormData(this.$refs.upload);
+						$.ajax({
+							url:"/operplat/version/add",
+							type: 'POST',
+							data: formData,
+							async: false,
+							cache: false,
+							contentType: false,
+							processData: false,
+							success:function (dataJson,dataStatus) {
+								if ("success" != dataJson.retCode){
+									alert(dataJson.retMsg);
+								}else {
+									alert(dataJson.retMsg);
+									window.location.reload();
+								}
+							},
+							error:function (req, errorMsg, exception) {
+								alert(errorMsg);
+							}
+						});
+					}
+				}
+			});
+		</script>
+	</body>
+</html>

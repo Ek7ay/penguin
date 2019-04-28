@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>企鹅车务运维平台登陆</title>
+    <link rel="stylesheet" href="css/TRconner/loginNew.css">
+</head>
+<body>
+    <div class="login">
+        <div class="bg"></div>
+        <div class="log-box">
+            <ul>
+                <li>
+                    <img src="images/login/Title.png">
+                </li>
+                <li>
+                    <div>
+                        <img id="User-name" src="images/login/User-name.png" height="17" width="17"/>
+                        <input id="account" type="text" placeholder="请输入用户名">
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <img id="Password" src="images/login/Password.png" height="21" width="16"/>
+                        <input id="pwd" type="password" placeholder="请输入密码">
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <img id="Remember" src="images/login/Remember-password.png" height="23" width="23"/>
+                        <p>记住密码</p>
+                    </div>
+                </li>
+                <li>
+                    <button id="landing">登录</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+<script src="js/jquery-1.8.3.min_2.js"></script>
+<script src="js/pintuer.js"></script>
+<script src="./js/randomString.js"></script>
+<script src="js/cookie.js"></script>
+<script>
+    // 添加回车事件
+    document.onkeydown = function(e){
+        if(e.keyCode == 13){
+            $('#landing').click();
+        }
+    }
+    // 图标的切换
+    $(()=>{
+        $("#account").on("input",()=>{
+            if($("#account").val() != ""){
+                $("#User-name").attr("src","images/login/User-name2.png");
+            }else{
+                $("#User-name").attr("src","images/login/User-name.png");
+            }
+        });
+        $("#pwd").on("input",()=>{
+            if($("#pwd").val() != ""){
+                $("#Password").attr("src","images/login/Password2.png");
+            }else{
+                $("#Password").attr("src","images/login/Password.png");
+            }
+        });
+        $("#Remember").on("click",()=>{
+            if($("#Remember").attr("src") == "images/login/Remember-password.png"){
+                $("#Remember").attr("src","images/login/Remember-password2.png");
+            }else{
+                $("#Remember").attr("src","images/login/Remember-password.png");
+                clearAllCookie();
+            }
+        });
+    });
+    // 获取cookie中的账号和密码
+    $(()=>{
+        var username = getCookie("username");
+        var password = getCookie("password");
+        $("#account").val(username);
+        $("#pwd").val(password);
+    });
+    // 登录
+    $('#landing').click(function(){
+        var username = $('#account').val();
+        var password = $('#pwd').val();
+        var operplat_sess_id = randomString();
+        setCookie('operplat_sess_id',operplat_sess_id);
+		$.ajax({
+			url:"/operplat/user/login",
+			context: document.body,
+			dataType:'JSON',
+			data:{'username':username,'password':password,'channel':'web'},
+			async: false,
+			success: function(dataJson,dataStatus){
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if(retCode != 'success'){
+			        alert(retMsg);
+			        return;
+			    }else{
+			    		let oper_id = dataJson.oper_id;
+			    		let oper_name = dataJson.oper_name;
+                        let projectName = dataJson.projectName;
+                        let otherBean = dataJson.otherBean;
+			    		setCookie('oper_id',oper_id);
+			    		setCookie("oper_name",oper_name);
+                        setCookie("projectName",projectName);
+                        setCookie("otherBean",otherBean);
+                        var first_login = dataJson.first_login;
+                        if (first_login == "Y"){
+                            window.location.replace('./html/PublicManagement/PasswordChange.html?age=18');
+                        }else {
+                            window.location.replace('./index.html');
+                        }
+                        if($("#Remember").attr("src") == "images/login/Remember-password2.png"){
+                            setCookie('username',username);
+                            setCookie('password',password);
+                        }
+			    }
+			},
+			error:function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+    });
+</script>
+</body>
+</html>

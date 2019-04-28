@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	  <meta name="renderer" content="webkit">
+	  <title>微信菜单新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" ref="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>菜单名称:</td>
+						<td>
+							<input placeholder="必输项" ref="menu_name" name="menu_name"/>
+						</td>
+					</tr>
+					<tr>
+						<td>图片地址:</td>
+						<td>
+							<input placeholder="必输项" ref="image_url" name="image_url"/>
+						</td>
+					</tr>
+					<tr>
+						<td>跳转地址:</td>
+						<td>
+							<input placeholder="必输项" ref="skip_url" name="skip_url"/>
+						</td>
+					</tr>
+					<tr>
+						<td>菜单开关:</td>
+						<td>
+							<select name="menu_switch">
+								<option value="off">关闭</option>
+								<option value="on">开启</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>菜单状态:</td>
+						<td>
+							<select name="menu_status">
+								<option value="unuseable">不可用</option>
+								<option value="useable">可用</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>备注:</td>
+						<td>
+							<textarea name="remark"></textarea>
+						</td>
+					</tr>
+				</table>
+				<button type="button" class="btn-submit" id="submit" @click="submit">提交</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/vue.js"></script>
+		<script>
+            new Vue({
+				el: '#form-box',
+				data() {
+					return{
+						menu_name: "",
+						image_url: "",
+						skip_url: ""
+					}
+				},
+				methods: {
+					submit() {
+						this.menu_name= this.$refs.menu_name.value;
+						if(this.menu_name == ''){
+							alert('菜单名称不能为空');
+							return;
+						}
+						this.image_url= this.$refs.image_url.value;
+						if(this.image_url == ''){
+							alert('图片地址不能为空');
+							return;
+						}
+						this.skip_url= this.$refs.skip_url.value;
+						if(this.skip_url == ''){
+							alert('跳转地址不能为空');
+							return;
+						}
+						var formData = new FormData(this.$refs.upload);
+						$.ajax({
+							url:"/operplat/wx_menu/add",
+							type: 'POST',
+							data: formData,
+							async: false,
+							cache: false,
+							contentType: false,
+							processData: false,
+							success:function (dataJson,dataStatus) {
+								if ("success" != dataJson.retCode){
+									alert(dataJson.retMsg);
+								}else {
+									alert(dataJson.retMsg);
+									window.location.reload();
+								}
+							},
+							error:function (req, errorMsg, exception) {
+								alert(errorMsg);
+							}
+						});
+					}
+				}
+			});
+		</script>
+	</body>
+</html>

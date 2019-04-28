@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="renderer" content="webkit">
+	<title>版本查询</title>
+	<link rel="stylesheet" href="../../css/reset.css" />
+	<link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+</head>
+<body class="info demo" >
+	<div id="app">
+		<div class="header">
+			<div class="month">
+				<label>
+					开始日期
+					<input
+							type="text"
+							id="sdate"
+							autocomplete="off"
+							style="margin-left: 10px;"
+							ref="sdate"
+					/>
+				</label>
+				<label class="ml15">
+					结束日期
+					<input
+							type="text"
+							id="edate"
+							autocomplete="off"
+							style="margin-left: 10px;"
+							ref="edate"
+					/>
+				</label>
+				<button
+						class="btn ml15"
+						@click="search"
+				>搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>版本号</th>
+					<th>上线时间</th>
+					<th>版本内容</th>
+				</tr>
+				<tr v-for="(item,index) in versions">
+					<td>{{index+1}}</td>
+					<td>{{item.version_id}}</td>
+					<td>{{item.time}}</td>
+					<td>{{item.version_value}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script src="../../js/vue.js"></script>
+<script>
+	// 执行日期插件实例
+	$(() => {
+		laydate.render({
+			elem: '#sdate'
+		});
+		laydate.render({
+			elem: '#edate'
+		});
+	});
+	// 执行VUE实例
+	new Vue({
+		el: "#app",
+		data() {
+			return{
+				versions: []
+			}
+		},
+		mounted() {
+			this.query();
+		},
+		methods: {
+			search() {
+				this.query();
+			},
+			query() {
+				var sdate = this.$refs.sdate.value;
+				var edate = this.$refs.edate.value;
+				$.ajax({
+					url: "/operplat/version/query",
+					context: document.body,
+					dataType: 'JSON',
+					async: false,
+					data: {'sdate': sdate, 'edate': edate},
+					success: (dataJson, dataStatus) => {
+						if (dataJson.retCode != 'success') {
+							this.versions = [];
+							alert(dataJson.retMsg);
+						} else {
+							this.versions = dataJson.versions;
+						}
+					},
+					error: function (req, errorMsg, exception) {
+						alert(dataJson.retMsg);
+					}
+				});
+			}
+		}
+	});
+</script>
+
+</html>

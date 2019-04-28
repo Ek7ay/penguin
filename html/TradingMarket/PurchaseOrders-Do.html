@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>收购订单处理</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			#check input,#checkd input{
+				margin-top: 4px;
+				width: 15px;
+				height: 15px;
+			}
+			#mo{
+				position: fixed;
+				left: 0;
+				top: 0;
+				z-index: 10;
+				padding: 5px;
+				background: rgba(0,0,0,0.5);
+				width: 100%;
+				height: 100%;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				display: none;
+			}
+			#total-box{
+				display: inline-flex;
+				justify-content: space-between;
+				width: 450px;
+				margin-left: 30px;
+			}
+			#total-box div span{
+				color: #00aaee;
+			}
+			#total-box div p{
+				display: inline-block;
+			}
+			.paging{ width: 100%; text-align: center!important; margin-top: 30px;}
+			.paging button{ width: 80px!important; height: 30px; color: #fff; background: #00aaee; border-radius: 5px; cursor: pointer; }
+			.paging label{ margin: 0 15px; }
+			.paging label input{height: 25px; width: 60px; text-align: center; border-radius: 5px; margin-left: 5px;border: 1px solid #F2F2F2;position: relative;top: -2px;left: -4px}
+			.btm_biaodan {height: 100%;}
+			#go{position: relative;top: -1px;}
+		</style>
+	</head>
+	<body class="info demo">
+		<div id="mo"></div>
+		<div class="header">
+				<div class="month" id="lable">
+					<lable for="order_id">订单编码：</lable>
+					<input type="text" id="order_id" placeholder="请输入">
+					<lable for="phone" class="class-lable">手机号：</lable>
+					<input type="text" id="phone" placeholder="请输入">
+					<lable for="ctime" class="class-lable">创建时间：</lable>
+					<input type="text" id="ctime" placeholder="请输入">
+					<lable for="status" class="class-lable" style="display: none">付款状态：</lable>
+					<select id="status" style="display: none">
+						<option value="">全部</option>
+						<option value="wait_pay">待付款</option>
+						<option value="success">成功</option>
+						<option value="fail">失败</option>
+					</select>
+					<button class="btn class-lable" id="search">搜索</button>
+					<button class="btn class-lable" id="s-up">手动处理</button>
+					<div id="total-box">
+						<div id="total1"><p class="otherBean"></p>总金额：<span></span></div>
+						<div id="total2">打款总金额：<span></span></div>
+						<div id="total3">信息总条数：<span></span></div>
+					</div>
+				</div>
+			</div>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<!--<input type="text" name="" value="">-->
+				<div class="content btm_biaodan">
+					<table border="1" cellspacing="" cellpadding="">
+						<tr>
+							<th>序号</th>
+							<th>订单编码</th>
+							<th>注册手机号</th>
+							<th>收款人姓名</th>
+							<th>银行卡号</th>
+							<th>银行名称</th>
+							<th><span class="otherBean"></span></th>
+							<th>打款金额</th>
+							<th>交易开始时间</th>
+							<th>交易结束时间</th>
+							<th>订单状态</th>
+							<th>操作状态</th>
+							<th id="checkd"><input type="checkbox"></th>
+						</tr>
+					</table>
+				</div>
+			</form>
+		</div>
+		<!-- 分页查询 -->
+		<div class="paging">
+			<button type="button" id="prev">上一页</button>
+			<label>
+				<input type="number" oninput="if(value<0)value =''" id="pageNum">
+				<button type="button" style="margin-left: 10px; width: 50px;" id="go">跳转</button>
+			</label>
+			<button type="button" id="next">下一页</button>
+			<label id="nowPage">
+				当前第&nbsp;<span></span>&nbsp;页
+			</label>
+			<label style="margin-left: 0;" id="pageNo">
+				共&nbsp;<span></span>&nbsp;页
+			</label>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script src="../../js/platformName.js"></script>
+	<script>
+        // 执行日期插件实例
+        lay('#version').html('-v' + laydate.v);
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#ctime' //指定元素
+        });
+        // 全局变量声明
+		var orders;
+        var order_id;
+        var phone;
+        var ctime;
+        var status;
+        var index = 1;
+        var pageNo;
+        var sum;
+        var total_total_amt;
+        var total_discount_amt;
+        // 查询函数声明
+		function query(order_id, phone,ctime,status,index) {
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/trading/order_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data:{"order_id":order_id,"phone":phone,"ctime":ctime,"status":status,"oper_status":"init","page":index, "count":"20"},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        orders = dataJson.orders;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        total_total_amt = dataJson.total_total_amt;
+                        total_discount_amt = dataJson.total_discount_amt;
+                        for (var i = 0; i < orders.length; i++) {
+                            var status = orders[i].status;
+                            var sta;
+                            if(status == "wait_pay"){
+                                sta = "待付款";
+                            }else if (status == "success"){
+                                sta = "成功";
+                            }else if (status == "fail"){
+                                sta = "失败";
+                            }
+                            var oper_status = orders[i].oper_status;
+                            var oper;
+                            if(oper_status == "init"){
+                                oper = "初始状态";
+                            }else if (oper_status == "send"){
+                                oper = "已发送支付平台";
+                            }else if (oper_status == "finish"){
+                                oper = "处理完成";
+                            }
+                            var order_id = orders[i].order_id;
+                            order_id = order_id.substring(14,20);
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${order_id}</td>
+										   <td>${orders[i].phone}</td>
+										   <td>${orders[i].cus_name}</td>
+										   <td>${orders[i].bank_card}</td>
+										   <td>${orders[i].bank_name}</td>
+										   <td>${orders[i].total_amt}</td>
+										   <td>${orders[i].dicount_amt}</td>
+										   <td>${orders[i].stime}</td>
+										   <td>${orders[i].etime}</td>
+										   <td>${sta}</td>
+										   <td>${oper}</td>
+										   <td id="check">
+										   		<input type="checkbox" name="orders" value=${orders[i].order_id}>
+								   		   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+		$(()=>{
+            $.ajax({
+                url:"/operplat/trading/order_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"oper_status":"init","page":index, "count":"20"},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        orders = dataJson.orders;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        total_total_amt = dataJson.total_total_amt;
+                        total_discount_amt = dataJson.total_discount_amt;
+                        for (var i = 0; i < orders.length; i++) {
+                            var status = orders[i].status;
+                            var sta;
+                            if(status == "wait_pay"){
+                                sta = "待付款";
+                            }else if (status == "success"){
+                                sta = "成功";
+                            }else if (status == "fail"){
+                                sta = "失败";
+							}
+                            var oper_status = orders[i].oper_status;
+                            var oper;
+                            if(oper_status == "init"){
+                                oper = "初始状态";
+                            }else if (oper_status == "send"){
+                                oper = "已发送支付平台";
+                            }else if (oper_status == "finish"){
+                                oper = "处理完成";
+                            }
+                            var order_id = orders[i].order_id;
+                            order_id = order_id.substring(14,20);
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${order_id}</td>
+										   <td>${orders[i].phone}</td>
+										   <td>${orders[i].cus_name}</td>
+										   <td>${orders[i].bank_card}</td>
+										   <td>${orders[i].bank_name}</td>
+										   <td>${orders[i].total_amt}</td>
+										   <td>${orders[i].dicount_amt}</td>
+										   <td>${orders[i].stime}</td>
+										   <td>${orders[i].etime}</td>
+										   <td>${sta}</td>
+										   <td>${oper}</td>
+										   <td id="check">
+										   		<input type="checkbox" name="orders" value=${orders[i].order_id}>
+								   		   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+            $('#pageNum').val(index);
+            $('#pageNo span').html(pageNo);
+            $('#nowPage span').html(index);
+            $("#total1 span").html(total_total_amt);
+            $("#total2 span").html(total_discount_amt);
+            $("#total3 span").html(sum);
+        });
+		// 分页查询
+        // 上一页
+        $("#prev").on("click",()=>{
+            if(index<=1){
+                alert("已经是第一页了！");
+                return;
+            };
+            index--;
+            $("#nowPage span").html(index);
+            $('#pageNum').val(index);
+            $(".test").empty();
+            order_id = $("#order_id").val();
+            phone = $("#phone").val();
+            ctime = $("#ctime").val();
+            status = $("#status option:selected").val();
+            query(order_id, phone,ctime,status,index);
+        });
+        // 下一页
+        $("#next").on("click",()=>{
+            if(index>=pageNo){
+                alert("已经是最后一页了！");
+                return;
+            };
+            index++;
+            $("#nowPage span").html(index);
+            $('#pageNum').val(index);
+            $(".test").empty();
+            order_id = $("#order_id").val();
+            phone = $("#phone").val();
+            ctime = $("#ctime").val();
+            status = $("#status option:selected").val();
+            query(order_id, phone,ctime,status,index);
+        });
+        // 输入页查询
+        $("#go").on("click",()=>{
+            var ind = $("#pageNum").val();
+            index = ind;
+            if(ind<=0){
+                alert("不能小于第一页！");
+                return;
+            };
+            if(ind>pageNo){
+                alert("不能大于最后一页！");
+                return;
+            };
+            $("#nowPage span").html(ind);
+            $(".test").empty();
+            order_id = $("#order_id").val();
+            phone = $("#phone").val();
+            ctime = $("#ctime").val();
+            status = $("#status option:selected").val();
+            query(order_id, phone,ctime,status,index);
+        });
+		// 分类查询
+		$("#search").click(()=>{
+             order_id = $("#order_id").val();
+             phone = $("#phone").val();
+             ctime = $("#ctime").val();
+             status = $("#status option:selected").val();
+            index = 1;
+            $(".test").empty();
+            $.ajax({
+                url:"/operplat/trading/order_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"order_id":order_id,"phone":phone,"ctime":ctime,"status":status,"oper_status":"init","page":index, "count":"20"},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        orders = dataJson.orders;
+                        sum = dataJson.sum;
+                        pageNo = dataJson.pageNo;
+                        total_total_amt = dataJson.total_total_amt;
+                        total_discount_amt = dataJson.total_discount_amt;
+                        for (var i = 0; i < orders.length; i++) {
+                            var status = orders[i].status;
+                            var sta;
+                            if(status == "wait_pay"){
+                                sta = "待付款";
+                            }else if (status == "success"){
+                                sta = "成功";
+                            }else if (status == "fail"){
+                                sta = "失败";
+                            }
+                            var oper_status = orders[i].oper_status;
+                            var oper;
+                            if(oper_status == "init"){
+                                oper = "初始状态";
+                            }else if (oper_status == "send"){
+                                oper = "已发送支付平台";
+                            }else if (oper_status == "finish"){
+                                oper = "处理完成";
+                            }
+                            var order_id = orders[i].order_id;
+                            order_id = order_id.substring(14,20);
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${order_id}</td>
+										   <td>${orders[i].phone}</td>
+										   <td>${orders[i].cus_name}</td>
+										   <td>${orders[i].bank_card}</td>
+										   <td>${orders[i].bank_name}</td>
+										   <td>${orders[i].total_amt}</td>
+										   <td>${orders[i].dicount_amt}</td>
+										   <td>${orders[i].stime}</td>
+										   <td>${orders[i].etime}</td>
+										   <td>${sta}</td>
+										   <td>${oper}</td>
+										   <td id="check">
+										   		<input type="checkbox" name="orders" value=${orders[i].order_id}>
+								   		   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+            $('#pageNo span').html(pageNo);
+            $('#nowPage span').html(index);
+            $('#pageNum').val(index);
+            $("#total1 span").html(total_total_amt);
+            $("#total2 span").html(total_discount_amt);
+            $("#total3 span").html(sum);
+        });
+		// 全选框的处理
+		$("#checkd input").on("change",()=>{
+		    if ($("#checkd input").attr("checked") == "checked"){
+				$("#check input").attr("checked",true);
+				console.log("true");
+			}
+            if ($("#checkd input").attr("checked") != "checked"){
+                $("#check input").attr("checked",false);
+                console.log("false");
+            }
+		});
+		// 手动处理
+		$("#s-up").on("click",()=>{
+            // 订单非空校验
+            var checkval = $("#check input");
+            console.log(checkval);
+            var checkvaloption = "";
+            for (i=0;i<checkval.length;i++){
+                if (checkval[i].checked == true){
+                    checkvaloption += checkval[i].value;
+                    console.log(checkval[i].value);
+                }
+            }
+            console.log(checkvaloption);
+            if(checkvaloption == "")
+            {
+                alert('请选择需要处理的订单');
+                return;
+            }
+            var re = confirm('确认提交吗？');
+            if (re){
+                $("#mo").show();
+                $.ajax({
+                    url:"/operplat/trading/order_oper",
+                    context: document.body,
+                    dataType: "JSON",
+                    async: true,
+                    data:$('#upload').serialize(),
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                            $("#mo").hide();
+                        }else {
+                            $("#mo").hide();
+                            console.log(dataJson);
+                            alert(dataJson.retMsg);
+                            console.log(dataJson.retMsg);
+                             order_id = $("#order_id").val();
+                             phone = $("#phone").val();
+                             ctime = $("#ctime").val();
+                             status = $("#status option:selected").val();
+                             oper_status = $("#oper_status option:selected").val();
+                            $(".test").empty();
+                            index = 1;
+                            $.ajax({
+                                url:"/operplat/trading/order_query",
+                                context: document.body,
+                                dataType: "JSON",
+                                async: false,
+                                data:{"order_id":order_id,"phone":phone,"ctime":ctime,"status":status,"oper_status":"init","page":index, "count":"20"},
+                                success:function (dataJson,dataStatus) {
+                                    if ("success" != dataJson.retCode) {
+                                        alert(dataJson.retMsg);
+                                    } else {
+                                        orders = dataJson.orders;
+                                        sum = dataJson.sum;
+                                        pageNo = dataJson.pageNo;
+                                        total_total_amt = dataJson.total_total_amt;
+                                        total_discount_amt = dataJson.total_discount_amt;
+                                        for (var i = 0; i < orders.length; i++) {
+                                            var status = orders[i].status;
+                                            var sta;
+                                            if(status == "wait_pay"){
+                                                sta = "待付款";
+                                            }else if (status == "success"){
+                                                sta = "成功";
+                                            }else if (status == "fail"){
+                                                sta = "失败";
+                                            }
+                                            var oper_status = orders[i].oper_status;
+                                            var oper;
+                                            if(oper_status == "init"){
+                                                oper = "初始状态";
+                                            }else if (oper_status == "send"){
+                                                oper = "已发送支付平台 ";
+                                            }else if (oper_status == "finish"){
+                                                oper = "处理完成";
+                                            }
+                                            var order_id = orders[i].order_id;
+                                            order_id = order_id.substring(14,20);
+                                            $(".btm_biaodan table").append(
+                                                `<tr class="test">
+											   <td>${i+1}</td>
+											   <td>${order_id}</td>
+											   <td>${orders[i].phone}</td>
+											   <td>${orders[i].cus_name}</td>
+											   <td>${orders[i].bank_card}</td>
+											   <td>${orders[i].bank_name}</td>
+											   <td>${orders[i].total_amt}</td>
+											   <td>${orders[i].dicount_amt}</td>
+											   <td>${orders[i].stime}</td>
+											   <td>${orders[i].etime}</td>
+											   <td>${sta}</td>
+											   <td>${oper}</td>
+											   <td id="check">
+													<input type="checkbox" name="orders" value=${orders[i].order_id}>
+											   </td>
+											</tr>`);
+                                        }
+                                    }
+                                },
+                                error:function (req, errorMsg, exception) {
+                                    alert(errorMsg);
+                                }
+                            });
+                            $('#pageNo span').html(pageNo);
+                            $('#nowPage span').html(index);
+                            $('#pageNum').val(index);
+                            $("#total1 span").html(total_total_amt);
+                            $("#total2 span").html(total_discount_amt);
+                            $("#total3 span").html(sum);
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+							$("#mo").hide();
+                        	alert(errorMsg);
+							 order_id = $("#order_id").val();
+							 phone = $("#phone").val();
+							 ctime = $("#ctime").val();
+							 status = $("#status option:selected").val();
+							 oper_status = $("#oper_status option:selected").val();
+							$(".test").empty();
+                        	index = 1;
+							$.ajax({
+                            url:"/operplat/trading/order_query",
+                            context: document.body,
+                            dataType: "JSON",
+                            async: false,
+                            data:{"order_id":order_id,"phone":phone,"ctime":ctime,"status":status,"oper_status":"init","page":index, "count":"20"},
+                            success:function (dataJson,dataStatus) {
+                                if ("success" != dataJson.retCode) {
+                                    alert(dataJson.retMsg);
+                                } else {
+                                    orders = dataJson.orders;
+                                    sum = dataJson.sum;
+                                    pageNo = dataJson.pageNo;
+                                    total_total_amt = dataJson.total_total_amt;
+                                    total_discount_amt = dataJson.total_discount_amt;
+                                    for (var i = 0; i < orders.length; i++) {
+                                        var status = orders[i].status;
+                                        var sta;
+                                        if(status == "wait_pay"){
+                                            sta = "待付款";
+                                        }else if (status == "success"){
+                                            sta = "成功";
+                                        }else if (status == "fail"){
+                                            sta = "失败";
+                                        }
+                                        var oper_status = orders[i].oper_status;
+                                        var oper;
+                                        if(oper_status == "init"){
+                                            oper = "初始状态";
+                                        }else if (oper_status == "send"){
+                                            oper = "已发送支付平台 ";
+                                        }else if (oper_status == "finish"){
+                                            oper = "处理完成";
+                                        }
+                                        var order_id = orders[i].order_id;
+                                        order_id = order_id.substring(14,20);
+                                        $(".btm_biaodan table").append(
+                                            `<tr class="test">
+											   <td>${i+1}</td>
+											   <td>${order_id}</td>
+											   <td>${orders[i].phone}</td>
+											   <td>${orders[i].cus_name}</td>
+											   <td>${orders[i].bank_card}</td>
+											   <td>${orders[i].bank_name}</td>
+											   <td>${orders[i].total_amt}</td>
+											   <td>${orders[i].dicount_amt}</td>
+											   <td>${orders[i].stime}</td>
+											   <td>${orders[i].etime}</td>
+											   <td>${sta}</td>
+											   <td>${oper}</td>
+											   <td id="check">
+													<input type="checkbox" name="orders" value=${orders[i].order_id}>
+											   </td>
+											</tr>`);
+                                    }
+                                }
+                            },
+                            error:function (req, errorMsg, exception) {
+                                alert(errorMsg);
+                            }
+                        });
+							$('#pageNo span').html(pageNo);
+							$('#nowPage span').html(index);
+                        	$('#pageNum').val(index);
+							$("#total1 span").html(total_total_amt);
+							$("#total2 span").html(total_discount_amt);
+							$("#total3 span").html(sum);
+                    }
+                });
+			};
+		});
+	</script>
+</html>

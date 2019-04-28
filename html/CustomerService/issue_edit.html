@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="renderer" content="webkit">
+    <title>疑难问题修改</title>
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/mine.css" />
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+
+    <style>
+        .class-button {
+            width: 44px;
+            height: 25px;
+            border-radius: 3px;
+            background-color: #f2f2f4;
+            color: #000;
+        }
+
+        .detail {
+            position: fixed;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            left: 30%;
+            background: #fff;
+            top: 15%;
+            border: 3px solid #00AAEE;
+            padding: 40px 35px 40px 20px;
+        }
+
+        .detail a.close {
+            position: absolute;
+            top: -7px;
+            right: 0px;
+            color: red;
+            font-size: 24px;
+        }
+
+        .deInfo {
+            padding: 30px;
+        }
+
+         .textarea1{
+            position: absolute;
+            bottom: 320px;
+            left: 47px;
+        }
+
+        .textarea2{
+            position: absolute;
+            bottom: 144px;
+            left: 47px;
+        }
+
+    </style>
+
+    <script>
+        var gloablFaqs;
+        var titelNo = "";
+
+        function queryIssues() {
+
+            var status = $('#status option:selected').val();
+        
+            if (status == null || status == "") {
+                alert("请选择问题状态");
+                return;
+            }
+            $('.test').empty();
+            $.ajax({
+                url: "/operplat/faq/qryFAQ",
+                context: document.body,
+                dataType: 'JSON',
+                data: {
+                    'title_id': $("#titleNo").val(),
+                    'title': $("#title").val(),
+                    'status': status
+                },
+                async: false,
+                success: function (dataJson, dataStatus) {
+                    var retCode = dataJson.retCode;
+                    var retMsg = dataJson.retMsg;
+                    if (retCode != 'success') {
+                        alert(retMsg);
+                        return;
+                    } else {
+                        gloablFaqs = dataJson.faqs;
+                        faqs = dataJson.faqs;
+                        for (var i = 0; i < faqs.length; i++) {
+                            var status = "";
+                            if (faqs[i].status == 'using') status = '启用';
+                            if (faqs[i].status == 'nonuse') status = '停用';
+
+                            $(".btm_biaodan table").append(
+                                "<tr class='test'><td>" + faqs[i].title_id +
+                                "</td><td>" + faqs[i].title +
+                                "</td><td>" + faqs[i].answer +
+                                "</td><td>" + status +
+                                "</td><td>" + faqs[i].ctime +
+                                "</td><td>" + faqs[i].utime +
+                                // "</td><td>" + faqs[i].oper_id +
+                                "</td><td>" + faqs[i].remark +
+                                "</td><td>" +
+                                '<button class="class-button" type="button" onclick="showUpdateItem(' +
+                                i + ')">修改</button>' +
+                                "</td><tr>");
+                        }
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert('出错啦，请稍后再试。');
+                }
+            });
+        }
+
+        function showUpdateItem(index) {
+            var item = gloablFaqs[index];
+            $('.deInfo').show();
+            $('#title2').val(item.title);
+            $('#content2').val(item.answer);
+            // $('#status2 option:selected').val(item.status);
+            $('#remark2').val(item.remark);
+            titelNo = item.title_id;
+        }
+
+        function updateItem() {
+            var titel = $('#title2').val();
+            var content = $('#content2').val();
+            var status = $('#status2 option:selected').val();
+            var remark = $('#remark2').val();
+
+            $.ajax({
+                url: "/operplat/faq/manageFAQ",
+                context: document.body,
+                dataType: 'JSON',
+                data: {
+                    'title_id': titelNo,
+                    'title': titel,
+                    'answer': content,
+                    'status': status,
+                    'remark': remark
+                },
+                async: false,
+                success: function (dataJson, dataStatus) {
+                    var retCode = dataJson.retCode;
+                    var retMsg = dataJson.retMsg;
+                    if (retCode != 'success') {
+                        alert(retMsg);
+                        return;
+                    } else {
+                        $('.detail a.close').parent().hide();
+                        window.location.reload();
+                    }
+                },
+                error: function (req, errorMsg, exception) {
+                    alert('出错啦，请稍后再试。');
+                }
+            });
+        }
+    </script>
+</head>
+
+<body class="info demo">
+
+    <div class="header">
+        <div class="month">
+            <label>
+                问题编号
+                <input type="text" id="titleNo" placeholder="请输入" style="margin-left: 10px;" />
+            </label>
+            <label class="ml15">
+                标题
+                <input type="text" id="title" placeholder="请输入" style="margin-left: 10px;" />
+            </label>
+            <label class="ml15">
+                状态
+                <select name="" id="status">
+                    <!-- <option value="">全部</option> -->
+                    <option value="using">启用</option>
+                    <option value="nonuse">停用</option>
+                </select>
+            </label>
+            <button class="btn ml15" id="search" onclick="queryIssues()">搜索</button>
+        </div>
+    </div>
+
+    <div class="content btm_biaodan">
+        <table border="1" cellspacing="" cellpadding="">
+            <tr>
+                <th>编号</th>
+                <th>标题</th>
+                <th>内容</th>
+                <th>状态</th>
+                <th>创建时间</th>
+                <th>修改时间</th>
+                <!-- <th>创建人</th> -->
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+        </table>
+
+    </div>
+
+    <!--详细信息-->
+    <div class="detail deInfo hide" style="height: 400px;overflow-y: scroll;">
+        <a class="close" href="javascript:;">×</a>
+        <div class="month">
+            <label class="ml15">
+                标题:
+                <input id="title2" style="margin-left: 10px;border:#e3e3e3 solid 1px;padding: 1px 3px"></input>
+            </label>
+        </div>
+
+        <div class="month">
+            <label class="ml15">
+                <span class= "textarea1" >内容：</span>
+                <textarea id="content2" style="height:100px; border:1px solid #ddd;margin-top: 30px;margin-left: 42px;"></textarea>
+            </label>
+        </div>
+
+        <div class="month">
+            <label class="ml15">
+                状态:
+                <select id="status2" style="margin-left: 10px;margin-top: 10px ">
+                    <option value="using"> 启用</option>
+                    <option value="nonuse"> 停用</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="month">
+            <label class="ml15">
+                <span class= "textarea2">备注：</span>
+                <textarea id="remark2" style="height:100px; border:1px solid #ddd;margin-top: 30px;margin-left: 42px;"></textarea>
+            </label>
+        </div>
+
+        <div style="display: flex;align-items: center;justify-content: center;margin-top: 40px">
+            <button class="btn ml15" id="update" onclick="updateItem()">修改</button>
+        </div>
+    </div>
+
+</body>
+
+<script>
+    $('.detail a.close').click(function () {
+        $(this).parent().hide();
+        console.log("12313455");
+    });
+</script>
+
+</html>

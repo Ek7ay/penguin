@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>充值路由新增</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	</head>
+	<body>
+		<div id="form-box">
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>编码:</td>
+						<td>
+							<input placeholder="必输项" id="route_code" name="route_code"/>
+						</td>
+					</tr>
+					<tr>
+						<td>名称:</td>
+						<td>
+							<input placeholder="必输项" id="route_name" name="route_name"/>
+						</td>
+					</tr>
+					<tr>
+						<td>渠道编码:</td>
+						<td>
+							<input placeholder="必输项" id="chan_code" name="chan_code"/>
+						</td>
+					</tr>
+					<tr>
+						<td>类型:</td>
+						<td>
+							<select name="type">
+								<option value="oil">油卡</option>
+								<option value="tel">话费</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>状态:</td>
+						<td>
+							<select name="status">
+								<option value="useable">可用</option>
+								<option value="unuseable">不可用</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>备注:</td>
+						<td>
+							<textarea name="remark"></textarea>
+						</td>
+					</tr>
+				</table>
+				<button type="button" class="btn-submit" id="submit">提交</button>
+			</form>
+		</div>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+            $("#submit").on("click",()=>{
+                var route_code = $("#route_code").val();
+                if(route_code == ''){
+                    alert('编码不能为空');
+                    return;
+                }
+                var route_name = $("#route_name").val();
+                if(route_name == ''){
+                    alert('名称不能为空');
+                    return;
+                }
+                var chan_code = $("#chan_code").val();
+                if(chan_code == ''){
+                    alert('渠道编码不能为空');
+                    return;
+                }
+                var formData = new FormData($("#upload")[0]);
+                $.ajax({
+                    url:"/operplat/route/add",
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success:function (dataJson,dataStatus) {
+                        if ("success" != dataJson.retCode){
+                            alert(dataJson.retMsg);
+                        }else {
+                            console.log(dataJson);
+                            alert(dataJson.retMsg);
+                            console.log(dataJson.retMsg);
+                            window.location.reload();
+                        }
+                    },
+                    error:function (req, errorMsg, exception) {
+                        alert(errorMsg);
+                    }
+                });
+            });
+		</script>
+	</body>
+</html>

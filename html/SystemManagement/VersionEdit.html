@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="renderer" content="webkit">
+	<title>版本修改</title>
+	<link rel="stylesheet" href="../../css/reset.css" />
+	<link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+	<style>
+		#albox{
+			border: 1px solid #00b7ee;
+			width: 300px;
+			height: 300px;
+			background-color: #ffffff;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			-webkit-transform: translate(-50%, -50%);
+			-moz-transform: translate(-50%, -50%);
+			-ms-transform: translate(-50%, -50%);
+			-o-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+		}
+		#albox span{
+			color: red;
+			font-size: 26px;
+			position: relative;
+			left: 270px;
+			cursor: pointer;
+		}
+		#albox form table tr{
+			line-height: 50px;
+			font-size: 14px;
+		}
+		#albox form table tr td:first-child{
+			text-align: right;
+		}
+		#albox form table tr td input{
+			width: 150px;
+			height: 25px;
+			border-radius: 3px;
+			border: 1px solid cadetblue;
+		}
+		#albox form table tr td textarea{
+			width: 150px;
+			height: 100px;
+			border-radius: 3px;
+			border: 1px solid cadetblue;
+		}
+		#albox button{
+			width: 55px;
+			height: 25px;
+			border: none;
+			border-radius: 3px;
+			background-color: cadetblue;
+			color: #FFFFFF;
+			margin-top: 100px;
+			margin-left: 65px;
+		}
+		#Editbtn{
+			width: 40px;
+			height: 20px;
+			border: none;
+			border-radius: 3px;
+			background-color: cadetblue;
+			color: #FFFFFF;
+		}
+		#tex1{
+			position: relative;
+			top: 24px;
+		}
+		#tex2{
+			position: absolute;
+		}
+	</style>
+</head>
+<body class="info demo" >
+	<div id="app">
+		<div class="header">
+			<div class="month">
+				<label>
+					开始日期
+					<input
+							type="text"
+							id="sdate"
+							autocomplete="off"
+							style="margin-left: 10px;"
+							ref="sdate"
+					/>
+				</label>
+				<label class="ml15">
+					结束日期
+					<input
+							type="text"
+							id="edate"
+							autocomplete="off"
+							style="margin-left: 10px;"
+							ref="edate"
+					/>
+				</label>
+				<button
+						class="btn ml15"
+						@click="search"
+				>搜索</button>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>版本号</th>
+					<th>上线时间</th>
+					<th>版本内容</th>
+					<th>操作</th>
+				</tr>
+				<tr v-for="(item,index) in versions">
+					<td>{{index+1}}</td>
+					<td>{{item.version_id}}</td>
+					<td>{{item.time}}</td>
+					<td>{{item.version_value}}</td>
+					<td><button
+							type="button"
+							@click="Edit(index)"
+							id="Editbtn"
+					>修改</button></td>
+				</tr>
+			</table>
+		</div>
+		<div id="albox" v-show="albox">
+			<div>
+				<span @click="hide">×</span>
+			</div>
+			<form
+				enctype="multipart/form-data"
+				ref="upload"
+			>
+				<table>
+					<tr>
+						<td>版本号：</td>
+						<td>
+							<input
+								type="text"
+								name="version_id"
+								v-model="version_id"
+								readonly="readonly"
+							>
+						</td>
+					</tr>
+					<tr>
+						<td id="tex1">版本内容：</td>
+						<td>
+							<textarea
+								name="version_value"
+								id="tex2"
+								v-model="version_value"
+							></textarea>
+						</td>
+					</tr>
+				</table>
+			</form>
+			<button
+				type="button"
+				@click="submit"
+			>确认</button>
+			<button
+				type="button"
+				@click="hide"
+			>取消</button>
+		</div>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script src="../../js/vue.js"></script>
+<script>
+	// 执行日期插件实例
+	$(() => {
+		laydate.render({
+			elem: '#sdate'
+		});
+		laydate.render({
+			elem: '#edate'
+		});
+	});
+	// 执行VUE实例
+	new Vue({
+		el: "#app",
+		data() {
+			return{
+				versions: [],
+				albox: false,
+				version_id: "",
+				version_value: ""
+			}
+		},
+		mounted() {
+			this.query();
+		},
+		methods: {
+			search() {
+				this.query();
+			},
+			hide() {
+				this.albox = false;
+			},
+			query() {
+				var sdate = this.$refs.sdate.value;
+				var edate = this.$refs.edate.value;
+				$.ajax({
+					url: "/operplat/version/query",
+					context: document.body,
+					dataType: 'JSON',
+					async: false,
+					data: {'sdate': sdate, 'edate': edate},
+					success: (dataJson, dataStatus) => {
+						if (dataJson.retCode != 'success') {
+							this.versions = [];
+							alert(dataJson.retMsg);
+						} else {
+							this.versions = dataJson.versions;
+						}
+					},
+					error: function (req, errorMsg, exception) {
+						alert(dataJson.retMsg);
+					}
+				});
+			},
+			Edit(data) {
+				this.version_id = this.versions[data].version_id;
+				this.version_value = this.versions[data].version_value;
+				this.albox = true;
+			},
+			submit(){
+				var formData = new FormData(this.$refs.upload);
+				$.ajax({
+					url:"/operplat/version/modify",
+					type: 'POST',
+					data: formData,
+					async: false,
+					cache: false,
+					contentType: false,
+					processData: false,
+					success: (dataJson,dataStatus) => {
+						if ("success" != dataJson.retCode){
+							alert(dataJson.retMsg);
+						}else {
+							this.hide();
+							this.query();
+							alert(dataJson.retMsg);
+						}
+					},
+					error:function (req, errorMsg, exception) {
+						alert(errorMsg);
+					}
+				});
+			}
+		}
+	});
+</script>
+</html>

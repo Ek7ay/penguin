@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>充值路由修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			.class-table{
+				width: 375px;
+				height: 518px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 310px;
+				left: 101px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table tr td textarea{
+				border-radius: 3px;
+			}
+			.class-table form table tr:last-child td{
+				padding:10px 0px;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+			.class-table form table tr td.author .author_list{
+				display: flex;
+				flex-direction: column;
+				width: 151px;
+				height: 300px;
+				overflow-y: scroll;
+				border: 1px solid #958888;
+				border-radius: 5px;
+			}
+			.class-table form table tr td.author .author_list label{
+				margin-top: 5px;
+				text-align: right;
+			}
+			.class-table form table tr td.author .author_list label input{
+				position: relative;
+				margin-right: 5px;
+				top: 3px;
+				width: 15px;
+				height: 15px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<!--<div class="header">-->
+			<!--<div class="month" id="lable">-->
+				<!--<lable for="route_code">编码：</lable>-->
+				<!--<input type="text" id="route_code" placeholder="请输入">-->
+				<!--<lable for="route_name">名称：</lable>-->
+				<!--<input type="text" id="route_name" placeholder="请输入">-->
+				<!--<lable for="type" class="class-lable">类型：</lable>-->
+					<!--<select id="type">-->
+						<!--<option value="">全部</option>-->
+						<!--<option value="oil">油卡</option>-->
+						<!--<option value="tel">话费</option>-->
+					<!--</select>-->
+				<!--<lable for="status" class="class-lable">状态：</lable>-->
+				<!--<select id="status">-->
+					<!--<option value="">全部</option>-->
+					<!--<option value="useable">可用</option>-->
+					<!--<option value="unuseable">不可用</option>-->
+				<!--</select>-->
+				<!--<lable for="ctime">创建时间：</lable>-->
+				<!--<input type="text" id="ctime" placeholder="请输入">-->
+				<!--<button class="btn class-lable" id="search">搜索</button>-->
+			<!--</div>-->
+		<!--</div>-->
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>创建序号</th>
+					<th>编码</th>
+					<th>名称</th>
+					<th>渠道编码</th>
+					<th>级别</th>
+					<th>类型</th>
+					<th>状态</th>
+					<th>创建时间</th>
+					<th>操作</th>
+				</tr>
+				<!--<tr>-->
+					<!--<th>1</th>-->
+					<!--<th>asfas</th>-->
+					<!--<th>sadf</th>-->
+					<!--<th>1</th>-->
+					<!--<th>safds</th>-->
+					<!--<th>asfas</th>-->
+					<!--<th>sadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>dsafsadf</th>-->
+					<!--<th>-->
+						<!--<button type="button" class="class_button open" >修改</button>-->
+					<!--</th>-->
+				<!--</tr>-->
+			</table>
+		</div>
+		<!--修改表单-->
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>序号：</td>
+						<td>
+							<input readonly="readonly" type="text" id="pid" name="pid">
+						</td>
+					</tr>
+					<tr>
+						<td>编码：</td>
+						<td>
+							<input type="text" id="route_code2" name="route_code">
+						</td>
+					</tr>
+					<tr>
+						<td>名称：</td>
+						<td>
+							<input type="text" id="route_name2" name="route_name">
+						</td>
+					</tr>
+					<tr>
+						<td>渠道编码：</td>
+						<td>
+							<input type="text" id="chan_code" name="chan_code">
+						</td>
+					</tr>
+					<tr>
+						<td>级别：</td>
+						<td>
+							<input type="text" id="level" name="level">
+						</td>
+					</tr>
+					<tr>
+						<td>类型：</td>
+						<td>
+							<select id="type2" name="type">
+								<option value="oil_zsy">中石油油卡</option>
+								<option value="oil_zsh">中石化油卡</option>
+								<option value="tel">话费</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>状态：</td>
+						<td>
+							<select id="status2" name="status">
+								<option value="useable">可用</option>
+								<option value="unuseable">不可用</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td id="beizhu">备注：</td>
+						<td>
+							<textarea id="remark" name="remark" rows="-8" cols="16"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/laydate.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 执行日期插件实例
+		$(()=>{
+            lay('#version').html('-v' + laydate.v);
+            laydate.render({
+                elem: '#ctime'
+                // ,type: 'datetime'
+            });
+		});
+        // 修改界面的显示和隐藏
+        $(()=>{
+            $(".class-table").hide();
+            $(".open").click(()=>{
+                $(".class-table").show();
+            });
+            $(".shut").click(()=>{
+                $(".class-table").hide();
+            });
+        });
+        var routes;
+		// 声明查询函数
+        function query() {
+            var route_code = $("#route_code").val();
+            var route_name = $("#route_name").val();
+            var type = $("#type option:selected").val();
+            var status = $("#status option:selected").val();
+            var ctime = $("#ctime").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/route/query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"route_code":route_code,"route_name":route_name,"type":type,"status":status,"use_type":ctime},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        routes = dataJson.routes;
+                        for (var i = 0; i < routes.length; i++) {
+                            var cardtype = routes[i].type;
+                            var type;
+                            if(cardtype == "oil_zsh"){
+                                type = "中石化油卡";
+                            }else if (cardtype == "tel"){
+                                type = "话费";
+                            }else if (cardtype == "oil_zsy"){
+                                type = "中石油油卡";
+                            }
+                            var status = routes[i].status;
+                            var sta;
+                            if(status == "useable"){
+                                sta = "可用";
+                            }else if (status == "unuseable"){
+                                sta = "不可用";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${routes[i].pid}</td>
+										   <td>${routes[i].route_code}</td>
+										   <td>${routes[i].route_name}</td>
+										   <td>${routes[i].chan_code}</td>
+										   <td>${routes[i].level}</td>
+										   <td>${type}</td>
+										   <td>${sta}</td>
+										   <td>${routes[i].ctime}</td>
+										   <td>
+												<button type="button" onclick="editMsg( ${i} )">修改</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+		$(()=>{query();})
+        // 分类查询
+		$("#search").click(()=>{query();});
+        // 获取修改内容
+        function editMsg(i){
+            $("#pid").val(routes[i].pid);
+            $("#route_code2").val(routes[i].route_code);
+            $("#route_name2").val(routes[i].route_name);
+            $("#chan_code").val(routes[i].chan_code);
+            $("#level").val(routes[i].level);
+            $("#type2").val(routes[i].type);
+            $("#status2").val(routes[i].status);
+            $("#remark").val(routes[i].remark);
+            $('.class-table').show();
+        };
+        // 编辑结果提交
+        function submitEdit() {
+            var formData = new FormData($( "#upload" )[0]);
+            $.ajax({
+                url:"/operplat/route/modify",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    }else{
+                        alert(dataJson.retMsg);
+                        $(".class-table").hide();
+                        // window.location.reload();
+                        query();
+                    }
+                },
+                error: function(req,errorMsg,exception){
+                    alert("出错啦");
+                }
+            });
+        };
+	</script>
+</html>

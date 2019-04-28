@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>参数新增</title>
+    <link rel="stylesheet" href="../../css/TRconner/style.css">
+    <style>
+        .total{height: 30px; line-height: 30px; margin-right: 40px; display: flex; align-items: center; font-size: 15px; font-weight: bold;}
+        .total span{  color: #000; font-size: 15px; padding: 10px ; display: block; text-align: center; font-weight: normal; line-height: 25px;	}
+    </style>
+</head>
+<body class="add">
+<form id="upload" enctype="multipart/form-data">
+    <label><span>参数名称：</span><input type="text" placeholder="必输项" name="paraname" id="para_name"/></label>
+    <label><span>参数编号：</span><input type="text" placeholder="必输项" name="paracode" id="para_code"/></label>
+    <label><span>参数固定值：</span><input type="text" placeholder="必输项" name="paraval" id="para_val"/></label>
+    <label><span>参数最小值：</span><input type="text" placeholder="请输入" name="minval" id="min_val"/></label>
+    <label><span>参数最大值：</span><input type="text" placeholder="请输入" name="maxval" id="max_val"/></label>
+    <label>
+        参数生效日期
+        <input type="text" name="effdate" id="s_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+    </label>
+    <label>
+        参数失效日期
+        <input type="text" name="expdate" id="e_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+    </label>
+    <label><span class="textarea">备注：</span><textarea name="remark"  placeholder="请输入" ></textarea></label>
+    <button type="button" class="btn-submit" id="submit">提交</button>
+</form>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/laydate.js"></script>
+<script>
+
+    lay('#version').html('-v'+ laydate.v);
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#s_date' //指定元素
+    });
+    lay('#version').html('-v'+ laydate.v);
+    //执行一个laydate实例
+    laydate.render({
+        elem: '#e_date' //指定元素
+    });
+    $("#submit").on("click", () => {
+        var para_name = $("#para_name").val();
+        if (para_name == '') {
+            alert('参数名称不能为空');
+            return;
+        }
+        var para_code = $("#para_code").val();
+        if (para_code == '') {
+            alert('参数编号不能为空');
+            return;
+        }
+        var para_val = $("#para_val").val();
+        if (para_val == '') {
+            alert('参数固定值不能为空');
+            return;
+        }
+
+        var formData = new FormData($("#upload")[0]);
+        $.ajax({
+            url: "/operplat/param/add",
+            type: 'POST',
+            data: formData,
+            async: false,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    console.log(dataJson);
+                    alert(dataJson.retMsg);
+                    console.log(dataJson.retMsg);
+                    window.location.reload();
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+    });
+</script>
+</body>
+</html>

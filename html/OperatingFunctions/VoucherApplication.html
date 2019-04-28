@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	  <meta charset="UTF-8">
+	  <title>兑换码生成申请</title>
+	  <link rel="stylesheet" href="../../css/TRconner/style.css">
+	  <link rel="stylesheet" href="../../css/TRconner/Role-Add.css">
+	  <style>
+		  #form-box{
+			  height: 335px;
+		  }
+		  #form-box h2{
+			  margin-left: 120px;
+		  }
+		  .bg-box{
+			  margin-left: 45px;
+		  }
+		  .bg-box table{
+			  font-size: 14px;
+			  border-collapse:collapse;
+			  border-top: 1px solid rgba(113, 158, 153, 0.82);
+			  border-left: 1px solid rgba(113, 158, 153, 0.82);
+			  background-color: #5b6b5b;
+		  }
+		  .bg-box input{
+			  width: 80px;
+			  height: 20px;
+			  outline: none;
+		  }
+		  .bg-box button{
+			  border: none;
+			  border-radius: 2px;
+			  color: white;
+			  background-color: #729892;
+			  outline: none;
+			  width: 54px;
+			  height: 22px;
+			  font-size: 12px;
+		  }
+		  .bg-box table tr th{
+			  color: whitesmoke;
+		  }
+		  .bg-box table tr td,.bg-box table tr th{
+			  border-bottom: 1px solid rgba(113, 158, 153, 0.82);
+			  border-right: 1px solid rgba(113, 158, 153, 0.82);
+			  width: 84px;
+			  height: 25px;
+			  text-align: center;
+		  }
+		  .sum{
+			  margin-left: 43px;
+			  margin-top: 15px;
+			  font-size: 14px;
+		  }
+		  #add{margin-top: 2px}
+		  #submit{ padding: 2px 50px; margin-top: 20px; background-color: #729892; color: #FFFFFF; font-size: 14px; border-radius: 5px;outline: none;}
+	  </style>
+	</head>
+	<body>
+		<div id="form-box">
+			<h2>兑换码生成申请单</h2>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>公司名称:</td>
+						<td>
+							<select name="cpid"></select>
+						</td>
+					</tr>
+					<tr>
+						<td>券类型:</td>
+						<td>
+							<select name="vouType"></select>
+						</td>
+					</tr>
+					<tr>
+						<td>申请人:</td>
+						<td>
+							<input type="text" readonly="readonly" id="oper_id"/>
+						</td>
+					</tr>
+					<tr>
+						<td>申请人手机号:</td>
+						<td>
+							<input type="text" placeholder="必输项" name="phoneno" oninput="if(value.length>11)value=value.slice(0,11)"
+		                            onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"/>
+						</td>
+					</tr>
+					<tr>
+						<td>邮件发送人:</td>
+						<td>
+							<input type="text" placeholder="输入多个邮件时需用 ， 隔开" name="email"/>
+						</td>
+					</tr>
+				</table>
+			</form>
+		</div>
+
+		<div class="bg-box">
+			<form>
+				<table>
+					<tr>
+						<th>面额</th>
+						<th>数量</th>
+						<th>单面额总数</th>
+						<th>操作</th>
+					</tr>
+					<tr class="change">
+						<td><input class="price" type="text" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"></td>
+						<td><input class="count" type="text" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')"></td>
+						<td><input class="total_amt" readonly="readonly" type="text"></td>
+						<td><button type="button" class="del">删除</button></td>
+					</tr>
+				</table>
+			</form>
+			<button id="add">增加</button>
+		</div>
+		<div class="sum">
+			<span>以上合计总金额为：</span><span id="sum"></span>
+		</div>
+		<button type="button" id="submit">提交</button>
+		<script src="../../js/jquery-1.8.3.min_2.js"></script>
+		<script src="../../js/cookie.js"></script>
+		<script>
+		// 控制表格的增加和减少
+		$(()=>{
+		    $("#add").on("click",()=>{
+		        $(".bg-box table tbody").append(`
+		        <tr class="change">
+						<td><input class="price" type="text" onkeyup="this.value=this.value.replace(/\\D/g,'')" onafterpaste="this.value=this.value.replace(/\\D/g,'')"></td>
+						<td><input class="count" type="text" onkeyup="this.value=this.value.replace(/\\D/g,'')" onafterpaste="this.value=this.value.replace(/\\D/g,'')"></td>
+						<td><input class="total_amt" readonly="readonly" type="text"></td>
+						<td><button type="button" class="del">删除</button></td>
+					</tr>
+		        `)
+			});
+			$(".del").live("click",function () {
+                $(this).parent().parent().remove();
+            })
+		});
+		// 加载公司名称
+		$(()=>{
+            $.ajax({
+                url:"/operplat/company/query",
+                context: document.body,
+                dataType: "JSON",
+				data:{"status":"enabled"},
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var cps = dataJson.cps;
+                        for (var i = 0; i < cps.length; i++){
+                            $("select[name='cpid']").append(`<option value=${cps[i].cpid}>${cps[i].cpname}</option>`)
+						}
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		// 加载券类型
+        $(()=>{
+            $.ajax({
+                url:"/operplat/vou_type/query",
+                context: document.body,
+                dataType: "JSON",
+                data:{"status":"enabled"},
+                async: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        var types = dataJson.types;
+                        for (var i = 0; i < types.length; i++){
+                            $("select[name='vouType']").append(`<option value=${types[i].voutype}>${types[i].type_name}</option>`)
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        });
+        // 获取操作员id
+        $(()=>{
+            var operid = getCookie("oper_id");
+            $("#oper_id").val(operid);
+        });
+        // 表格的数据处理
+		function computed() {
+            var sum = 0;
+            $(".change").each(function (index,el) {
+                var x = $(el).find(".price").val();
+                var y = $(el).find(".count").val();
+                sum += x*y;
+            });
+            $("#sum").html(sum);
+		};
+		$(()=>{
+		    $(".change").live("change",function () {
+				var price = $(this).find(".price").val();
+				var count = $(this).find(".count").val();
+				var total_amt = price*count;
+				$(this).find(".total_amt").val(total_amt);
+				computed();
+            });
+            $(".del").live("click",function () {computed();});
+		});
+		// 提交数据
+		$("#submit").on("click",()=>{
+			var apply_details = [];
+			$(".change").each(function (index, el) {
+				var arr = {
+                    price:  $(el).find(".price").val(),
+                    count:  $(el).find(".count").val(),
+                    total_amt: $(el).find(".total_amt").val()
+				};
+				apply_details.push(arr);
+            });
+            apply_details = JSON.stringify(apply_details);
+            var validation;
+            $(".change").each(function (index, el) {
+			  var price =  $(el).find(".price").val();
+			  if (price == "") {
+			      alert("面额不能为空");
+                  validation = "err";
+				  return;
+              }
+			  var count =  $(el).find(".count").val();
+			  if (count == "") {
+			      alert("数量不能为空");
+                  validation = "err";
+                  return;
+			  }
+            });
+            if (validation == "err") {return;}
+            var cpid = $("select[name='cpid'] option:selected").val();
+            var vouType = $("select[name='vouType'] option:selected").val();
+            var oper_id = $("#oper_id").val();
+            var phoneno = $("input[name='phoneno']").val();
+            if(!(/^1[3456789]\d{9}$/.test(phoneno))){
+                alert("手机号码有误，请重填");
+                return false;
+            }
+            var email = $("input[name='email']").val();
+            if (email == "") {
+                alert("邮件发送人不能为空")
+				return;
+			}
+			var total_amt = $("#sum").html();
+            $.ajax({
+                url:"/operplat/vou/apply",
+                context: document.body,
+                dataType: "JSON",
+                async: true,
+                data:{"cpid":cpid, "vouType":vouType,"oper_id":oper_id,"phoneno":phoneno,"email":email,"apply_details":apply_details,"total_amt":total_amt},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode){
+                        alert(dataJson.retMsg);
+                    }else {
+                        alert(dataJson.retMsg);
+                        window.location.reload();
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+		});
+		</script>
+	</body>
+</html>

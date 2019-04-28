@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<meta name="renderer" content="webkit">
+		<title>商户信息修改</title>
+		<link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+		<link rel="stylesheet" href="../../css/TRconner/mine.css">
+		<style>
+			select{
+				width: 180px;
+				height: 30px;
+				border-radius: 5px;
+				background: #FFFFFF;
+				border: 1px solid #E2E2E2;
+			}
+			.class-table{
+				width: 390px;
+				height: 450px;
+				border: 1px solid grey;
+				position: fixed;
+				top: 15%;
+				left: 35%;
+				padding-top: 25px;
+				background-color: #FFFFFF;
+			}
+			.class-table form table tr{
+				font-size: 15px;
+				line-height: 40px;
+			}
+			.class-table form table tr td:first-child{
+				text-align: right;
+			}
+			.class-table form table tr td input{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table{
+				margin-left: 71px;
+				margin-top: 13px;
+			}
+			#beizhu{
+				position: absolute;
+				top: 227px;
+				left: 116px;
+			}
+			.class-table form table tr td select{
+				width: 150px;
+				height: 30px;
+				border: 1px solid #757f75;
+				border-radius: 3px;
+				box-sizing: border-box;
+			}
+			.class-table form table tr td textarea{
+				border-radius: 3px;
+			}
+			.class-table form table tr:last-child td{
+				padding:10px 0px;
+			}
+			.class_instruction{
+				width: 70px;
+				height: 25px;
+				font-size: 14px;
+				border: none;
+				background-color: #818181;
+				color: white;
+				border-radius: 3px;
+			}
+			.pop-up-button{
+				margin-top: 20px;
+				margin-left: 89px;
+			}
+			.pop-up-button button:last-child{
+				margin-left: 54px;
+			}
+			a.shut{
+				position: absolute;
+				top: -3px;
+				right: 6px;
+				color: red;
+				font-size: 24px;
+			}
+			.class-table form table tr td.author .author_list label{
+				margin-top: 5px;
+				text-align: right;
+			}
+			.class-table form table tr td.author .author_list label input{
+				position: relative;
+				margin-right: 5px;
+				top: 3px;
+				width: 15px;
+				height: 15px;
+			}
+			.btn_ss{
+				width: 75px;
+				height: 25px;
+				border-radius: 3px;
+				color: #ffffff;
+				background-color: #00a0e9;
+			}
+			.btm_biaodan table tr td:last-child{
+				width: 180px;
+			}
+		</style>
+	</head>
+	<body class="info demo">
+		<div class="header">
+			<div class="month" id="lable">
+				<lable for="phoneno">商户注册手机号：</lable>
+				<input type="text" id="phoneno" placeholder="请输入">
+				<lable for="audit_status" class="class-lable">审核状态：</lable>
+					<select id="audit_status">
+						<option value="">全部</option>
+						<option value="wait_audit">等待审核</option>
+						<option value="audit_failed">审核未通过</option>
+						<option value="audit_success">审核通过</option>
+					</select>
+				<lable for="status" class="class-lable">状态：</lable>
+				<select id="status">
+					<option value="">全部</option>
+					<option value="normal">正常</option>
+					<option value="delete">删除</option>
+				</select>
+				<button class="btn class-lable" id="search">搜索</button><br>
+			</div>
+		</div>
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>顺序号</th>
+					<th>客户号</th>
+					<th>商户注册手机号</th>
+					<th>审核状态</th>
+					<th>状态</th>
+					<th>创建时间</th>
+					<th>更新时间</th>
+					<th>证件号码</th>
+					<th>操作</th>
+				</tr>
+			</table>
+		</div>
+		<!--修改表单-->
+		<div class="class-table">
+			<a class="shut" href="javascript:;">×</a>
+			<form id="upload" enctype="multipart/form-data">
+				<table>
+					<tr>
+						<td>客户号：</td>
+						<td>
+							<input readonly="readonly" type="text" id="cusid" name="cusid">
+						</td>
+					</tr>
+					<tr>
+						<td>当前额度：</td>
+						<td>
+							<input type="text" readonly="readonly" id="quota" name="quota">
+						</td>
+					</tr>
+					<tr>
+						<td>要增加额度：</td>
+						<td>
+							<input type="text" id="add_quota" name="add_quota" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')">
+						</td>
+					</tr>
+					<tr>
+						<td>服务费抽成：</td>
+						<td>
+							<input type="text" id="service_amt" name="service_amt">
+						</td>
+					</tr>
+					<tr>
+						<td>创建时间：</td>
+						<td>
+							<input readonly="readonly" type="text" id="ctime">
+						</td>
+					</tr>
+					<tr>
+						<td id="beizhu">备注：</td>
+						<td>
+							<textarea readonly="readonly" id="remark" rows="-8" cols="16"></textarea>
+						</td>
+					</tr>
+				</table>
+				<div class="pop-up-button">
+					<button type="button" class="class_instruction" onclick="submitEdit()">确定</button>
+					<button class="class_instruction shut">取消</button>
+				</div>
+			</form>
+		</div>
+	</body>
+	<script src="../../js/jquery-1.8.3.min_2.js"></script>
+	<script src="../../js/cookie.js"></script>
+	<script>
+        // 修改界面的显示和隐藏
+        $(()=>{
+            $(".class-table").hide();
+            $(".open").click(()=>{
+                $(".class-table").show();
+            });
+            $(".shut").click(()=>{
+                $(".class-table").hide();
+            });
+        });
+        // 声明全局变量
+        var merchants;
+		// 声明查询函数
+        function query() {
+            var phoneno = $("#phoneno").val();
+            var audit_status = $("#audit_status option:selected").val();
+            var status = $("#status option:selected").val();
+            $('.test').empty();
+            $.ajax({
+                url:"/operplat/trading_new/merchant_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+				data:{"phoneno":phoneno, "audit_status":audit_status,"status":status},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+						merchants = dataJson.merchants;
+                        for (var i = 0; i < merchants.length; i++) {
+                            var audit_status = merchants[i].audit_status;
+                            var lol;
+                            if(audit_status == "wait_audit"){
+                                lol = "等待审核";
+                            }else if (audit_status == "audit_failed"){
+                                lol = "审核未通过";
+                            }else if (audit_status == "audit_success"){
+                                lol = "审核通过";
+                            }
+                            var status = merchants[i].status;
+                            var sta;
+                            if(status == "normal"){
+                                sta = "正常";
+                            }else if (status == "delete"){
+                                sta = "删除";
+                            }
+                            $(".btm_biaodan table").append(
+                                `<tr class="test">
+										   <td>${i+1}</td>
+										   <td>${merchants[i].cusid}</td>
+										   <td>${merchants[i].phoneno}</td>
+										   <td>${lol}</td>
+										   <td>${sta}</td>
+										   <td>${merchants[i].ctime}</td>
+										   <td>${merchants[i].mtime}</td>
+										   <td>${merchants[i].cert_no}</td>
+										   <td>
+												<button type="button" class="btn_ss" onclick="editMsg( ${i} )">额度修改</button>
+												<button type="button" class="btn_ss" onclick="chan( ${i} )">历史查询</button>
+										   </td>
+										</tr>`);
+                        }
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        }
+		// load查询
+        $(()=>{query();});
+		// 分类查询
+		$("#search").click(()=>{query();});
+        // 获取修改内容
+        function editMsg(i){
+            var cusid = merchants[i].cusid;
+            $.ajax({
+                url:"/operplat/trading_new/merchant_quota_query",
+                context: document.body,
+                dataType: "JSON",
+                async: false,
+                data:{"cusid":cusid},
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    } else {
+                        $("#cusid").val(dataJson.cusid);
+                        $("#quota").val(dataJson.quota);
+                        $("#add_quota").val("");
+                        $("#service_amt").val(dataJson.service_amt);
+                        $("#ctime").val(dataJson.ctime);
+                        $("#remark").val(dataJson.remark);
+                        $('.class-table').show();
+                    }
+                },
+                error:function (req, errorMsg, exception) {
+                    alert(errorMsg);
+                }
+            });
+        };
+        // 编辑结果提交
+        function submitEdit() {
+            var formData = new FormData($( "#upload" )[0]);
+            $.ajax({
+                url:"/operplat/trading_new/merchant_quota_modify",
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success:function (dataJson,dataStatus) {
+                    if ("success" != dataJson.retCode) {
+                        alert(dataJson.retMsg);
+                    }else{
+                        alert(dataJson.retMsg);
+                        $(".class-table").hide();
+                        query();
+                    }
+                },
+                error: function(req,errorMsg,exception){
+                    alert("出错啦");
+                }
+            });
+        };
+        // 跳转到商户额度变动记录查询
+		function chan(i) {
+            var cusid = merchants[i].cusid;
+            window.location.replace('./AmountChange_Inquire.html?cusid='+cusid);
+        }
+	</script>
+</html>

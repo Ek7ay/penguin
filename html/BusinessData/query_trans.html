@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="renderer" content="webkit">
+	<title>交易流水查询</title>
+	<link rel="stylesheet" href="../../css/reset.css" />
+	<link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+	<style>
+		.total {
+			height: 30px;
+			line-height: 30px;
+			margin-right: 40px;
+			display: flex;
+			align-items: center;
+			font-size: 15px;
+			font-weight: bold;
+		}
+
+		.total span {
+			color: #000;
+			font-size: 15px;
+			padding: 10px;
+			display: block;
+			text-align: center;
+			font-weight: normal;
+			line-height: 25px;
+		}
+	</style>
+</head>
+
+<body class="info demo">
+	<div class="header">
+		<div class="month">
+			<label>
+				开始日期
+				<input type="text" id="s_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+			</label>
+			<label class="ml15">
+				结束日期
+				<input type="text" id="e_date" autocomplete="off" placeholder="请输入" style="margin-left: 10px;" />
+			</label>
+			<label class="ml15">
+				状态
+				<select name="" id="transtatus">
+					<option value="">全部</option>
+					<option value="00">成功</option>
+					<option value="01">失败</option>
+					<option value="03">处理中</option>
+				</select>
+			</label>
+
+			<label class="ml15">
+				充值渠道
+				<select name="" id="rechType">
+				</select>
+			</label>
+
+			<label class="ml15">
+				账户类型
+				<select name="" id="acctType">
+				</select>
+			</label>
+			<button class="btn ml15" id="search">搜索</button>
+			<label class="fr total">总金额：
+				<span id="totalAmt"></span>
+			</label>
+		</div>
+	</div>
+	<div class="content btm_biaodan">
+		<table border="1" cellspacing="" cellpadding="">
+			<tr>
+				<th>序号</th>
+				<th>手机号</th>
+				<th>流水号</th>
+				<th>交易时间</th>
+				<th>交易金额</th>
+				<th>交易类型</th>
+				<th>交易状态</th>
+
+				<th>充值渠道</th>
+				<th>账户类型</th>
+				<th>扣款金额</th>
+			</tr>
+		</table>
+
+	</div>
+
+	<div style="float: right; padding: 10px">
+
+		<button id="lastPage" style="padding: 3px 8px;">上一页</button>
+		<button id="nextPage" style="padding: 3px 8px;">下一页</button>
+
+		<!-- <button id="load" style="margin-left: 20px;padding: 3px 8px;">下载</button> -->
+		<a href=" " id="load" style="margin-left: 20px;padding: 3px 8px;">下载</a>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/laydate.js"></script>
+<script src="../../js/cookie.js"></script>
+<script src="../../js/platformName.js"></script>
+<script>
+	lay('#version').html('-v' + laydate.v);
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#s_date' //指定元素
+	});
+	lay('#version').html('-v' + laydate.v);
+	//执行一个laydate实例
+	laydate.render({
+		elem: '#e_date' //指定元素
+	});
+
+	var flag = true;
+	var page = 0;
+	$('#lastPage').click(function () {
+		if (page > 0) {
+			page--;
+			query();
+		}
+	});
+
+	$('#nextPage').click(function () {
+		if (flag) {
+			page++;
+			query();
+		}
+
+	});
+
+	$('#load').click(function () {
+		var s_date = $('#s_date').val();
+		var e_date = $('#e_date').val();
+		if (s_date == '') {
+			alert('请输入起始日期');
+			return;
+		}
+		if (e_date == '') {
+			alert('请输入截止日期');
+			return;
+		}
+
+		var transtatus = $('#transtatus option:selected').val();
+		var acctType = $('#acctType option:selected').val();
+		var rechType = $('#rechType option:selected').val();
+
+		$(this).attr('href', '/operplat/stat/query_trans_download?s_date=' + s_date + '&e_date=' + e_date +
+			"&transtatus=" + transtatus + "&channel=" + rechType + "&acct_type=" + acctType);
+	});
+
+	$('#search').click(function () {
+		page = 0;
+		query();
+	});
+
+	$(function () {
+		$.ajax({
+			url: "/operplat/supply/query",
+			context: document.body,
+			dataType: 'JSON',
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					alert(retMsg);
+					return;
+				} else {
+
+					var htmlStr = '<option value="">全部</option>';
+					var types = dataJson.chans;
+					for (var i = 0; i < types.length; i++) {
+						htmlStr += '<option value=' + types[i].chan_code + '>' + types[i].chan_name + '</option>';
+					}
+					$("#rechType").html(htmlStr);
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	})
+
+	$(function () {
+		$.ajax({
+			url: "/operplat/acct_type/query",
+			context: document.body,
+			dataType: 'JSON',
+			data: {
+				'status': "enabled"
+			},
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					alert(retMsg);
+					return;
+				} else {
+
+					var htmlStr = '<option value="">全部</option>';
+					var types = dataJson.types;
+					for (var i = 0; i < types.length; i++) {
+						htmlStr += '<option value=' + types[i].acct_type + '>' + types[i].type_name + '</option>';
+					}
+					$("#acctType").html(htmlStr);
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	})
+
+	function query() {
+		var s_date = $('#s_date').val();
+		var e_date = $('#e_date').val();
+		if (s_date == '') {
+			alert('请输入起始日期');
+			return;
+		}
+		if (e_date == '') {
+			alert('请输入截止日期');
+			return;
+		}
+		querytrans(s_date, e_date);
+	}
+
+	function querytrans(s_date, e_date) {
+		var transtatus = $('#transtatus option:selected').val();
+		var acctType = $('#acctType option:selected').val();
+		var rechType = $('#rechType option:selected').val();
+		$('.test').empty();
+		$.ajax({
+			url: "/operplat/stat/query_trans",
+			context: document.body,
+			dataType: 'JSON',
+			data: {
+				's_date': s_date,
+				'e_date': e_date,
+				'transtatus': transtatus,
+				'page_count': '20',
+				'channel': rechType,
+				'acct_type': acctType,
+				'page_num': page
+			},
+			async: false,
+			success: function (dataJson, dataStatus) {
+				var retCode = dataJson.retCode;
+				var retMsg = dataJson.retMsg;
+				if (retCode != 'success') {
+					alert(retMsg);
+					return;
+				} else {
+					var trans = dataJson.trans;
+					console.log(trans);
+					var pageNo = dataJson.pageNo;
+					if (page < pageNo - 1) {
+						flag = true;
+					} else {
+						flag = false;
+					}
+
+					$('#totalAmt').html(dataJson.total_amt);
+					for (var i = 0; i < trans.length; i++) {
+						var tran_type = "";
+						var transtatus = "";
+						if (trans[i].transtatus == '00') transtatus = '成功';
+						if (trans[i].transtatus == '01') transtatus = '失败';
+						if (trans[i].transtatus == '03') transtatus = '处理中';
+
+						if (trans[i].tran_type == '001') tran_type = '中石化油卡充值';
+						if (trans[i].tran_type == '002') tran_type = '中石油油卡充值';
+						if (trans[i].tran_type == '003') tran_type = '话费充值';
+						if (trans[i].tran_type == '004') tran_type = '中石化油卡购买';
+						if (trans[i].tran_type == '005') tran_type = '中石油油卡购买';
+						if (trans[i].tran_type == '006') tran_type = '预留';
+						if (trans[i].tran_type == '007') tran_type = 'ETCP停车券';
+						if (trans[i].tran_type == '008') tran_type = otherBean+'回购';
+						if (trans[i].tran_type == '009') tran_type = '洗车服务';
+						if (trans[i].tran_type == '010') tran_type = '违章代缴';
+						if (trans[i].tran_type == '011') tran_type = '消费券';
+						if (trans[i].tran_type == '012') tran_type = '客户洗车券交易';
+						if (trans[i].tran_type == '013') tran_type = '违章查询';
+                        if (trans[i].tran_type == '014') tran_type = otherBean+'转让';
+                        if (trans[i].tran_type == '015') tran_type = '油卡批量采购，中石化';
+						if (trans[i].tran_type == '016') tran_type = '油卡批量采购，中石油';
+                        if (trans[i].tran_type == '017') tran_type =  projectName+'健康';
+                        if (trans[i].tran_type == '018') tran_type = '出险查询';
+                        if (trans[i].tran_type == '019') tran_type = '违章高发地查询';
+                        if (trans[i].tran_type == '020') tran_type = '二手车估值';
+                        if (trans[i].tran_type == '021') tran_type = '洗车套餐购买';
+                        if (trans[i].tran_type == '022') tran_type = '代驾服务购买';
+                        if (trans[i].tran_type == '023') tran_type = '车辆保修检测';
+                        if (trans[i].tran_type == '024') tran_type = '车辆保修';
+                        if (trans[i].tran_type == '025') tran_type = '车辆检测';
+                        if (trans[i].tran_type == '026') tran_type = '服务权益转让';
+
+						var channel = trans[i].channel;
+						if ("juhe" == channel) {
+							channel = "聚合";
+						} else if ("oufei" == channel) {
+							channel = "欧飞";
+						} else if ("etcp" == channel) {
+							channel = "etcp";
+						} else if ("self" == channel) {
+							channel = "本平台";
+						} else if ("intercept" == channel) {
+							channel = "拦截";
+						}else if ("yaolian" == channel) {
+                            channel = "药联";
+                        }else if ("daijia" == channel) {
+                            channel = "代驾";
+                        } else if ("bc" == channel) {
+                            channel = "帮充";
+                        } else if ("xinxiang" == channel) {
+                            channel = "欣享";
+                        } else if ("cbs" == channel) {
+                            channel = "查博士";
+                        } else {
+							channel = "";
+						}
+
+						$(".btm_biaodan table").append(
+							"<tr class='test'><td>" + (i + 1) +
+							"</td><td>" + trans[i].phoneno +
+							"</td><td>" + trans[i].payno +
+							"</td><td>" + trans[i].trandt +
+							"</td><td>" + trans[i].tran_amt +
+							"</td><td>" + tran_type +
+							"</td><td>" + transtatus +
+
+							"</td><td>" + channel +
+							"</td><td>" + trans[i].acct_name +
+							"</td><td>" + trans[i].deduct_amt +
+							"</td><tr>");
+					}
+				}
+			},
+			error: function (req, errorMsg, exception) {
+				alert('出错啦，请稍后再试。');
+			}
+		});
+	}
+</script>
+
+</html>

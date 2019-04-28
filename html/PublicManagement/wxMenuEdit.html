@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="renderer" content="webkit">
+	<title>微信菜单修改</title>
+	<link rel="stylesheet" href="../../css/reset.css" />
+	<link rel="stylesheet" href="../../css/pintuer.css">
+	<link rel="stylesheet" href="../../css/mine.css" />
+	<style>
+		#albox{
+			border: 1px solid #00b7ee;
+			width: 300px;
+			height: 650px;
+			background-color: #ffffff;
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			-webkit-transform: translate(-50%, -50%);
+			-moz-transform: translate(-50%, -50%);
+			-ms-transform: translate(-50%, -50%);
+			-o-transform: translate(-50%, -50%);
+			transform: translate(-50%, -50%);
+		}
+		#albox span{
+			color: red;
+			font-size: 26px;
+			position: relative;
+			left: 270px;
+			cursor: pointer;
+		}
+		#albox form table tr{
+			line-height: 50px;
+			font-size: 14px;
+		}
+		#albox form table tr td:first-child{
+			text-align: right;
+		}
+		#albox form table tr td input,#albox form table tr td select{
+			width: 150px;
+			height: 25px;
+			border-radius: 3px;
+			border: 1px solid cadetblue;
+		}
+		#albox form table tr td textarea{
+			width: 150px;
+			height: 100px;
+			border-radius: 3px;
+			border: 1px solid cadetblue;
+		}
+		#albox button{
+			width: 55px;
+			height: 25px;
+			border: none;
+			border-radius: 3px;
+			background-color: cadetblue;
+			color: #FFFFFF;
+			margin-top: 100px;
+			margin-left: 65px;
+		}
+		#Editbtn{
+			width: 40px;
+			height: 20px;
+			border: none;
+			border-radius: 3px;
+			background-color: cadetblue;
+			color: #FFFFFF;
+		}
+		#tex1{
+			position: relative;
+			top: 24px;
+		}
+		#tex2{
+			position: absolute;
+		}
+		.btm_biaodan table{
+			white-space:nowrap;
+		}
+		.btm_biaodan{
+			overflow-x: auto;
+		}
+	</style>
+</head>
+<body class="info demo" >
+	<div id="app">
+		<div class="content btm_biaodan">
+			<table border="1" cellspacing="" cellpadding="">
+				<tr>
+					<th>序号</th>
+					<th>菜单编码</th>
+					<th>菜单名称</th>
+					<th>图片地址</th>
+					<th>跳转地址</th>
+					<th>函数调用</th>
+					<th>菜单开关</th>
+					<th>菜单状态</th>
+					<th>级别</th>
+					<th>操作</th>
+				</tr>
+				<tr v-for="(item,index) in menus">
+					<td>{{index+1}}</td>
+					<td>{{item.menu_id}}</td>
+					<td>{{item.menu_name}}</td>
+					<td>{{item.image_url}}</td>
+					<td>{{item.skip_url}}</td>
+					<td>{{item.func}}</td>
+					<td>{{sw(item.menu_switch)}}</td>
+					<td>{{status(item.menu_status)}}</td>
+					<td>{{item.level}}</td>
+					<td><button
+							type="button"
+							@click="Edit(index)"
+							id="Editbtn"
+					>修改</button></td>
+				</tr>
+			</table>
+		</div>
+		<div id="albox" v-show="albox">
+			<div>
+				<span @click="hide">×</span>
+			</div>
+			<form
+					enctype="multipart/form-data"
+					ref="upload"
+			>
+				<table>
+					<tr>
+						<td>菜单编码：</td>
+						<td>
+							<input
+									type="text"
+									name="menu_id"
+									v-model="menu_id"
+									readonly="readonly"
+							>
+						</td>
+					</tr>
+					<tr>
+						<td>菜单名称：</td>
+						<td>
+							<input
+									type="text"
+									name="menu_name"
+									v-model="menu_name"
+							>
+						</td>
+					</tr>
+					<tr>
+						<td>图片地址：</td>
+						<td>
+							<input
+									type="text"
+									name="image_url"
+									v-model="image_url"
+							>
+						</td>
+					</tr>
+					<tr>
+						<td>跳转地址：</td>
+						<td>
+							<input
+									type="text"
+									name="skip_url"
+									v-model="skip_url"
+							>
+						</td>
+					</tr>
+					<tr>
+						<td>函数调用：</td>
+						<td>
+							<input
+									type="text"
+									name="func"
+									v-model="func"
+							>
+						</td>
+					</tr>
+					<tr>
+						<td>菜单开关：</td>
+						<td>
+							<select 
+									name="menu_switch"
+									v-model="menu_switch"
+							>
+								<option value="on">开启</option>
+								<option value="off">关闭</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>菜单状态：</td>
+						<td>
+							<select
+									name="menu_status"
+									v-model="menu_status"
+							>
+								<option value="useable">可用</option>
+								<option value="unuseable">不可用</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>级别：</td>
+						<td>
+							<input
+									type="text"
+									name="level"
+									v-model="level"
+							>
+						</td>
+					</tr>
+
+					<tr>
+						<td id="tex1">备注：</td>
+						<td>
+							<textarea
+									name="remark"
+									id="tex2"
+									v-model="remark"
+							></textarea>
+						</td>
+					</tr>
+				</table>
+			</form>
+			<button
+					type="button"
+					@click="submit"
+			>确认</button>
+			<button
+					type="button"
+					@click="hide"
+			>取消</button>
+		</div>
+	</div>
+</body>
+<script src="../../js/jquery-1.8.3.min_2.js"></script>
+<script src="../../js/vue.js"></script>
+<script>
+	new Vue({
+		el: "#app",
+		data() {
+			return{
+				menus: [],
+				albox: false,
+				menu_id: "",
+				menu_name: "",
+				image_url: "",
+				skip_url: "",
+				func: "",
+				menu_switch: "",
+				menu_status: "",
+				level: "",
+				remark: ""
+			}
+		},
+		mounted() {
+			this.query();
+		},
+		methods: {
+			query() {
+				$.ajax({
+					url: "/operplat/wx_menu/query",
+					context: document.body,
+					dataType: 'JSON',
+					async: false,
+					success: (dataJson, dataStatus) => {
+						if (dataJson.retCode != 'success') {
+							this.menus = [];
+							alert(dataJson.retMsg);
+						} else {
+							this.menus = dataJson.menus;
+						}
+					},
+					error: function (req, errorMsg, exception) {
+						alert(dataJson.retMsg);
+					}
+				});
+			},
+			sw(data) {
+				switch (data) {
+					case 'on':
+						return '开启';
+						break;
+					case 'off':
+						return '关闭';
+						break;
+				}
+			},
+			status(data) {
+				switch (data) {
+					case 'useable':
+						return '可用';
+						break;
+					case 'unuseable':
+						return '不可用';
+						break;
+				}
+			},
+			hide() {
+				this.albox = false;
+			},
+			Edit(data) {
+				this.menu_id =  this.menus[data].menu_id;
+				this.menu_name = this.menus[data].menu_name;
+				this.image_url = this.menus[data].image_url;
+				this.skip_url = this.menus[data].skip_url;
+				this.func = this.menus[data].func;
+				this.menu_switch = this.menus[data].menu_switch;
+				this.menu_status = this.menus[data].menu_status;
+				this.level = this.menus[data].level;
+				this.remark = this.menus[data].remark;
+				this.albox = true;
+			},
+			submit() {
+				var formData = new FormData(this.$refs.upload);
+				$.ajax({
+					url:"/operplat/wx_menu/modify",
+					type: 'POST',
+					data: formData,
+					async: false,
+					cache: false,
+					contentType: false,
+					processData: false,
+					success: (dataJson,dataStatus) => {
+						if ("success" != dataJson.retCode){
+							alert(dataJson.retMsg);
+						}else {
+							this.hide();
+							this.query();
+							alert(dataJson.retMsg);
+						}
+					},
+					error:function (req, errorMsg, exception) {
+						alert(errorMsg);
+					}
+				});
+			}
+		}
+	});
+</script>
+
+</html>

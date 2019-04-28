@@ -1,0 +1,16 @@
+/*公用样式*/
+.btn{ padding: 5px 15px; background-color: #59A9FF; color: #FFFFFF; font-size: 14px; border-radius: 5px;}
+.btn-submit{ padding: 5px 30px; background-color: #59A9FF; color: #FFFFFF; font-size: 14px; border-radius: 5px;}
+/*添加模板*/
+.add{ padding: 40px 0 0 10px; }
+.add form label{display: block;}
+.add form label+label{ margin-top: 15px;}
+.add form label span{ width: 100px; text-align: right; margin-right: 15px; display: inline-block; color: #000;}
+.add form label span.textarea{ position: relative; top: -38px;}
+.add form label input{ width: 212px; height: 35px; border: 1px solid #EEEEEE; border-radius: 5px; padding-left: 10px; box-sizing: border-box;}
+.add form label select{ width: 212px; height: 35px; border: 1px solid #EEEEEE; border-radius: 5px; padding-left: 5px; margin-left: -5px; box-sizing: border-box;}
+.add form label input:focus{ border: 2px solid #59A9FF; box-shadow: 1px 0px 2px solid #000;}
+.add form label input.upload{border: none;}
+.add form label textarea{ width: 200px; height: 80px; border: 1px solid #EEEEEE; border-radius: 5px; padding: 5px;}
+.add form label textarea:focus{ border: 2px solid #59A9FF; box-shadow: 1px 0px 2px solid #000;}
+.add button{ margin-left: 20px; margin-top: 35px;}

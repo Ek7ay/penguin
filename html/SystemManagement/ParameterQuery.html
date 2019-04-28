@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="renderer" content="webkit">
+    <title>参数查询</title>
+    <link rel="stylesheet" href="../../css/TRconner/pintuer.css">
+    <link rel="stylesheet" href="../../css/TRconner/mine.css">
+    <script src="../../js/jquery-1.8.3.min_2.js"></script>
+    <script src="../../js/cookie.js"></script>
+</head>
+<body class="info demo">
+<div class="content btm_biaodan">
+    <table border="1" cellspacing="" cellpadding="">
+        <tr>
+            <th>序号</th>
+            <th>参数编号</th>
+            <th>参数名称</th>
+            <th>参数固定值</th>
+            <th>备注</th>
+        </tr>
+    </table>
+</div>
+<script>
+    var params;
+    // load查询
+    $(() => {
+        $.ajax({
+            url: "/operplat/param/query",
+            context: document.body,
+            dataType: "JSON",
+            async: false,
+            success: function (dataJson, dataStatus) {
+                if ("success" != dataJson.retCode) {
+                    alert(dataJson.retMsg);
+                } else {
+                    params = dataJson.params;
+                    for (var i = 0; i < params.length; i++) {
+                        if(params[i].minval== null){
+                            params[i].minval = "";
+                        }
+                        if(params[i].maxval == null) {
+                            params[i].maxval = "";
+                        }
+                        if(params[i].effdate == null) {
+                            params[i].effdate = "";
+                        }
+                        if(params[i].expdate == null) {
+                            params[i].expdate = "";
+                        }
+                        if(params[i].remark == null) {
+                            params[i].remark = "";
+                        }
+                        $(".btm_biaodan table").append(
+                            `<tr class="test">
+										   <td>${i + 1}</td>
+										   <td>${params[i].paracode}</td>
+										   <td>${params[i].paraname}</td>
+										   <td>${params[i].paraval}</td>
+										    <td>${params[i].remark}</td>
+										</tr>`);
+                    }
+                }
+            },
+            error: function (req, errorMsg, exception) {
+                alert(errorMsg);
+            }
+        });
+    });
+</script>
+</body>
+</html>
